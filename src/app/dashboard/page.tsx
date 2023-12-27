@@ -1,8 +1,8 @@
 "use client";
+import SideBar from "@/app/component/sideBar";
+import NavBar from "@/app/component/navBar";
 import React, { useEffect } from "react";
 import _ from "lodash";
-import SideBar from "@/component/sideBar";
-import NavBar from "@/component/navBar";
 import { useRouter } from "next/navigation";
 
 export default function Home() {

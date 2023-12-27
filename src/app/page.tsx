@@ -1,10 +1,34 @@
 "use client";
 import React, { useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [isShowPassword, setShowPassword] = React.useState<boolean>(false);
+
+  // Define state variables for form fields
+  const [formData, setFormData] = React.useState({
+    email: "",
+    password: "",
+  });
+
+  // Handle form field changes
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    try {
+      router.replace("/dashboard");
+    } catch (e: any) {}
+  };
 
   return (
     <main className="flex min-h-screen items-center justify-center p-24 flex-col  bg-white dark:bg-white">
@@ -21,7 +45,12 @@ export default function Home() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          <form
+            className="space-y-6"
+            action="#"
+            method="POST"
+            onSubmit={handleSubmit}
+          >
             <div>
               <label
                 htmlFor="email"

@@ -1,9 +1,10 @@
 "use client";
-import SideBar from "@/app/component/sideBar";
-import NavBar from "@/app/component/navBar";
+
 import React, { useEffect } from "react";
 import _ from "lodash";
 import { useRouter } from "next/navigation";
+import SideBar from "@/app/component/sideBar";
+import NavBar from "@/app/component/navBar";
 
 export default function Home() {
   const router = useRouter();
@@ -16,12 +17,14 @@ export default function Home() {
         <SideBar
           opens={menuOpen}
           closeds={() => {
+            console.log("close");
             isMenuOpen(false);
           }}
         />
         <NavBar
           items={{ label: "Dashboard", link: "#" }}
           opens={() => {
+            console.log("open");
             isMenuOpen(!menuOpen);
           }}
         />

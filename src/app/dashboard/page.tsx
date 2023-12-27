@@ -17,14 +17,14 @@ export default function Home() {
         <SideBar
           opens={menuOpen}
           closeds={() => {
-            console.log("close");
+            alert("test false");
             isMenuOpen(false);
           }}
         />
         <NavBar
           items={{ label: "Dashboard", link: "#" }}
           opens={() => {
-            console.log("open");
+            alert("test true");
             isMenuOpen(!menuOpen);
           }}
         />

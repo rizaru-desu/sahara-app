@@ -139,7 +139,7 @@ export default function Home() {
           />
 
           <div className="flex justify-end">
-            <div className="relative m-[2px] mb-3 float-right hidden sm:block">
+            <div className="relative m-[2px] mb-3 float-right block">
               <label htmlFor="inputFilter" className="sr-only">
                 Filter
               </label>

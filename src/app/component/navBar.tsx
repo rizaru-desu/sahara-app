@@ -47,7 +47,7 @@ function NavBar({ items, opens }: { items: any; opens: () => void }) {
                   viewBox="0 0 24 24"
                   fill="currentColor"
                   aria-hidden="true"
-                  stroke-width="3"
+                  strokeWidth="3"
                   className="h-6 w-6 text-blue-gray-500"
                 >
                   <path

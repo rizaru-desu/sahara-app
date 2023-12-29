@@ -4,7 +4,7 @@ export class AuthService {
   protected readonly instance: AxiosInstance;
   public constructor() {
     this.instance = axios.create({
-      baseURL: "http://localhost:3000/",
+      baseURL: "https://sahara-app.vercel.app/",
       timeout: 30000,
       timeoutErrorMessage: "Time out!",
     });

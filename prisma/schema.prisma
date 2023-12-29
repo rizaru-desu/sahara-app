@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  userId        String   @id
+  fullname      String?
+  phone         String?
+  dateOfBirth   String?
+  email         String   @unique
+  password      String
+  roleId        String
+  verification  Boolean @default(false)
+  createBy      String?  @default("bySystem")
+  modifiedBy    String?
+  createdAt     DateTime @default(now())
+  modifedAt     DateTime @updatedAt
+  token         AuthToken[]
+}
+
+model AuthToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique @db.VarChar(500)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId], map: "authToken_userId_fkey")
+}
+
+
+model StringMap {
+  stringId    String   @id
+  objectName  String?
+  key         Int?
+  value       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createBy    String?  @default("bySystem")
+  modifiedBy  String?
+}
+

@@ -1,10 +1,15 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { AuthService } from "./utils/services/auth.service";
+import { ToastContainer } from "react-toastify";
+import Loader from "./component/loader";
+import { toastMessage } from "./component/toasttify";
 
 export default function Home() {
   const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
   const [isShowPassword, setShowPassword] = React.useState<boolean>(false);
 
   // Define state variables for form fields
@@ -24,10 +29,24 @@ export default function Home() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      router.replace("/dashboard");
-    } catch (e: any) {}
+      const authService = new AuthService();
+      const responseApi = await authService.login(formData);
+
+      if (responseApi.data.result === "OK") {
+        setLoading(false);
+        router.replace("/dashboard");
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({ message: e.response.data.message, type: "error" });
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
   };
 
   return (
@@ -66,6 +85,7 @@ export default function Home() {
                   autoComplete="email"
                   required
                   className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -87,6 +107,7 @@ export default function Home() {
                   autoComplete="current-password"
                   required
                   className="block w-full rounded-md border-0 py-1.5 px-3  text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                  onChange={handleInputChange}
                 />
 
                 <button
@@ -120,6 +141,7 @@ export default function Home() {
       <footer className="bg-white text-black text-center py-4">
         &copy; 2023 PT. SAHARA BOGATAMA All rights reserved.
       </footer>
+      <Loader active={loading} />
     </main>
   );
 }

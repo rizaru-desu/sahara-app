@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import React, { Suspense } from "react";
 import _ from "lodash";
 import {
   Chart as ChartJS,
@@ -24,6 +24,7 @@ import {
   GridColDef,
   GridToolbar,
 } from "@mui/x-data-grid";
+import Loading from "../loading";
 
 ChartJS.register(
   CategoryScale,
@@ -105,59 +106,61 @@ export default function Home() {
       <SideBar opens={menuOpen} closeds={open} />
       <NavBar items={{ label: "Dashboard", link: "#" }} opens={open} />
 
-      <div className="p-4 xl:ml-80 gap-12">
-        <div className="gap-2 grid grid-flow-row grid-cols-1 md:grid-cols-2 place-content-center place-items-center">
-          <div className="h-80">
-            <Pie data={data} updateMode="resize" />
+      <Suspense fallback={<Loading />}>
+        <div className="p-4 xl:ml-80 gap-12">
+          <div className="gap-2 grid grid-flow-row grid-cols-1 md:grid-cols-2 place-content-center place-items-center">
+            <div className="h-80">
+              <Pie data={data} updateMode="resize" />
+            </div>
+
+            <div className="h-80 w-full">
+              <Bar
+                options={{
+                  plugins: {
+                    legend: {
+                      position: "top" as const,
+                    },
+                    title: {
+                      display: true,
+                      text: "Chart.js Bar Chart",
+                    },
+                  },
+                }}
+                data={dataBar}
+              />
+            </div>
           </div>
 
-          <div className="h-80 w-full">
-            <Bar
-              options={{
-                plugins: {
-                  legend: {
-                    position: "top" as const,
-                  },
-                  title: {
-                    display: true,
-                    text: "Chart.js Bar Chart",
-                  },
-                },
-              }}
-              data={dataBar}
+          <div className="h-[450px] m-10">
+            <DataGrid
+              pagination
+              rows={rows}
+              columns={columns}
+              pageSizeOptions={[5, 10, 25]}
+              slots={{ toolbar: GridToolbar }}
             />
-          </div>
-        </div>
 
-        <div className="h-[450px] m-10">
-          <DataGrid
-            pagination
-            rows={rows}
-            columns={columns}
-            pageSizeOptions={[5, 10, 25]}
-            slots={{ toolbar: GridToolbar }}
-          />
-
-          <div className="flex justify-end">
-            <div className="relative m-[2px] mb-3 float-right block">
-              <label htmlFor="inputFilter" className="sr-only">
-                Filter
-              </label>
-              <select
-                id="inputFilter"
-                className="block w-40 rounded-lg border dark:border-none dark:bg-red-700 bg-red-700 p-2 text-sm focus:border-white-400 focus:outline-none focus:ring-1 focus:ring-white-400"
-                defaultValue={1} // Set the defaultValue here
-              >
-                <option value={1}>Last week</option>
-                <option value={2}>Last month</option>
-                <option value={3}>Yesterday</option>
-                <option value={4}>Last 7 days</option>
-                <option value={5}>Last 30 days</option>
-              </select>
+            <div className="flex justify-end">
+              <div className="relative m-[2px] mb-3 float-right block">
+                <label htmlFor="inputFilter" className="sr-only">
+                  Filter
+                </label>
+                <select
+                  id="inputFilter"
+                  className="block w-40 text-white rounded-lg border dark:border-none dark:bg-red-700 bg-red-700 p-2 text-sm focus:border-white-400 focus:outline-none focus:ring-1 focus:ring-white-400"
+                  defaultValue={1} // Set the defaultValue here
+                >
+                  <option value={1}>Last week</option>
+                  <option value={2}>Last month</option>
+                  <option value={3}>Yesterday</option>
+                  <option value={4}>Last 7 days</option>
+                  <option value={5}>Last 30 days</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Suspense>
     </main>
   );
 }

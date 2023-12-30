@@ -1,13 +1,15 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 
-const dev = false;
 export class AuthService {
   protected readonly instance: AxiosInstance;
   public constructor() {
-    this.instance = axios.create({
-      baseURL: dev
+    const baseURL =
+      process.env.NODE_ENV === "development"
         ? "http://localhost:3000/"
-        : "https://sahara-app.vercel.app/",
+        : "https://sahara-app.vercel.app/";
+
+    this.instance = axios.create({
+      baseURL: baseURL,
       timeout: 30000,
       timeoutErrorMessage: "Time out!",
     });

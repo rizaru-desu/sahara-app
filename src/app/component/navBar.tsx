@@ -2,8 +2,17 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { FaPowerOff, FaUserCircle } from "react-icons/fa";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
+import { toastMessage } from "./toasttify";
 
-function NavBar({ items, opens }: { items: any; opens: () => void }) {
+function NavBar({
+  items,
+  opens,
+  logout,
+}: {
+  items: any;
+  opens: () => void;
+  logout: () => void;
+}) {
   const router = useRouter();
 
   return (
@@ -55,7 +64,7 @@ function NavBar({ items, opens }: { items: any; opens: () => void }) {
               </span>
             </span>
 
-            <button>
+            <button onClick={logout}>
               <span className="flex flex-row middle none font-sans font-bold center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30  items-center gap-1 px-4 xl:flex">
                 <FaPowerOff size={15} color={"#000"} />
                 Log Out

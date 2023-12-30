@@ -25,6 +25,9 @@ import {
   GridToolbar,
 } from "@mui/x-data-grid";
 import Loading from "../loading";
+import { AuthService } from "../utils/services/auth.service";
+import { toastMessage } from "../component/toasttify";
+import Loader from "../component/loader";
 
 ChartJS.register(
   CategoryScale,
@@ -94,7 +97,7 @@ const columns: GridColDef[] = [
 
 export default function Home() {
   const router = useRouter();
-
+  const [loading, setLoading] = React.useState(false);
   const [menuOpen, isMenuOpen] = React.useState(false);
 
   const open = React.useCallback(() => {
@@ -104,7 +107,31 @@ export default function Home() {
   return (
     <main className="dark:bg-white bg-white min-h-screen">
       <SideBar opens={menuOpen} closeds={open} />
-      <NavBar items={{ label: "Dashboard", link: "#" }} opens={open} />
+      <NavBar
+        items={{ label: "Dashboard", link: "#" }}
+        opens={open}
+        logout={async () => {
+          try {
+            const authService = new AuthService();
+            const responseApi = await authService.logout();
+
+            if (responseApi.data.result === "OK") {
+              setLoading(false);
+              router.replace("/dashboard");
+            }
+          } catch (e: any) {
+            setLoading(false);
+            if (e.response && e.response.status === 500) {
+              toastMessage({
+                message: e.response.data.message,
+                type: "error",
+              });
+            } else {
+              toastMessage({ message: e.message, type: "error" });
+            }
+          }
+        }}
+      />
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-12">
@@ -161,6 +188,7 @@ export default function Home() {
           </div>
         </div>
       </Suspense>
+      <Loader active={loading} />
     </main>
   );
 }

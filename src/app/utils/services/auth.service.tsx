@@ -26,4 +26,12 @@ export class AuthService {
 
     return response; // Assuming the API response has a property 'result'
   };
+
+  logout = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/logout/"
+    );
+
+    return response; // Assuming the API response has a property 'result'
+  };
 }

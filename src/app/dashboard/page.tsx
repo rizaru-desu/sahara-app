@@ -112,12 +112,13 @@ export default function Home() {
         opens={open}
         logout={async () => {
           try {
+            setLoading(true);
             const authService = new AuthService();
             const responseApi = await authService.logout();
 
             if (responseApi.data.result === "OK") {
               setLoading(false);
-              router.replace("/dashboard");
+              router.replace("/");
             }
           } catch (e: any) {
             setLoading(false);

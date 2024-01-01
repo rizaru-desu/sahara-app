@@ -34,6 +34,25 @@ function validateParamsSchema({ data }: { data: any }) {
   }
 }
 
+interface User {
+  userId: string;
+  fullname: string | null;
+  phone: string | null;
+  dateOfBirth: string | null;
+  email: string;
+  password: string;
+  roleId: string;
+  verification: boolean;
+  createBy: string | null;
+  modifiedBy: string | null;
+  createdAt: Date;
+  modifedAt: Date;
+  StringMap?: {
+    key: string;
+    value: string;
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const token = request.headers.get("Authorization") as any;
@@ -47,13 +66,13 @@ export async function POST(request: NextRequest) {
         : tokenWithoutBearer,
     })) as any;
 
-    console.log(userData?.value);
-
     if (tokenValidated) {
       const { userId } = tokenValidated;
-      const user = await findUser({
+
+      const user: User | null = await findUser({
         userId,
       });
+
       return NextResponse.json(
         {
           result: "OK",

@@ -25,6 +25,9 @@ model User {
   createdAt     DateTime @default(now())
   modifedAt     DateTime @updatedAt
   token         AuthToken[]
+  StringMap     StringMap @relation(fields: [roleId], references: [stringId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([roleId])
 }
 
 model AuthToken {
@@ -48,5 +51,6 @@ model StringMap {
   updatedAt   DateTime @updatedAt
   createBy    String?  @default("bySystem")
   modifiedBy  String?
+  users       User[]
 }
 

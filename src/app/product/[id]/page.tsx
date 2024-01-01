@@ -173,6 +173,21 @@ export default function Page({ params }: { params: { id: string } }) {
             <span className="row-start-1 col-start-2">Disimpan oleh: </span>
             <span className="row-start-2 col-start-2">Diubah oleh: </span>
           </div>
+
+          <div className="flex flex-row gap-5 my-10">
+            <button
+              type="submit"
+              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+            >
+              Simpan
+            </button>
+            <button
+              type="submit"
+              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+            >
+              batal
+            </button>
+          </div>
         </div>
       </Suspense>
 

@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { FaBoxesPacking } from "react-icons/fa6";
 import { RiMoneyEuroCircleFill, RiMoneyDollarCircleFill } from "react-icons/ri";
+import { useRouter } from "next/navigation";
 
 function SideBar({
   roles,
@@ -21,6 +22,7 @@ function SideBar({
   opens: boolean;
   closeds: () => void;
 }) {
+  const router = useRouter();
   const SideMenu = [
     {
       title: "Master Data",
@@ -30,7 +32,7 @@ function SideBar({
     },
     {
       title: "Product",
-      href: "/dashboard",
+      href: "/product",
       header: false,
       icon: <FaBox size={25} color={"#fff"} />,
     },
@@ -86,6 +88,7 @@ function SideBar({
       icon: <RiMoneyDollarCircleFill size={25} color={"#fff"} />,
     },
   ];
+
   return (
     <aside
       className={`bg-red-700 ${
@@ -126,7 +129,11 @@ function SideBar({
       <div className="m-4">
         <ul className="mb-4 flex flex-col gap-1">
           <li>
-            <a aria-current="page" className="active" href="#">
+            <a
+              aria-current="page"
+              className="active"
+              onClick={() => router.push("/dashboard")}
+            >
               <button
                 className="middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white hover:bg-white/10 active:bg-white/30 w-full flex items-center gap-4 px-4 capitalize"
                 type="button"
@@ -147,7 +154,12 @@ function SideBar({
                   {i.title}
                 </p>
               ) : (
-                <a className="" href="#">
+                <a
+                  className=""
+                  onClick={() => {
+                    router.replace(i.href);
+                  }}
+                >
                   <button
                     className="middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white hover:bg-white/10 active:bg-white/30 w-full flex items-center gap-4 px-4 capitalize"
                     type="button"

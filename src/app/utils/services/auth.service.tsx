@@ -34,4 +34,13 @@ export class AuthService {
 
     return response; // Assuming the API response has a property 'result'
   };
+
+  userDetail = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-user/",
+      {}
+    );
+
+    return response; // Assuming the API response has a property 'result'
+  };
 }

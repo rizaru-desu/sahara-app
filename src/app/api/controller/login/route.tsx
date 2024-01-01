@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import z from "zod";
-import { parse, serialize } from "cookie";
+import { serialize } from "cookie";
 import { generateToken } from "@/app/utils/token/generate";
 
 //region validation input schema
@@ -51,9 +51,8 @@ export async function POST(request: NextRequest) {
 
     // Save user data to a cookie
     const userCookie = serialize("userData", String(userData.token), {
-      httpOnly: true,
+      httpOnly: process.env.NODE_ENV === "development" ? false : true,
       secure: true,
-      //maxAge: 10,
       maxAge: 3 * 60 * 60, //maxAge: 60 * 60 * 24, // Cookie will expire in 1 day (adjust as needed)
       sameSite: true,
       path: "/",

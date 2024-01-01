@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export const protectedRoutes = ["/dashboard"];
+export const protectedRoutes = ["/dashboard", "/product/", "/product"];
 export const authRoutes = ["/"]; //login page
 
 export async function middleware(request: NextRequest) {

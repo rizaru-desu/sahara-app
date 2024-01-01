@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import SideBar from "@/app/component/sideBar";
 import NavBar from "@/app/component/navBar";
 import { Bar } from "react-chartjs-2";
-import { faker } from "@faker-js/faker";
+
 import {
   DataGrid,
   GridRowsProp,
@@ -67,18 +67,19 @@ const data = {
 };
 
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
-
+const generateRandomNumber = (min: any, max: any) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 const dataBar = {
   labels,
   datasets: [
     {
       label: "Dataset 1",
-      data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+      data: labels.map(() => generateRandomNumber(0, 1000)),
       backgroundColor: "rgba(255, 99, 132, 0.5)",
     },
     {
       label: "Dataset 2",
-      data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+      data: labels.map(() => generateRandomNumber(0, 1000)),
       backgroundColor: "rgba(53, 162, 235, 0.5)",
     },
   ],
@@ -99,10 +100,71 @@ export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [menuOpen, isMenuOpen] = React.useState(false);
+  const [dataUser, setDataUser] = React.useState(undefined);
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
   }, [menuOpen]);
+
+  const logoutUser = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const authService = new AuthService();
+      const responseApi = await authService.logout();
+
+      if (responseApi.data.result === "OK") {
+        setLoading(false);
+        router.replace("/");
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [router]);
+
+  const detailUser = React.useCallback(async () => {
+    try {
+      const roles = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+      setLoading(true);
+      const authService = new AuthService();
+      const responseApi = await authService.userDetail();
+
+      const { result, data } = responseApi.data;
+      if (result === "OK") {
+        setLoading(false);
+        if (roles.includes(data?.roleId?.key)) {
+          setDataUser(responseApi.data.data);
+        } else {
+          logoutUser();
+          toastMessage({ message: "NOT ADMIN!", type: "error" });
+        }
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else if (e.response && e.response.status === 401) {
+        logoutUser();
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [logoutUser]);
+
+  React.useEffect(() => {
+    detailUser();
+  }, [detailUser]);
 
   return (
     <main className="dark:bg-white bg-white min-h-screen">
@@ -110,27 +172,9 @@ export default function Home() {
       <NavBar
         items={{ label: "Dashboard", link: "#" }}
         opens={open}
+        data={dataUser}
         logout={async () => {
-          try {
-            setLoading(true);
-            const authService = new AuthService();
-            const responseApi = await authService.logout();
-
-            if (responseApi.data.result === "OK") {
-              setLoading(false);
-              router.replace("/");
-            }
-          } catch (e: any) {
-            setLoading(false);
-            if (e.response && e.response.status === 500) {
-              toastMessage({
-                message: e.response.data.message,
-                type: "error",
-              });
-            } else {
-              toastMessage({ message: e.message, type: "error" });
-            }
-          }
+          logoutUser();
         }}
       />
 
@@ -164,7 +208,6 @@ export default function Home() {
               pagination
               rows={rows}
               columns={columns}
-              pageSizeOptions={[5, 10, 25]}
               slots={{ toolbar: GridToolbar }}
             />
 
@@ -189,6 +232,7 @@ export default function Home() {
           </div>
         </div>
       </Suspense>
+
       <Loader active={loading} />
     </main>
   );

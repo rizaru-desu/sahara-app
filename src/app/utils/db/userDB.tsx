@@ -16,6 +16,25 @@ export const findByEmail = async ({ email }: { email: string }) => {
 };
 //endregion
 
+export const findUser = async ({ userId }: { userId: string }) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { userId },
+      include: {
+        StringMap: true,
+      },
+    } as any);
+
+    return user;
+  } catch (error: any) {
+    // Instead of using "any" type, you can let TypeScript infer the type of the error
+    throw new Error(error.message);
+  } finally {
+    // Close the Prisma client to avoid leaks
+    await prisma.$disconnect();
+  }
+};
+
 //region create user
 export const createUser = async ({
   dataUser,

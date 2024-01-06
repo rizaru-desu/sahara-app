@@ -17,7 +17,7 @@ export class AuthService {
 
   login = async ({ email, password }: { email: string; password: string }) => {
     const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/login/",
+      "api/controller/login-apps/",
       {
         email,
         password,
@@ -39,6 +39,41 @@ export class AuthService {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/get-user/",
       {}
+    );
+
+    return response; // Assuming the API response has a property 'result'
+  };
+
+  getAllUser = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-all-user/",
+      { skip, take }
+    );
+
+    return response; // Assuming the API response has a property 'result'
+  };
+
+  saveRolebyUserId = async ({
+    fullname,
+    userId,
+    roles,
+  }: {
+    fullname: string;
+    userId: string;
+    roles: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/update-roles/",
+      { fullname, userId, roles }
+    );
+
+    return response; // Assuming the API response has a property 'result'
+  };
+
+  searchUser = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-user-search/",
+      { value }
     );
 
     return response; // Assuming the API response has a property 'result'

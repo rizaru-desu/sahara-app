@@ -1,38 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import z from "zod";
-import { v4 as uuidv4 } from "uuid";
 import { validateToken } from "@/app/utils/token/validate";
 import { findUser } from "@/app/utils/db/userDB";
-import { cookies } from "next/headers";
 import _ from "lodash";
-
-const paramsSchema = z
-  .object({
-    guid: z.string(),
-  })
-  .strict();
-
-function validateParamsSchema({ data }: { data: any }) {
-  try {
-    const parseData = paramsSchema.parse(data);
-    return parseData;
-  } catch (error: any) {
-    if (error.issues && error.issues.length > 0) {
-      const validationErrors = error.issues.map((issue: any) => ({
-        path: issue.path.join("."),
-        message: issue.message,
-      }));
-
-      const errorMessage = validationErrors
-        .map((error: any) => `Field '${error.path}' ${error.message}`)
-        .join(" \n");
-
-      throw new Error(errorMessage);
-    } else {
-      throw new Error("Invalid Schema.");
-    }
-  }
-}
 
 interface User {
   userId: string;
@@ -86,10 +55,10 @@ export async function POST(request: NextRequest) {
               value: user?.StringMap?.value,
             },
             verification: false,
-            createBy: "bySystem",
-            modifiedBy: null,
-            createdAt: "2023-12-30T17:48:58.606Z",
-            modifedAt: "2023-12-30T17:48:58.606Z",
+            createBy: user?.createBy,
+            modifiedBy: user?.modifiedBy,
+            createdAt: user?.createdAt,
+            modifedAt: user?.modifedAt,
           },
         },
         {

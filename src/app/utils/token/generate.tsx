@@ -6,7 +6,6 @@ import { findByEmail } from "../db/userDB";
 
 const prisma = new PrismaClient();
 
-//region generate token
 export const generateToken = async ({
   email,
   password,
@@ -23,7 +22,6 @@ export const generateToken = async ({
       );
     } else {
       if (await bcrypt.compare(password, user.password)) {
-        // Check if env.JWT_SECRET is defined before using it
         if (!env.JWT_SECRET) {
           throw new Error("JWT_SECRET is not defined in the environment.");
         }
@@ -55,9 +53,6 @@ export const generateToken = async ({
       }
     }
   } catch (error: any) {
-    // Instead of using "any" type, you can let TypeScript infer the type of the error
     throw new Error(error.message);
   }
 };
-
-//endregion

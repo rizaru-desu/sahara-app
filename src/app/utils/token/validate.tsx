@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { env } from "process";
 
-//region validate token
 export const validateToken = async ({ token }: { token: any }) => {
   try {
     if (!env.JWT_SECRET) {
@@ -22,8 +21,6 @@ export const validateToken = async ({ token }: { token: any }) => {
 
     return decodedToken;
   } catch (error: any) {
-    // Instead of using "any" type, you can let TypeScript infer the type of the error
     throw new Error(error.message);
   }
 };
-//endregion

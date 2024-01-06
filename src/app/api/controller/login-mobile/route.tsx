@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
   try {
     //get the details provided by user
     const json = await request.json();
+
     //understand whether the details are correct as expect.
     const resultValid = validateSchema({
       data: json,

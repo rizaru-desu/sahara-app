@@ -20,6 +20,7 @@ const createUserSchema = z
       { message: "Invalid phone number format" }
     ),
     dateOfBirth: z.string(),
+    createBy: z.string().optional(),
   })
   .strict();
 
@@ -63,13 +64,12 @@ export async function POST(request: NextRequest) {
     if (!user) {
       await createUser({
         dataUser: {
-          userId: uuidv4().toUpperCase(),
           email: resultValid.email,
           password: hashedPassword,
           fullname: resultValid.fullname,
           dateOfBirth: resultValid.dateOfBirth,
           phone: resultValid.phone,
-          roleId: "37254D02-3CDC-4469-8B9E-2FD241FBB868",
+          roleId: "062208b4-94f8-440f-8599-07aee4121fe0", //User Only
         },
       });
 

@@ -3,19 +3,43 @@ import { useRouter } from "next/navigation";
 import { FaPowerOff, FaUserCircle } from "react-icons/fa";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { toastMessage } from "./toasttify";
+import { AuthService } from "../utils/services/auth.service";
+import Loader from "./loader";
 
 function NavBar({
   items,
   opens,
-  logout,
   data,
 }: {
   items: any;
   opens: () => void;
-  logout: () => void;
   data?: any;
 }) {
   const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
+
+  const logoutUser = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const authService = new AuthService();
+      const responseApi = await authService.logout();
+
+      if (responseApi.data.result === "OK") {
+        setLoading(false);
+        router.replace("/");
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [router]);
 
   return (
     <div className="p-4 xl:ml-80">
@@ -66,7 +90,11 @@ function NavBar({
               </span>
             </span>
 
-            <button onClick={logout}>
+            <button
+              onClick={() => {
+                logoutUser();
+              }}
+            >
               <span className="flex flex-row middle none font-sans font-bold center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30  items-center gap-1 px-4 xl:flex">
                 <FaPowerOff size={15} color={"#000"} />
                 Log Out
@@ -75,6 +103,8 @@ function NavBar({
           </div>
         </div>
       </nav>
+
+      <Loader active={loading} />
     </div>
   );
 }

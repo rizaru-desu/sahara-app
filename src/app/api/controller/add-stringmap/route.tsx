@@ -1,6 +1,5 @@
 import { addStringMap } from "@/app/utils/db/stringMapDB";
 import { type NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 import z from "zod";
 
 //region validation input schema
@@ -48,7 +47,7 @@ export async function POST(request: NextRequest) {
     });
 
     await addStringMap({
-      data: { ...validatedStringMap, stringId: uuidv4().toUpperCase() },
+      data: validatedStringMap,
     });
     return NextResponse.json(
       {

@@ -22,15 +22,16 @@ export default function RootLayout({
         {children}
 
         <ToastContainer
-          position="top-right"
-          autoClose={false}
-          limit={1}
-          newestOnTop
-          closeOnClick={false}
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
           rtl={false}
           pauseOnFocusLoss
           draggable={false}
-          theme="light"
+          pauseOnHover
+          theme="dark"
         />
       </body>
     </html>

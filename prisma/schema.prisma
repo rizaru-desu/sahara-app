@@ -12,16 +12,16 @@ generator client {
 }
 
 model User {
-  userId        String   @id
-  fullname      String?
-  phone         String?
-  dateOfBirth   String?
-  email         String   @unique
-  password      String
-  roleId        String
+  userId        String  @id @default(uuid()) @db.VarChar(255)
+  fullname      String? @db.VarChar(255)
+  phone         String? @db.VarChar(50)
+  dateOfBirth   String? @db.VarChar(50)
+  email         String  @unique @db.VarChar(255)
+  password      String  @db.VarChar(255)
+  roleId        String  @db.VarChar(255)
   verification  Boolean @default(false)
-  createBy      String?  @default("bySystem")
-  modifiedBy    String?
+  createBy      String?  @default("bySystem") @db.VarChar(255)
+  modifiedBy    String? @db.VarChar(255)
   createdAt     DateTime @default(now())
   modifedAt     DateTime @updatedAt
   token         AuthToken[]
@@ -35,7 +35,7 @@ model AuthToken {
   token     String   @unique @db.VarChar(500)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String
+  userId    String   @db.VarChar(255)
   user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@index([userId], map: "authToken_userId_fkey")
@@ -43,14 +43,14 @@ model AuthToken {
 
 
 model StringMap {
-  stringId    String   @id
-  objectName  String?
+  stringId    String   @id @default(uuid()) @db.VarChar(255)
+  objectName  String?  @db.VarChar(255)
   key         Int?
-  value       String?
+  value       String?  @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  createBy    String?  @default("bySystem")
-  modifiedBy  String?
+  createBy    String?  @default("bySystem") @db.VarChar(255)
+  modifiedBy  String?  @db.VarChar(255)
   users       User[]
 }
 

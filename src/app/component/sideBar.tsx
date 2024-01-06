@@ -18,7 +18,7 @@ function SideBar({
   opens,
   closeds,
 }: {
-  roles?: any;
+  roles?: number;
   opens: boolean;
   closeds: () => void;
 }) {
@@ -29,63 +29,79 @@ function SideBar({
       href: "#",
       header: true,
       icon: undefined,
+      roles: [0],
     },
     {
       title: "Product",
       href: "/product",
       header: false,
       icon: <FaBox size={25} color={"#fff"} />,
+      roles: [0],
     },
     {
       title: "Customer",
-      href: "/dashboard",
+      href: "/customer",
       header: false,
       icon: <FaUserFriends size={25} color={"#fff"} />,
+      roles: [0],
     },
     {
-      title: "User Roles",
-      href: "/dashboard",
+      title: "All User",
+      href: "/list-user",
       header: false,
       icon: <FaUserCog size={25} color={"#fff"} />,
+      roles: [0],
     },
     {
       title: "Setting",
-      href: "/dashboard",
+      href: "/setting",
       header: false,
       icon: <FaCog size={25} color={"#fff"} />,
+      roles: [0],
     },
-    { title: "Inventory", href: "#", header: true },
+    { title: "Inventory", href: "#", header: true, roles: [0] },
     {
       title: "Stock",
-      href: "/dashboard",
+      href: "/stock",
       header: false,
       icon: <FaWarehouse size={25} color={"#fff"} />,
+      roles: [0],
     },
     {
       title: "Labeling",
-      href: "/dashboard",
+      href: "/labeling",
       header: false,
       icon: <FaQrcode size={25} color={"#fff"} />,
+      roles: [0],
     },
-    { title: "Distribution", href: "#", header: true, icon: undefined },
+    {
+      title: "Distribution",
+      href: "#",
+      header: true,
+      icon: undefined,
+      roles: [0],
+    },
     {
       title: "Delivery Order",
-      href: "/dashboard",
+      href: "/delivery-order",
       header: false,
       icon: <FaBoxesPacking size={25} color={"#fff"} />,
+      roles: [0],
     },
-    { title: "Reports", href: "#", header: true, icon: undefined },
+    { title: "Reports", href: "#", header: true, icon: undefined, roles: [0] },
     {
       title: "Point By",
-      href: "/dashboard",
+      href: "/pointby-report",
       header: false,
       icon: <RiMoneyEuroCircleFill size={25} color={"#fff"} />,
+      roles: [0],
     },
     {
       title: "Customer",
-      href: "/dashboard",
+      href: "/customer-report",
       header: false,
       icon: <RiMoneyDollarCircleFill size={25} color={"#fff"} />,
+      roles: [0],
     },
   ];
 
@@ -148,14 +164,14 @@ function SideBar({
         </ul>
         <ul className="mb-4 flex flex-col gap-1 ">
           {_.map(SideMenu, (i: any, idx: number) => (
-            <li key={idx} className={i.header ? "mx-3.5 mt-4 mb-2" : ""}>
+            <li key={idx} className={` ${i.header ? "mx-3.5 mt-4 mb-2" : ""}`}>
               {i.header ? (
                 <p className="block antialiased font-sans text-sm leading-normal text-white font-black uppercase opacity-75">
                   {i.title}
                 </p>
               ) : (
                 <a
-                  className=""
+                  className={`${i.roles.includes(roles) ? "block" : "hidden"}`}
                   onClick={() => {
                     router.replace(i.href);
                   }}

@@ -17,17 +17,13 @@ import { useRouter } from "next/navigation";
 import SideBar from "@/app/component/sideBar";
 import NavBar from "@/app/component/navBar";
 import { Bar } from "react-chartjs-2";
+import { DataGrid } from "@mui/x-data-grid";
+import { Pagination } from "@mui/material";
 
-import {
-  DataGrid,
-  GridRowsProp,
-  GridColDef,
-  GridToolbar,
-} from "@mui/x-data-grid";
+import Loader from "../component/loader";
 import Loading from "../loading";
 import { AuthService } from "../utils/services/auth.service";
 import { toastMessage } from "../component/toasttify";
-import Loader from "../component/loader";
 
 ChartJS.register(
   CategoryScale,
@@ -85,22 +81,19 @@ const dataBar = {
   ],
 };
 
-const rows: GridRowsProp = [
-  { id: 1, col1: "Hello", col2: "World" },
-  { id: 2, col1: "DataGridPro", col2: "is Awesome" },
-  { id: 3, col1: "MUI", col2: "is Amazing" },
-];
-
-const columns: GridColDef[] = [
-  { field: "col1", headerName: "Column 1", width: 150 },
-  { field: "col2", headerName: "Column 2", width: 150 },
-];
+interface UserData {
+  roleId?: {
+    key: number;
+  };
+}
 
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [menuOpen, isMenuOpen] = React.useState(false);
-  const [dataUser, setDataUser] = React.useState(undefined);
+  const [dataUser, setDataUser] = React.useState<UserData | undefined>(
+    undefined
+  );
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -131,8 +124,6 @@ export default function Home() {
 
   const detailUser = React.useCallback(async () => {
     try {
-      const roles = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
       setLoading(true);
       const authService = new AuthService();
       const responseApi = await authService.userDetail();
@@ -140,12 +131,7 @@ export default function Home() {
       const { result, data } = responseApi.data;
       if (result === "OK") {
         setLoading(false);
-        if (roles.includes(data?.roleId?.key)) {
-          setDataUser(responseApi.data.data);
-        } else {
-          logoutUser();
-          toastMessage({ message: "NOT ADMIN!", type: "error" });
-        }
+        setDataUser(data);
       }
     } catch (e: any) {
       setLoading(false);
@@ -168,14 +154,11 @@ export default function Home() {
 
   return (
     <main className="dark:bg-white bg-white min-h-screen">
-      <SideBar opens={menuOpen} closeds={open} />
+      <SideBar opens={menuOpen} closeds={open} roles={dataUser?.roleId?.key} />
       <NavBar
         items={{ label: "Dashboard", link: "#" }}
         opens={open}
         data={dataUser}
-        logout={async () => {
-          logoutUser();
-        }}
       />
 
       <Suspense fallback={<Loading />}>
@@ -205,13 +188,18 @@ export default function Home() {
 
           <div className="h-[450px] m-10">
             <DataGrid
-              pagination
-              rows={rows}
-              columns={columns}
-              slots={{ toolbar: GridToolbar }}
+              pagination={true}
+              autoHeight
+              rows={[]}
+              columns={[]}
+              rowSelection={false}
             />
 
-            <div className="flex justify-end">
+            <div className="flex justify-center py-4">
+              <Pagination count={1} page={1} shape="rounded" />
+            </div>
+
+            <div className="flex justify-end mt-3">
               <div className="relative m-[2px] mb-3 float-right block">
                 <label htmlFor="inputFilter" className="sr-only">
                   Filter

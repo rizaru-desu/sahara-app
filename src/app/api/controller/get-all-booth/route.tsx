@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
             id: item.boothId,
             photo: `${baseURL}/api/controller/photo-viewer/${item.boothId}`,
           },
-          _.omit(item, "customerId", "photoBooth")
+          _.omit(item, "boothId", "photoBooth")
         );
       });
 

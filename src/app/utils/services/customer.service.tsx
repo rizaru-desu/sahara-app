@@ -1,0 +1,43 @@
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+
+export class AuthService {
+  protected readonly instance: AxiosInstance;
+  public constructor() {
+    const baseURL =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000/"
+        : "https://sahara-app.vercel.app/";
+
+    this.instance = axios.create({
+      baseURL: baseURL,
+      timeout: 30000,
+      timeoutErrorMessage: "Time out!",
+    });
+  }
+
+  getCustomer = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-all-customer/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getBooth = async ({
+    skip,
+    take,
+    customerId,
+  }: {
+    skip: number;
+    take: number;
+    customerId: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-all-customer/",
+      { skip, take, customerId }
+    );
+
+    return response;
+  };
+}

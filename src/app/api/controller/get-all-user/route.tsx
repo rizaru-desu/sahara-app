@@ -62,17 +62,19 @@ export async function POST(request: NextRequest) {
         take: resultValid.take,
       });
 
-      const updatedUser = _.map(user, (item) => {
-        return {
-          ...item,
-          id: item.userId,
-        };
+      const finalResult = _.map(user, (item) => {
+        return Object.assign(
+          {
+            id: item.userId,
+          },
+          _.omit(item, "userId")
+        );
       });
 
       return NextResponse.json(
         {
           result: "OK",
-          data: updatedUser,
+          data: finalResult,
           countUser: totalCount,
         },
         {

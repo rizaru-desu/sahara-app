@@ -1,5 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider     = "mysql"
@@ -7,25 +8,22 @@ datasource db {
   relationMode = "prisma"
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  userId        String  @id @default(uuid()) @db.VarChar(255)
-  fullname      String? @db.VarChar(255)
-  phone         String? @db.VarChar(50)
-  dateOfBirth   String? @db.VarChar(50)
-  email         String  @unique @db.VarChar(255)
-  password      String  @db.VarChar(255)
-  roleId        String  @db.VarChar(255)
-  verification  Boolean @default(false)
-  createBy      String?  @default("bySystem") @db.VarChar(255)
-  modifiedBy    String? @db.VarChar(255)
-  createdAt     DateTime @default(now())
-  modifedAt     DateTime @updatedAt
-  token         AuthToken[]
-  StringMap     StringMap @relation(fields: [roleId], references: [stringId], onDelete: NoAction, onUpdate: NoAction)
+  userId       String      @id @default(uuid()) @db.VarChar(255)
+  fullname     String?     @db.VarChar(255)
+  phone        String?     @db.VarChar(50)
+  dateOfBirth  String?     @db.VarChar(50)
+  email        String      @unique @db.VarChar(255)
+  password     String      @db.VarChar(255)
+  roleId       String      @db.VarChar(255)
+  verification Boolean     @default(false)
+  createBy     String?     @default("bySystem") @db.VarChar(255)
+  modifiedBy   String?     @db.VarChar(255)
+  createdAt    DateTime    @default(now())
+  modifedAt    DateTime    @updatedAt
+  token        AuthToken[]
+  booth        Booth[]
+  StringMap    StringMap   @relation(fields: [roleId], references: [stringId], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([roleId])
 }
@@ -41,16 +39,48 @@ model AuthToken {
   @@index([userId], map: "authToken_userId_fkey")
 }
 
-
-model StringMap {
-  stringId    String   @id @default(uuid()) @db.VarChar(255)
-  objectName  String?  @db.VarChar(255)
-  key         Int?
-  value       String?  @db.VarChar(255)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Customer {
+  customerId  String   @id @default(uuid()) @db.VarChar(255)
+  namaUsaha   String   @unique @db.VarChar(500)
+  merekUsaha  String   @db.VarChar(500)
+  lamaUsaha   Int
+  jumlahBooth Int
+  instagram   String?  @db.VarChar(255)
+  ecommerce   String?  @db.VarChar(255)
+  facebook    String?  @db.VarChar(255)
   createBy    String?  @default("bySystem") @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  modifedAt   DateTime @updatedAt
   modifiedBy  String?  @db.VarChar(255)
-  users       User[]
+  booth       Booth[]
 }
 
+model Booth {
+  boothId     String   @id @default(uuid()) @db.VarChar(255)
+  alamatBooth String   @db.VarChar(500)
+  geolocation String   @db.VarChar(255)
+  photoBooth  Bytes    @db.LongBlob
+  userId      String   @db.VarChar(255)
+  customerId  String   @db.VarChar(255)
+  createBy    String?  @default("bySystem") @db.VarChar(255)
+  modifiedBy  String?  @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  modifedAt   DateTime @updatedAt
+  customer    Customer @relation(fields: [customerId], references: [customerId], onDelete: NoAction, onUpdate: NoAction)
+  user        User     @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([customerId])
+  @@index([userId])
+}
+
+model StringMap {
+  stringId   String   @id @default(uuid()) @db.VarChar(255)
+  objectName String?  @db.VarChar(255)
+  key        Int?
+  value      String?  @db.VarChar(255)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createBy   String?  @default("bySystem") @db.VarChar(255)
+  modifiedBy String?  @db.VarChar(255)
+  users      User[]
+}

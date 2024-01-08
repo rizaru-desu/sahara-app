@@ -146,6 +146,7 @@ export const createUser = async ({
     dateOfBirth: string;
     fullname: string;
     roleId: string;
+    createBy?: string;
   };
 }) => {
   try {

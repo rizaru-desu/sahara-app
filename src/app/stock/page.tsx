@@ -85,7 +85,7 @@ export default function Page() {
     <main className="dark:bg-white bg-white min-h-screen">
       <SideBar opens={menuOpen} closeds={open} roles={dataUser?.roleId?.key} />
       <NavBar
-        items={{ label: "Setting", link: "#" }}
+        items={{ label: "Stock", link: "#" }}
         opens={open}
         data={dataUser}
       />

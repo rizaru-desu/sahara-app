@@ -33,6 +33,15 @@ export default function Page() {
 
   const [inputValue, setInputValue] = React.useState("");
 
+  // Define state variables for form fields
+  const [formDataUser, setFormDataUser] = React.useState({
+    email: "",
+    fullname: "",
+    phone: "",
+    bod: "",
+    roles: "",
+  });
+
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
   }, [menuOpen]);
@@ -183,6 +192,20 @@ export default function Page() {
     }
   };
 
+  const handleInputChangeAddUser = (e: any) => {
+    const { name, value } = e.target;
+
+    setFormDataUser((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmitAddUser = (event: any) => {
+    event.preventDefault();
+    console.log(formDataUser);
+  };
+
   return (
     <main className="dark:bg-white bg-white min-h-screen">
       <SideBar opens={menuOpen} closeds={open} roles={dataUser?.roleId?.key} />
@@ -194,20 +217,26 @@ export default function Page() {
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-5">
-          <form className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col">
+          <form
+            className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col"
+            action="#"
+            method="POST"
+            onSubmit={handleSubmitAddUser}
+          >
             <h6 className="text-black">User Baru</h6>
             <div>
               <label
-                htmlFor="kodeProduct"
+                htmlFor="fullname"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
                 Fullname
               </label>
               <div className="mt-2">
                 <input
-                  id="kodeProduct"
-                  name="kodeProduct"
+                  id="fullname"
+                  name="fullname"
                   type="text"
+                  onChange={handleInputChangeAddUser}
                   placeholder="Please input fullname."
                   required
                   className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
@@ -217,18 +246,19 @@ export default function Page() {
 
             <div>
               <label
-                htmlFor="kodeProduct"
+                htmlFor="email"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
                 email
               </label>
               <div className="mt-2">
                 <input
-                  id="kodeProduct"
-                  name="kodeProduct"
-                  placeholder="Please input email."
+                  id="email"
+                  name="email"
+                  placeholder="Please input email. example@mail.com"
                   type="email"
                   required
+                  onChange={handleInputChangeAddUser}
                   className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
                 />
               </div>
@@ -237,18 +267,19 @@ export default function Page() {
             <div className="flex flex-row gap-5 flex-wrap items-center">
               <div>
                 <label
-                  htmlFor="kodeProduct"
+                  htmlFor="phone"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
                   No Hp.
                 </label>
                 <div className="mt-2">
                   <input
-                    id="kodeProduct"
-                    name="kodeProduct"
+                    id="phone"
+                    name="phone"
                     type="text"
                     required
                     placeholder="contoh +628167222222..."
+                    onChange={handleInputChangeAddUser}
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -256,33 +287,40 @@ export default function Page() {
 
               <div>
                 <label
-                  htmlFor="variant"
+                  htmlFor="bod"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
                   Tanggal lahir
                 </label>
                 <div className="mt-2">
                   <input
-                    id="variant"
-                    name="variant"
+                    id="bod"
+                    name="bod"
                     type="date"
                     required
+                    onChange={handleInputChangeAddUser}
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
 
               <div className="relative float-right block">
-                <label htmlFor="inputFilter" className="sr-only">
+                <label htmlFor="roles" className="sr-only">
                   Roles
                 </label>
                 <select
-                  id="inputFilter"
+                  id="roles"
+                  name="roles"
                   className="block w-40 text-white rounded-lg border dark:border-none dark:bg-red-700 bg-red-700 p-2 text-sm focus:border-white-400 focus:outline-none focus:ring-1 focus:ring-white-400"
-                  defaultValue={2} // Set the defaultValue here
+                  defaultValue={"062208b4-94f8-440f-8599-07aee4121fe0"} // Set the defaultValue here
+                  onChange={handleInputChangeAddUser}
                 >
-                  <option value={1}>Administration</option>
-                  <option value={2}>User Only</option>
+                  <option value={"480663db-e5b7-400d-8485-954dc54686cd"}>
+                    Administration
+                  </option>
+                  <option value={"062208b4-94f8-440f-8599-07aee4121fe0"}>
+                    User Only
+                  </option>
                 </select>
               </div>
             </div>

@@ -12,9 +12,10 @@ import { toastMessage } from "../component/toasttify";
 import Loader from "../component/loader";
 import moment from "moment";
 import { FaTrash } from "react-icons/fa";
-import { Pagination } from "@mui/material";
+import { IconButton, Pagination } from "@mui/material";
 
 interface UserData {
+  fullname?: string;
   roleId?: {
     key: number;
   };
@@ -40,6 +41,7 @@ export default function Page() {
     phone: "",
     bod: "",
     roles: "",
+    createBy: "",
   });
 
   const open = React.useCallback(() => {
@@ -52,7 +54,7 @@ export default function Page() {
       const authService = new AuthService();
       const responseApi = await authService.logout();
 
-      if (responseApi.data.result === "OK") {
+      if (responseApi.status === 200) {
         setLoading(false);
         router.replace("/");
       }
@@ -79,8 +81,8 @@ export default function Page() {
           take,
         });
 
-        const { result, data, countUser } = responseApi.data;
-        if (result === "OK") {
+        if (responseApi.status === 200) {
+          const { data, countUser } = responseApi.data;
           setLoading(false);
           setAllDataUser(data);
           setTotalPage(Math.ceil(countUser / 100));
@@ -111,8 +113,8 @@ export default function Page() {
           value,
         });
 
-        const { result, data, countUser } = responseApi.data;
-        if (result === "OK") {
+        if (responseApi.status === 200) {
+          const { data } = responseApi.data;
           setLoading(false);
           setAllDataUser(data);
           setTotalPage(1);
@@ -140,8 +142,8 @@ export default function Page() {
       const authService = new AuthService();
       const responseApi = await authService.userDetail();
 
-      const { result, data } = responseApi.data;
-      if (result === "OK") {
+      if (responseApi.status === 200) {
+        const { data } = responseApi.data;
         setLoading(false);
         setDataUser(data);
       }
@@ -160,6 +162,111 @@ export default function Page() {
     }
   }, [logoutUser]);
 
+  const addUser = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const authService = new AuthService();
+      const responseApi = await authService.addUser({
+        email: formDataUser.email,
+        fullname: formDataUser.fullname,
+        phone: formDataUser.phone,
+        bod: formDataUser.bod,
+        roles: formDataUser.roles,
+        createBy: dataUser?.fullname,
+      });
+
+      if (responseApi.status === 200) {
+        const { message } = responseApi.data;
+        setLoading(false);
+        toastMessage({ message, type: "success" });
+        location.reload();
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else if (e.response && e.response.status === 401) {
+        logoutUser();
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [
+    dataUser?.fullname,
+    formDataUser.bod,
+    formDataUser.email,
+    formDataUser.fullname,
+    formDataUser.phone,
+    formDataUser.roles,
+    logoutUser,
+  ]);
+
+  const deletUser = React.useCallback(
+    async ({ userId }: { userId: string }) => {
+      try {
+        setLoading(true);
+        const authService = new AuthService();
+        const responseApi = await authService.deleteUser({ userId });
+
+        if (responseApi.status === 200) {
+          const { message } = responseApi.data;
+          setLoading(false);
+          toastMessage({ message, type: "success" });
+          location.reload();
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
+  const updateUserRole = React.useCallback(
+    async ({ userId, roleId }: { userId: string; roleId: string }) => {
+      try {
+        setLoading(true);
+        const authService = new AuthService();
+        const responseApi = await authService.updateUserRoles({
+          userId,
+          roles: roleId,
+          modifiedBy: dataUser?.fullname,
+        });
+
+        if (responseApi.status === 200) {
+          const { message } = responseApi.data;
+          setLoading(false);
+          toastMessage({ message, type: "success" });
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [dataUser?.fullname, logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
     getCurrentListUser({ skip: 0, take: 100 });
@@ -176,12 +283,10 @@ export default function Page() {
     });
   };
 
-  // Event handler to update the state when the input changes
   const handleInputChange = (event: any) => {
     setInputValue(event.target.value);
   };
 
-  // Event handler to handle form submission (if needed)
   const handleSubmit = (event: any) => {
     event.preventDefault();
 
@@ -203,7 +308,7 @@ export default function Page() {
 
   const handleSubmitAddUser = (event: any) => {
     event.preventDefault();
-    console.log(formDataUser);
+    addUser();
   };
 
   return (
@@ -224,6 +329,7 @@ export default function Page() {
             onSubmit={handleSubmitAddUser}
           >
             <h6 className="text-black">User Baru</h6>
+
             <div>
               <label
                 htmlFor="fullname"
@@ -312,9 +418,10 @@ export default function Page() {
                   id="roles"
                   name="roles"
                   className="block w-40 text-white rounded-lg border dark:border-none dark:bg-red-700 bg-red-700 p-2 text-sm focus:border-white-400 focus:outline-none focus:ring-1 focus:ring-white-400"
-                  defaultValue={"062208b4-94f8-440f-8599-07aee4121fe0"} // Set the defaultValue here
                   onChange={handleInputChangeAddUser}
+                  required
                 >
+                  <option value="">Choose a role</option>
                   <option value={"480663db-e5b7-400d-8485-954dc54686cd"}>
                     Administration
                   </option>
@@ -382,21 +489,29 @@ export default function Page() {
             <DataGrid
               pagination={true}
               autoHeight
+              getRowHeight={() => "auto"}
+              rowSelection={false}
               rows={isAllDataUser}
               columns={[
                 {
                   field: "id",
-                  headerName: "Hapus User",
+                  headerName: "Action",
                   minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                  hideSortIcons: true,
+                  disableColumnMenu: true,
                   renderCell: (params) => {
                     const onClick = (e: any) => {
                       e.stopPropagation(); // don't select this row after clicking
+
+                      deletUser({ userId: params.id.toString() });
                     };
 
                     return (
-                      <button onClick={onClick}>
-                        <FaTrash color={"red"} size={25} />
-                      </button>
+                      <IconButton aria-label="delete" onClick={onClick}>
+                        <FaTrash color="#2D3250" size={20} />
+                      </IconButton>
                     );
                   },
                 },
@@ -404,32 +519,42 @@ export default function Page() {
                   field: "fullname",
                   headerName: "Nama Lengkap",
                   minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
                 },
                 {
                   field: "email",
                   headerName: "Email",
                   minWidth: 150,
+                  headerAlign: "center",
                 },
                 {
                   field: "phone",
                   headerName: "No. HP",
                   minWidth: 150,
+                  headerAlign: "center",
                 },
                 {
                   field: "dateOfBirth",
                   headerName: "Tanggal Lahir",
                   minWidth: 150,
+                  headerAlign: "center",
                 },
 
                 {
                   field: "verification",
                   headerName: "Verifikasi",
                   minWidth: 150,
+                  headerAlign: "center",
                 },
                 {
                   field: "roleId",
                   headerName: "Roles",
                   minWidth: 200,
+                  align: "center",
+                  headerAlign: "center",
+                  hideSortIcons: true,
+                  disableColumnMenu: true,
                   renderCell: (params) => {
                     return (
                       <div className="flex align-middle">
@@ -442,18 +567,24 @@ export default function Page() {
                           defaultValue={params.value} // Set the defaultValue here
                           onChange={(e) => {
                             e.stopPropagation();
-                            alert("change success");
+
+                            const { value } = e.target;
+
+                            updateUserRole({
+                              userId: params.id.toString(),
+                              roleId: value,
+                            });
                           }}
                         >
                           <option
-                            value={"e8830804-3803-42c6-a3ae-1f3421d5c056"}
+                            value={"480663db-e5b7-400d-8485-954dc54686cd"}
                           >
                             ADMINISTRATION
                           </option>
                           <option
-                            value={"480663db-e5b7-400d-8485-954dc54686cd"}
+                            value={"062208b4-94f8-440f-8599-07aee4121fe0"}
                           >
-                            USER
+                            USER ONLY
                           </option>
                         </select>
                       </div>
@@ -468,6 +599,7 @@ export default function Page() {
                 {
                   field: "createdAt",
                   headerName: "Created At",
+                  headerAlign: "center",
                   minWidth: 150,
                   renderCell: (params) => {
                     return (
@@ -480,11 +612,13 @@ export default function Page() {
                 {
                   field: "modifiedBy",
                   headerName: "Modified By",
+                  headerAlign: "center",
                   minWidth: 150,
                 },
                 {
                   field: "modifedAt",
                   headerName: "Modifed At",
+                  headerAlign: "center",
                   minWidth: 150,
                   renderCell: (params) => {
                     return (
@@ -495,7 +629,6 @@ export default function Page() {
                   },
                 },
               ]}
-              rowSelection={false}
             />
           </div>
 

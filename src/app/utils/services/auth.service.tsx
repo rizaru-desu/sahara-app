@@ -24,7 +24,7 @@ export class AuthService {
       }
     );
 
-    return response; // Assuming the API response has a property 'result'
+    return response;
   };
 
   logout = async () => {
@@ -32,7 +32,7 @@ export class AuthService {
       "api/controller/logout/"
     );
 
-    return response; // Assuming the API response has a property 'result'
+    return response;
   };
 
   userDetail = async () => {
@@ -41,7 +41,7 @@ export class AuthService {
       {}
     );
 
-    return response; // Assuming the API response has a property 'result'
+    return response;
   };
 
   getAllUser = async ({ skip, take }: { skip: number; take: number }) => {
@@ -50,24 +50,56 @@ export class AuthService {
       { skip, take }
     );
 
-    return response; // Assuming the API response has a property 'result'
+    return response;
   };
 
-  saveRolebyUserId = async ({
+  addUser = async ({
+    email,
     fullname,
+    phone,
+    bod,
+    roles,
+    createBy,
+  }: {
+    email: string;
+    fullname: string;
+    phone: string;
+    bod: string;
+    roles: string;
+    createBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/add-user/",
+      { email, fullname, phone, bod, roles, createBy }
+    );
+
+    return response;
+  };
+
+  deleteUser = async ({ userId }: { userId: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delete-user/",
+      { userId }
+    );
+
+    return response;
+  };
+
+  updateUserRoles = async ({
+    modifiedBy,
     userId,
     roles,
   }: {
-    fullname: string;
+    modifiedBy?: string;
     userId: string;
     roles: string;
   }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/update-roles/",
-      { fullname, userId, roles }
+      { modifiedBy, userId, roles }
     );
 
-    return response; // Assuming the API response has a property 'result'
+    return response;
   };
 
   searchUser = async ({ value }: { value: string }) => {
@@ -76,6 +108,6 @@ export class AuthService {
       { value }
     );
 
-    return response; // Assuming the API response has a property 'result'
+    return response;
   };
 }

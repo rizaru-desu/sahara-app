@@ -2,19 +2,19 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
-import { manyUserPagination, updateRoleUser } from "@/app/utils/db/userDB";
+import { updateRoleUser } from "@/app/utils/db/userDB";
 
-const createUserSchema = z
+const Schema = z
   .object({
     userId: z.string(),
     roles: z.string(),
-    fullname: z.string(),
+    modifiedBy: z.string().optional(),
   })
   .strict();
 
 function validateSchema({ data }: { data: any }) {
   try {
-    const parseData = createUserSchema.parse(data);
+    const parseData = Schema.parse(data);
     return parseData;
   } catch (error: any) {
     if (error.issues && error.issues.length > 0) {
@@ -57,13 +57,13 @@ export async function POST(request: NextRequest) {
       const user = await updateRoleUser({
         userId: resultValid.userId,
         roleId: resultValid.roles,
-        fullname: resultValid.fullname,
+        modifiedBy: resultValid.modifiedBy,
       });
 
       return NextResponse.json(
         {
           result: "OK",
-          data: user,
+          message: `${user.email} account has been successfully updated roles`,
         },
         {
           status: 200,

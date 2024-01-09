@@ -5,13 +5,14 @@ import _ from "lodash";
 import { useRouter } from "next/navigation";
 import SideBar from "@/app/component/sideBar";
 import NavBar from "@/app/component/navBar";
-import { faker } from "@faker-js/faker";
 import { DataGrid } from "@mui/x-data-grid";
 import Loading from "../loading";
 import { AuthService } from "../utils/services/auth.service";
 import { toastMessage } from "../component/toasttify";
 import Loader from "../component/loader";
-import { Pagination } from "@mui/material";
+import { IconButton, Pagination } from "@mui/material";
+import { CustomerService } from "../utils/services/customer.service";
+import { FaInstagram, FaFacebook, FaShopify } from "react-icons/fa";
 
 interface UserData {
   roleId?: {
@@ -26,6 +27,10 @@ export default function Product() {
   const [dataUser, setDataUser] = React.useState<UserData | undefined>(
     undefined
   );
+
+  const [isTotalPage, setTotalPage] = React.useState(0);
+  const [isCurrentPage, setCurrentPage] = React.useState(1);
+  const [isAllDataCustomer, setAllDataCustomer] = React.useState([]);
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -80,9 +85,43 @@ export default function Product() {
     }
   }, [logoutUser]);
 
+  const getCurrentListCustomer = React.useCallback(
+    async ({ skip, take }: { skip: number; take: number }) => {
+      try {
+        setLoading(true);
+        const customerService = new CustomerService();
+        const responseApi = await customerService.getCustomer({
+          skip,
+          take,
+        });
+
+        if (responseApi.status === 200) {
+          const { data, countUser } = responseApi.data;
+          setLoading(false);
+          setAllDataCustomer(data);
+          setTotalPage(Math.ceil(countUser / 100));
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
-  }, [detailUser]);
+    getCurrentListCustomer({ skip: 0, take: 100 });
+  }, [detailUser, getCurrentListCustomer]);
 
   return (
     <main className="dark:bg-white bg-white min-h-screen">
@@ -95,86 +134,6 @@ export default function Product() {
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-5">
-          <form className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col">
-            <h6 className="text-black">Customer baru</h6>
-            <div>
-              <label
-                htmlFor="kodeProduct"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                ...
-              </label>
-              <div className="mt-2">
-                <input
-                  id="kodeProduct"
-                  name="kodeProduct"
-                  type="text"
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-row gap-5 flex-wrap">
-              <div>
-                <label
-                  htmlFor="kodeProduct"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  ...
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="kodeProduct"
-                    name="kodeProduct"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="variant"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  ...
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="variant"
-                    name="variant"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="variant"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  ...
-                </label>
-                <div className="mt-2 flex flex-row">
-                  <input
-                    id="variant"
-                    name="variant"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-            >
-              Simpan
-            </button>
-          </form>
-
           <div className="m-10 flex flex-col">
             <form
               className="flex flex-row items-center m-[2px] mb-3"
@@ -220,7 +179,132 @@ export default function Product() {
               </div>
             </form>
 
-            <DataGrid pagination autoHeight rows={[]} columns={[]} />
+            <DataGrid
+              pagination={true}
+              autoHeight
+              getRowHeight={() => "auto"}
+              rowSelection={false}
+              rows={isAllDataCustomer}
+              columns={[
+                {
+                  field: "namaUsaha",
+                  headerName: "Nama Usaha",
+                  minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
+                },
+                {
+                  field: "merekUsaha",
+                  headerName: "Nama Merek",
+                  minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
+                },
+                {
+                  field: "lamaUsaha",
+                  headerName: "Lama Usaha (Bulan)",
+                  minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                },
+                {
+                  field: "jumlahBooth",
+                  headerName: "Total Booth",
+                  minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                  hideSortIcons: true,
+                  disableColumnMenu: true,
+                  renderCell: (params) => {
+                    const onClick = (e: any) => {
+                      e.stopPropagation(); // don't select this row after clicking
+
+                      router.push(`/customer/booth/${params.id}`);
+                    };
+                    return (
+                      <button onClick={onClick}>
+                        <span className="text-blue-700">{params.value}</span>
+                      </button>
+                    );
+                  },
+                },
+                {
+                  field: "instagram",
+                  headerName: "instagram",
+                  minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                  hideSortIcons: true,
+                  disableColumnMenu: true,
+                  renderCell: (params) => {
+                    return (
+                      <IconButton
+                        aria-label="delete"
+                        href={params.value}
+                        target="_blank"
+                      >
+                        <FaInstagram color="#2D3250" size={20} />
+                      </IconButton>
+                    );
+                  },
+                },
+                {
+                  field: "facebook",
+                  headerName: "facebook",
+                  minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                  hideSortIcons: true,
+                  disableColumnMenu: true,
+                  renderCell: (params) => {
+                    return (
+                      <IconButton
+                        aria-label="delete"
+                        href={params.value}
+                        target="_blank"
+                      >
+                        <FaFacebook color="#2D3250" size={20} />
+                      </IconButton>
+                    );
+                  },
+                },
+                {
+                  field: "ecommerce",
+                  headerName: "ecommerce",
+                  minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                  hideSortIcons: true,
+                  disableColumnMenu: true,
+                  renderCell: (params) => {
+                    return (
+                      <IconButton
+                        aria-label="delete"
+                        href={params.value}
+                        target="_blank"
+                      >
+                        <FaShopify color="#2D3250" size={20} />
+                      </IconButton>
+                    );
+                  },
+                },
+
+                {
+                  field: "createBy",
+                  headerName: "Create By",
+                  minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
+                },
+                {
+                  field: "modifiedBy",
+                  headerName: "Modified By",
+                  minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
+                },
+              ]}
+            />
 
             <div className="flex justify-center py-4">
               <Pagination count={1} page={1} shape="rounded" />
@@ -232,20 +316,4 @@ export default function Product() {
       <Loader active={loading} />
     </main>
   );
-}
-
-function generateMeatKebabsWithFaker() {
-  const meatKebabs = [];
-
-  for (let i = 1; i <= 100; i++) {
-    meatKebabs.push({
-      id: i,
-      productCode: faker.string.alphanumeric(4).toUpperCase(),
-      productName: `Meat Kebab ${i}`,
-      productVariant: faker.commerce.productAdjective(),
-      productWeight: `${faker.number.int({ min: 150, max: 250 })}g`,
-    });
-  }
-
-  return meatKebabs;
 }

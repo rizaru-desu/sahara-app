@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 
-export class AuthService {
+export class CustomerService {
   protected readonly instance: AxiosInstance;
   public constructor() {
     const baseURL =
@@ -34,7 +34,7 @@ export class AuthService {
     customerId: string;
   }) => {
     const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/get-all-customer/",
+      "api/controller/get-all-booth/",
       { skip, take, customerId }
     );
 

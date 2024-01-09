@@ -15,8 +15,8 @@ const createUserSchema = z
       },
       { message: "Invalid phone number format" }
     ),
-    dateOfBirth: z.string(),
-    roleId: z.string(),
+    bod: z.string(),
+    roles: z.string(),
     createBy: z.string().optional(),
   })
   .strict();
@@ -68,9 +68,10 @@ export async function POST(request: NextRequest) {
           email: resultValid.email,
           password: hashedPassword,
           fullname: resultValid.fullname,
-          dateOfBirth: resultValid.dateOfBirth,
+          dateOfBirth: moment(resultValid.bod).format("DD-MM-YYYY"),
           phone: resultValid.phone,
-          roleId: resultValid.roleId,
+          roleId: resultValid.roles,
+          createBy: resultValid.createBy,
         },
       });
 

@@ -3,7 +3,6 @@ import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
 import { manyBoothPagination } from "@/app/utils/db/customerDB";
-import { usePathname } from "next/navigation";
 
 const createUserSchema = z
   .object({

@@ -5,7 +5,6 @@ import { generateToken } from "@/app/utils/token/generate";
 import { findByEmail } from "@/app/utils/db/userDB";
 import { findStringMap } from "@/app/utils/db/stringMapDB";
 
-//region validation input schema
 const createUserSchema = z
   .object({
     email: z.string().email(),
@@ -34,15 +33,11 @@ function validateSchema({ data }: { data: any }) {
     }
   }
 }
-//endregion
 
-//region post login user
 export async function POST(request: NextRequest) {
   try {
-    //get the details provided by user
     const json = await request.json();
 
-    //understand whether the details are correct as expect.
     const resultValid = validateSchema({
       data: json,
     });
@@ -57,11 +52,10 @@ export async function POST(request: NextRequest) {
     const findRoles = await findStringMap({ id: findAccount?.roleId || "" });
 
     if (findRoles?.key !== 100) {
-      // Save user data to a cookie
       const userCookie = serialize("userData", String(userData.token), {
         httpOnly: process.env.NODE_ENV === "development" ? false : true,
         secure: true,
-        maxAge: 3 * 60 * 60, //maxAge: 60 * 60 * 24, // Cookie will expire in 1 day (adjust as needed)
+        maxAge: 60 * 60 * 24, //maxAge: 60 * 60 * 24,  // Cookie will expire in 1 day (adjust as needed), 3 * 60 * 60 // 3 hourss
         sameSite: true,
         path: "/",
       });
@@ -82,15 +76,13 @@ export async function POST(request: NextRequest) {
       throw new Error("Sorry, your account does not have access.");
     }
   } catch (error: any) {
-    // Return a JSON response with a specific HTTP status code
     return NextResponse.json(
       {
         message: error.message,
       },
       {
-        status: 500, // You can replace 500 with the desired status code
+        status: 500,
       }
     );
   }
 }
-//endregion

@@ -4,7 +4,6 @@ import _ from "lodash";
 import z from "zod";
 import { findManyUserFilter, manyUserPagination } from "@/app/utils/db/userDB";
 
-//region validation input schema
 const createUserSchema = z
   .object({
     value: z.string(),
@@ -32,7 +31,6 @@ function validateSchema({ data }: { data: any }) {
     }
   }
 }
-//endregion
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,10 +45,8 @@ export async function POST(request: NextRequest) {
         : tokenWithoutBearer,
     })) as any;
 
-    //get the details provided by user
     const json = await request.json();
 
-    //understand whether the details are correct as expect.
     const resultValid = validateSchema({
       data: json,
     });
@@ -61,10 +57,12 @@ export async function POST(request: NextRequest) {
       });
 
       const updatedUser = _.map(result, (item) => {
-        return {
-          ...item,
-          id: item.userId,
-        };
+        return Object.assign(
+          {
+            id: item.userId,
+          },
+          _.omit(item, "userId")
+        );
       });
 
       return NextResponse.json(
@@ -89,13 +87,12 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error: any) {
-    // Return a JSON response with a specific HTTP status code
     return NextResponse.json(
       {
         message: error.message,
       },
       {
-        status: 500, // You can replace 500 with the desired status code
+        status: 500,
       }
     );
   }

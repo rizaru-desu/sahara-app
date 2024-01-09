@@ -1,9 +1,9 @@
-import { addBooth, addCustomer } from "@/app/utils/db/customerDB";
-import { addStringMap } from "@/app/utils/db/stringMapDB";
+import { addBooth } from "@/app/utils/db/customerDB";
+import { validateToken } from "@/app/utils/token/validate";
+import _ from "lodash";
 import { type NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
-//region validation input schema
 const Schema = z
   .object({
     alamatBooth: z.string(),
@@ -36,46 +36,63 @@ function validateSchema({ data }: { data: any }) {
     }
   }
 }
-//endregion
 
-//region post add string map
 export async function POST(request: NextRequest) {
   try {
-    //get the details provided by user
+    const token = request.headers.get("Authorization") as any;
+
+    const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
+    const userData = request.cookies.get("userData");
+
+    const tokenValidated = (await validateToken({
+      token: _.isEmpty(tokenWithoutBearer)
+        ? userData?.value
+        : tokenWithoutBearer,
+    })) as any;
+
     const json = await request.json();
 
-    //understand whether the details are correct as expect.
     const validated = validateSchema({
       data: json,
     });
 
-    const result = await addBooth({
-      alamatBooth: validated.alamatBooth,
-      geolocation: validated.gelocation,
-      photoBooth: validated.photoBooth,
-      userId: validated.userId,
-      customerId: validated.customerId,
-    });
+    if (tokenValidated) {
+      await addBooth({
+        alamatBooth: validated.alamatBooth,
+        geolocation: validated.gelocation,
+        photoBooth: validated.photoBooth,
+        userId: validated.userId,
+        customerId: validated.customerId,
+      });
 
-    return NextResponse.json(
-      {
-        result: "OK",
-        message: result,
-      },
-      {
-        status: 200,
-      }
-    );
+      return NextResponse.json(
+        {
+          result: "OK",
+          message: "Succesfully registered the booth",
+        },
+        {
+          status: 200,
+        }
+      );
+    } else {
+      return NextResponse.json(
+        {
+          result: "OK",
+          message: "Invalid token. Authentication failed.",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
   } catch (error: any) {
-    // Return a JSON response with a specific HTTP status code
     return NextResponse.json(
       {
         message: error.message,
       },
       {
-        status: 500, // You can replace 500 with the desired status code
+        status: 500,
       }
     );
   }
 }
-//endregion

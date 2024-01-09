@@ -116,16 +116,16 @@ export const manyUserPagination = async ({
 export const updateRoleUser = async ({
   userId,
   roleId,
-  fullname,
+  modifiedBy,
 }: {
   userId: string;
   roleId: string;
-  fullname: string;
+  modifiedBy?: string;
 }) => {
   try {
     const user = await prisma.user.update({
       where: { userId },
-      data: { roleId, modifiedBy: fullname },
+      data: { roleId, modifiedBy },
     });
 
     return user;
@@ -168,6 +168,21 @@ export const batchCreateUser = async ({ dataUser }: { dataUser: [] }) => {
       data: dataUser,
     });
 
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const deleteUser = async ({ userId }: { userId: string }) => {
+  try {
+    const result = await prisma.user.delete({
+      where: {
+        userId,
+      },
+    });
     return result;
   } catch (error: any) {
     throw new Error(error.message);

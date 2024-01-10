@@ -24,6 +24,15 @@ export class CustomerService {
     return response;
   };
 
+  searchCustomer = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-customer-search/",
+      { value }
+    );
+
+    return response;
+  };
+
   getBooth = async ({
     skip,
     take,
@@ -36,6 +45,15 @@ export class CustomerService {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/get-all-booth/",
       { skip, take, customerId }
+    );
+
+    return response;
+  };
+
+  searchBooth = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-booth-search/",
+      { value }
     );
 
     return response;

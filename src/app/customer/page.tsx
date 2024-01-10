@@ -32,6 +32,8 @@ export default function Product() {
   const [isCurrentPage, setCurrentPage] = React.useState(1);
   const [isAllDataCustomer, setAllDataCustomer] = React.useState([]);
 
+  const [inputValue, setInputValue] = React.useState("");
+
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
   }, [menuOpen]);
@@ -118,10 +120,65 @@ export default function Product() {
     [logoutUser]
   );
 
+  const searchCustomer = React.useCallback(
+    async ({ value }: { value: any }) => {
+      try {
+        setLoading(true);
+        const customerService = new CustomerService();
+
+        const responseApi = await customerService.searchCustomer({
+          value,
+        });
+
+        if (responseApi.status === 200) {
+          const { data } = responseApi.data;
+          setLoading(false);
+          setAllDataCustomer(data);
+          setTotalPage(1);
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
     getCurrentListCustomer({ skip: 0, take: 100 });
   }, [detailUser, getCurrentListCustomer]);
+
+  const handleChange = async (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPage(value);
+    getCurrentListCustomer({ skip: Math.max(0, (value - 1) * 100), take: 100 });
+  };
+
+  const handleInputSearchChange = (event: any) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleSubmitSearch = (event: any) => {
+    event.preventDefault();
+
+    if (!_.isEmpty(inputValue)) {
+      searchCustomer({ value: inputValue });
+    } else {
+      toastMessage({ message: "Please input value search...", type: "error" });
+    }
+  };
 
   return (
     <main className="dark:bg-white bg-white min-h-screen">
@@ -139,6 +196,7 @@ export default function Product() {
               className="flex flex-row items-center m-[2px] mb-3"
               action="#"
               method="POST"
+              onSubmit={handleSubmitSearch}
             >
               <div className="relative mr-5 float-left">
                 <label htmlFor="inputSearch" className="sr-only">
@@ -147,9 +205,10 @@ export default function Product() {
                 <input
                   id="inputSearch"
                   type="text"
-                  placeholder="Search ..."
+                  placeholder="Search Nama usaha / Merek Usaha..."
                   className="block w-[280px] text-black placeholder:text-black rounded-lg dark:border-red-700 border-2 py-2 pl-10 pr-4 text-sm focus:border-red-900 focus:outline-none focus:ring-1 focus:ring-red-900"
                   minLength={3}
+                  onChange={handleInputSearchChange}
                 />
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transform">
                   <svg
@@ -307,7 +366,12 @@ export default function Product() {
             />
 
             <div className="flex justify-center py-4">
-              <Pagination count={1} page={1} shape="rounded" />
+              <Pagination
+                count={isTotalPage}
+                page={isCurrentPage}
+                onChange={handleChange}
+                shape="rounded"
+              />
             </div>
           </div>
         </div>

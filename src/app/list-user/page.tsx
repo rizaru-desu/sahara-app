@@ -605,6 +605,7 @@ export default function Page() {
                           id="inputFilter"
                           className="block text-black p-2 text-sm bg-transparent focus:ring-transparent hover:border-none"
                           defaultValue={params.value} // Set the defaultValue here
+                          value={params.value}
                           onChange={(e) => {
                             e.stopPropagation();
 

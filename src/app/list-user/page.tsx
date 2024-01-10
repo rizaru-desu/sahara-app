@@ -32,6 +32,8 @@ export default function Page() {
   const [isCurrentPage, setCurrentPage] = React.useState(1);
   const [isAllDataUser, setAllDataUser] = React.useState([]);
 
+  const [isAllRole, setAllRole] = React.useState([]);
+
   const [inputValue, setInputValue] = React.useState("");
 
   // Define state variables for form fields
@@ -267,10 +269,50 @@ export default function Page() {
     [dataUser?.fullname, logoutUser]
   );
 
+  const getAllRole = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const authService = new AuthService();
+      const responseApi = await authService.getAllRole();
+
+      if (responseApi.status === 200) {
+        const { data } = responseApi.data;
+        setLoading(false);
+
+        const mergedData = _.concat(
+          [
+            {
+              stringId: "",
+              objectName: "Roles",
+              key: 0,
+              value: "Choose a Role",
+            },
+          ],
+          data
+        ) as any;
+
+        setAllRole(mergedData);
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else if (e.response && e.response.status === 401) {
+        logoutUser();
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [logoutUser]);
+
   React.useEffect(() => {
     detailUser();
     getCurrentListUser({ skip: 0, take: 100 });
-  }, [detailUser, getCurrentListUser]);
+    getAllRole();
+  }, [detailUser, getAllRole, getCurrentListUser]);
 
   const handleChange = async (
     event: React.ChangeEvent<unknown>,
@@ -421,13 +463,11 @@ export default function Page() {
                   onChange={handleInputChangeAddUser}
                   required
                 >
-                  <option value="">Choose a role</option>
-                  <option value={"480663db-e5b7-400d-8485-954dc54686cd"}>
-                    Administration
-                  </option>
-                  <option value={"062208b4-94f8-440f-8599-07aee4121fe0"}>
-                    User Only
-                  </option>
+                  {_.map(isAllRole, (_item: any, index: number) => (
+                    <option key={index.toString()} value={_item.stringId}>
+                      {_item.value}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -576,16 +616,15 @@ export default function Page() {
                             });
                           }}
                         >
-                          <option
-                            value={"480663db-e5b7-400d-8485-954dc54686cd"}
-                          >
-                            ADMINISTRATION
-                          </option>
-                          <option
-                            value={"062208b4-94f8-440f-8599-07aee4121fe0"}
-                          >
-                            USER ONLY
-                          </option>
+                          {_.map(isAllRole, (_item: any, index: number) => (
+                            <option
+                              hidden={_.isEmpty(_item.stringId) ? true : false}
+                              key={index.toString()}
+                              value={_item.stringId}
+                            >
+                              {_item.value}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     );

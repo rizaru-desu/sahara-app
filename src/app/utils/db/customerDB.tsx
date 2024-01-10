@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Buffer } from "buffer";
+import _ from "lodash";
 const prisma = new PrismaClient();
 
 interface AddCustomerInput {
@@ -137,6 +138,49 @@ export const findPhoto = async ({ boothId }: { boothId: string }) => {
     });
 
     return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const findManyCustomerFilter = async ({ value }: { value: string }) => {
+  try {
+    const result = await prisma.customer.findMany({
+      where: {
+        OR: [
+          {
+            namaUsaha: { contains: value },
+          },
+          { merekUsaha: { contains: value } },
+        ],
+      },
+      orderBy: { namaUsaha: "asc" },
+    });
+
+    return { result, totalCount: _.size(result) };
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const findManyBoothFilter = async ({ value }: { value: string }) => {
+  try {
+    const result = await prisma.booth.findMany({
+      where: {
+        OR: [
+          {
+            alamatBooth: { contains: value },
+          },
+        ],
+      },
+      orderBy: { alamatBooth: "asc" },
+    });
+
+    return { result, totalCount: _.size(result) };
   } catch (error: any) {
     throw new Error(error.message);
   } finally {

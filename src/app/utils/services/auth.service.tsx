@@ -53,6 +53,15 @@ export class AuthService {
     return response;
   };
 
+  getAllRole = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-all-role/",
+      {}
+    );
+
+    return response;
+  };
+
   addUser = async ({
     email,
     fullname,

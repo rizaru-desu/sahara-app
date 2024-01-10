@@ -28,3 +28,18 @@ export const findStringMap = async ({ id }: { id: string }) => {
     await prisma.$disconnect();
   }
 };
+
+export const findRoleStringMap = async () => {
+  try {
+    const result = await prisma.stringMap.findMany({
+      where: { objectName: "Roles" },
+      select: { stringId: true, objectName: true, key: true, value: true },
+    });
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};

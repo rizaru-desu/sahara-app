@@ -5,15 +5,16 @@ import _ from "lodash";
 import { useRouter } from "next/navigation";
 import SideBar from "@/app/component/sideBar";
 import NavBar from "@/app/component/navBar";
-import { faker } from "@faker-js/faker";
 import { DataGrid } from "@mui/x-data-grid";
 import Loading from "../loading";
 import { AuthService } from "../utils/services/auth.service";
 import { toastMessage } from "../component/toasttify";
 import Loader from "../component/loader";
 import { Pagination } from "@mui/material";
+import { ProductService } from "../utils/services/product.service";
 
 interface UserData {
+  fullname?: string;
   roleId?: {
     key: number;
   };
@@ -27,6 +28,18 @@ export default function Product() {
     undefined
   );
 
+  const [file, setFile] = React.useState<File | null>(null);
+
+  const [formDataProduct, setFormDataProduct] = React.useState({
+    productName: "",
+    productCode: "",
+    price: 0,
+    weight: 0,
+    unit: "",
+    expiredPeriod: 0,
+    createBy: "",
+  });
+
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
   }, [menuOpen]);
@@ -37,7 +50,7 @@ export default function Product() {
       const authService = new AuthService();
       const responseApi = await authService.logout();
 
-      if (responseApi.data.result === "OK") {
+      if (responseApi.status === 200) {
         setLoading(false);
         router.replace("/");
       }
@@ -60,8 +73,8 @@ export default function Product() {
       const authService = new AuthService();
       const responseApi = await authService.userDetail();
 
-      const { result, data } = responseApi.data;
-      if (result === "OK") {
+      if (responseApi.status === 200) {
+        const { data } = responseApi.data;
         setLoading(false);
         setDataUser(data);
       }
@@ -80,9 +93,154 @@ export default function Product() {
     }
   }, [logoutUser]);
 
+  const uploadFile = React.useCallback(
+    async ({ formData }: { formData: any }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.uploadProduct({ formData });
+
+        if (responseApi.status === 200) {
+          const { data } = responseApi.data;
+          setLoading(false);
+          toastMessage({
+            message: data,
+            type: "success",
+          });
+          location.reload();
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
+  const addProduct = React.useCallback(
+    async ({
+      productName,
+      productCode,
+      price,
+      weight,
+      unit,
+      expiredPeriod,
+      createBy,
+    }: {
+      productName: string;
+      productCode: string;
+      price: number;
+      weight: number;
+      unit: string;
+      expiredPeriod: number;
+      createBy?: string;
+    }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.addProduct({
+          productName,
+          productCode,
+          price,
+          weight,
+          unit,
+          expiredPeriod,
+          createBy,
+        });
+
+        if (responseApi.status === 200) {
+          const { message } = responseApi.data;
+          setLoading(false);
+          toastMessage({
+            message: message,
+            type: "success",
+          });
+          location.reload();
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
   }, [detailUser]);
+
+  const handleFileChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
+    const selectedFile = event.currentTarget.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+
+  const handleFormSubmitFile = async (event: React.SyntheticEvent) => {
+    event.preventDefault();
+
+    if (!file) {
+      console.error("No file selected.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("files", file);
+    formData.append("createBy", dataUser?.fullname || "");
+
+    uploadFile({ formData });
+  };
+
+  const handleInputChangeProduct = (e: any) => {
+    const { name, value } = e.target;
+
+    setFormDataProduct((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmitAddProduct = (event: any) => {
+    event.preventDefault();
+
+    const {
+      productName,
+      productCode,
+      price,
+      weight,
+      unit,
+      expiredPeriod,
+      createBy,
+    } = formDataProduct;
+
+    addProduct({
+      productName,
+      productCode,
+      price: parseFloat(price.toString()),
+      weight: parseFloat(weight.toString()),
+      unit,
+      expiredPeriod: parseFloat(expiredPeriod.toString()),
+      createBy,
+    });
+  };
 
   return (
     <main className="dark:bg-white bg-white min-h-screen">
@@ -95,85 +253,183 @@ export default function Product() {
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-5">
-          <form className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col">
-            <h6 className="text-black">Produk baru</h6>
-            <div>
-              <label
-                htmlFor="kodeProduct"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Nama Produk
-              </label>
-              <div className="mt-2">
-                <input
-                  id="kodeProduct"
-                  name="kodeProduct"
-                  type="text"
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-row gap-5 flex-wrap">
-              <div>
-                <label
-                  htmlFor="kodeProduct"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Kode Product
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="kodeProduct"
-                    name="kodeProduct"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="variant"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Variant
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="variant"
-                    name="variant"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="variant"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Berat
-                </label>
-                <div className="mt-2 flex flex-row">
-                  <input
-                    id="variant"
-                    name="variant"
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+          <div className="grid grid-cols-1 gap-5 place-content-center place-items-start md:grid-cols-2">
+            <form
+              className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col"
+              onSubmit={handleSubmitAddProduct}
             >
-              Simpan
-            </button>
-          </form>
+              <h6 className="text-black text-bold">
+                <strong>Add Product</strong>
+              </h6>
+              <div>
+                <label
+                  htmlFor="productName"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Product Name
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="productName"
+                    name="productName"
+                    type="text"
+                    required
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeProduct}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-row gap-5 flex-wrap">
+                <div>
+                  <label
+                    htmlFor="productCode"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Product Code
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      id="productCode"
+                      name="productCode"
+                      type="text"
+                      required
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                      onChange={handleInputChangeProduct}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="price"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Price (Rupiah)
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      id="price"
+                      name="price"
+                      type="number"
+                      required
+                      placeholder="Example: 10000"
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                      onChange={handleInputChangeProduct}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="weight"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Weight (Kg)
+                  </label>
+                  <div className="mt-2 flex flex-row">
+                    <input
+                      id="weight"
+                      name="weight"
+                      type="number"
+                      required
+                      step="0.1"
+                      placeholder="example: 0.1"
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                      onChange={handleInputChangeProduct}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="unit"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Unit
+                  </label>
+                  <div className="mt-2 flex flex-row">
+                    <input
+                      id="unit"
+                      name="unit"
+                      type="text"
+                      required
+                      placeholder="example: Pack/etc"
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                      onChange={handleInputChangeProduct}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="expiredPeriod"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Expired Period (day)
+                  </label>
+                  <div className="mt-2 flex flex-row">
+                    <input
+                      id="expiredPeriod"
+                      name="expiredPeriod"
+                      type="number"
+                      required
+                      placeholder="example: 20"
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                      onChange={handleInputChangeProduct}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+              >
+                Simpan
+              </button>
+            </form>
+
+            <form
+              className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col my-5"
+              onSubmit={handleFormSubmitFile}
+            >
+              <div>
+                <label
+                  htmlFor="uploadProduct"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Upload product
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="uploadProduct"
+                    name="files"
+                    type="file"
+                    required
+                    accept=".xls, .xlsx"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+              >
+                Upload
+              </button>
+
+              <a
+                href="./template/product.xlsx"
+                className="flex justify-center rounded-md self-end
+               bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+              >
+                Download Template
+              </a>
+            </form>
+          </div>
 
           <div className="m-10 flex flex-col">
             <form
@@ -232,20 +488,4 @@ export default function Product() {
       <Loader active={loading} />
     </main>
   );
-}
-
-function generateMeatKebabsWithFaker() {
-  const meatKebabs = [];
-
-  for (let i = 1; i <= 100; i++) {
-    meatKebabs.push({
-      id: i,
-      productCode: faker.string.alphanumeric(4).toUpperCase(),
-      productName: `Meat Kebab ${i}`,
-      productVariant: faker.commerce.productAdjective(),
-      productWeight: `${faker.number.int({ min: 150, max: 250 })}g`,
-    });
-  }
-
-  return meatKebabs;
 }

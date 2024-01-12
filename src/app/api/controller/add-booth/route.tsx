@@ -9,7 +9,6 @@ const Schema = z
     alamatBooth: z.string(),
     gelocation: z.string(),
     photoBooth: z.string(),
-    userId: z.string(),
     customerId: z.string(),
     createBy: z.string().optional(),
   })
@@ -61,7 +60,6 @@ export async function POST(request: NextRequest) {
         alamatBooth: validated.alamatBooth,
         geolocation: validated.gelocation,
         photoBooth: validated.photoBooth,
-        userId: validated.userId,
         customerId: validated.customerId,
       });
 

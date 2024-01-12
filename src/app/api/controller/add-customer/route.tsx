@@ -13,6 +13,7 @@ const Schema = z
     instagram: z.string().url().optional(),
     facebook: z.string().url().optional(),
     ecommerce: z.string().url().optional(),
+    userId: z.string(),
     createBy: z.string().optional(),
   })
   .strict();
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
         instagram: validated.instagram,
         facebook: validated.facebook,
         ecommerce: validated.ecommerce,
+        userId: validated.userId,
       });
 
       return NextResponse.json(

@@ -11,6 +11,7 @@ interface AddCustomerInput {
   namaUsaha: string;
   merekUsaha: string;
   jumlahBooth: number;
+  userId: string;
 }
 
 export const addCustomer = async ({
@@ -21,17 +22,19 @@ export const addCustomer = async ({
   namaUsaha,
   merekUsaha,
   jumlahBooth,
+  userId,
 }: AddCustomerInput) => {
   try {
     const result = await prisma.customer.create({
       data: {
-        facebook: facebook,
-        instagram: instagram,
-        ecommerce: ecommerce,
-        lamaUsaha: lamaUsaha,
-        namaUsaha: namaUsaha,
-        merekUsaha: merekUsaha,
-        jumlahBooth: jumlahBooth,
+        facebook,
+        instagram,
+        ecommerce,
+        lamaUsaha,
+        namaUsaha,
+        merekUsaha,
+        jumlahBooth,
+        userId,
       },
     });
 
@@ -47,7 +50,6 @@ interface AddBoothInput {
   alamatBooth: string;
   geolocation: string;
   photoBooth: string;
-  userId: string;
   customerId: string;
 }
 
@@ -55,7 +57,6 @@ export const addBooth = async ({
   alamatBooth,
   geolocation,
   photoBooth,
-  userId,
   customerId,
 }: AddBoothInput) => {
   try {
@@ -66,7 +67,6 @@ export const addBooth = async ({
         alamatBooth,
         geolocation,
         photoBooth: decodedPhotoBooth,
-        userId,
         customerId,
       },
     });

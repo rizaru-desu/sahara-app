@@ -57,4 +57,13 @@ export class ProductService {
 
     return response;
   };
+
+  searchProduct = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-product-search/",
+      { value }
+    );
+
+    return response;
+  };
 }

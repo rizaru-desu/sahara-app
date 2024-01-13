@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
-import { findManyBoothFilter } from "@/app/utils/db/customerDB";
+import { findManyProductFilter } from "@/app/utils/db/productDB";
 
 const createSchema = z
   .object({
@@ -52,17 +52,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, totalCount } = await findManyBoothFilter({
+      const { result, totalCount } = await findManyProductFilter({
         value: resultValid.value,
       });
 
       const final = _.map(result, (item) => {
         return Object.assign(
           {
-            id: item.boothId,
-            photo: item.photoBooth,
+            id: item.productId,
           },
-          _.omit(item, "boothId", '"photoBooth"')
+          _.omit(item, "boothId")
         );
       });
 

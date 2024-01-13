@@ -12,6 +12,7 @@ import { toastMessage } from "../component/toasttify";
 import Loader from "../component/loader";
 import { Pagination } from "@mui/material";
 import { ProductService } from "../utils/services/product.service";
+import moment from "moment";
 
 interface UserData {
   fullname?: string;
@@ -39,6 +40,12 @@ export default function Product() {
     expiredPeriod: 0,
     createBy: "",
   });
+
+  const [isTotalPage, setTotalPage] = React.useState(0);
+  const [isCurrentPage, setCurrentPage] = React.useState(1);
+  const [isAllDataProduct, setAllDataProduct] = React.useState([]);
+
+  const [inputValue, setInputValue] = React.useState("");
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -183,9 +190,75 @@ export default function Product() {
     [logoutUser]
   );
 
+  const getAllProduct = React.useCallback(
+    async ({ skip, take }: { skip: number; take: number }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.getAllProduct({
+          skip,
+          take,
+        });
+
+        if (responseApi.status === 200) {
+          const { data, countUser } = responseApi.data;
+          setLoading(false);
+          setAllDataProduct(data);
+          setTotalPage(Math.ceil(countUser / 100));
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
+  const searchProduct = React.useCallback(
+    async ({ value }: { value: any }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.searchProduct({
+          value,
+        });
+
+        if (responseApi.status === 200) {
+          const { data } = responseApi.data;
+          setLoading(false);
+          setAllDataProduct(data);
+          setTotalPage(1);
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
-  }, [detailUser]);
+    getAllProduct({ skip: 0, take: 100 });
+  }, [detailUser, getAllProduct]);
 
   const handleFileChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
     const selectedFile = event.currentTarget.files?.[0];
@@ -240,6 +313,31 @@ export default function Product() {
       expiredPeriod: parseFloat(expiredPeriod.toString()),
       createBy,
     });
+  };
+
+  const handleChange = async (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPage(value);
+    getAllProduct({
+      skip: Math.max(0, (value - 1) * 100),
+      take: 100,
+    });
+  };
+
+  const handleInputChange = (event: any) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleSubmitSearch = (event: any) => {
+    event.preventDefault();
+
+    if (!_.isEmpty(inputValue)) {
+      searchProduct({ value: inputValue });
+    } else {
+      toastMessage({ message: "Please input value search...", type: "error" });
+    }
   };
 
   return (
@@ -436,6 +534,7 @@ export default function Product() {
               className="flex flex-row items-center m-[2px] mb-3"
               action="#"
               method="POST"
+              onSubmit={handleSubmitSearch}
             >
               <div className="relative mr-5 float-left">
                 <label htmlFor="inputSearch" className="sr-only">
@@ -444,8 +543,9 @@ export default function Product() {
                 <input
                   id="inputSearch"
                   type="text"
-                  placeholder="Search ..."
+                  placeholder="Search product name/code ..."
                   className="block w-[280px] text-black placeholder:text-black rounded-lg dark:border-red-700 border-2 py-2 pl-10 pr-4 text-sm focus:border-red-900 focus:outline-none focus:ring-1 focus:ring-red-900"
+                  onChange={handleInputChange}
                   minLength={3}
                 />
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transform">
@@ -476,10 +576,107 @@ export default function Product() {
               </div>
             </form>
 
-            <DataGrid pagination autoHeight rows={[]} columns={[]} />
+            <DataGrid
+              pagination={true}
+              autoHeight
+              getRowHeight={() => "auto"}
+              rowSelection={false}
+              rows={isAllDataProduct}
+              columns={[
+                {
+                  field: "productCode",
+                  headerName: "product Code",
+                  minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
+                },
+                {
+                  field: "productName",
+                  headerName: "Product Name",
+                  minWidth: 500,
+                  align: "left",
+                  headerAlign: "center",
+                },
+                {
+                  field: "weight",
+                  headerName: "weight (Kg)",
+                  minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                },
+                {
+                  field: "price",
+                  headerName: "Price (Rp.)",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                },
+                {
+                  field: "unit",
+                  headerName: "Unit",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                },
+                {
+                  field: "expiredPeriod",
+                  headerName: "expired Period",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                },
+                {
+                  field: "createBy",
+                  headerName: "createBy",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                },
+                {
+                  field: "modifiedBy",
+                  headerName: "modifiedBy",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                },
+                {
+                  field: "createdAt",
+                  headerName: "createdAt",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {moment(params.value).format("DD-MM-YYYY hh:mm")}
+                      </span>
+                    );
+                  },
+                },
+                {
+                  field: "modifedAt",
+                  headerName: "modifedAt",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {moment(params.value).format("DD-MM-YYYY hh:mm")}
+                      </span>
+                    );
+                  },
+                },
+              ]}
+            />
 
             <div className="flex justify-center py-4">
-              <Pagination count={1} page={1} shape="rounded" />
+              <Pagination
+                count={isTotalPage}
+                page={isCurrentPage}
+                onChange={handleChange}
+                shape="rounded"
+              />
             </div>
           </div>
         </div>

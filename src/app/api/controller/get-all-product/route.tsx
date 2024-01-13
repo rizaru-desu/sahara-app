@@ -2,17 +2,18 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
-import { findManyBoothFilter } from "@/app/utils/db/customerDB";
+import { manyProductPagination } from "@/app/utils/db/productDB";
 
-const createSchema = z
+const Schema = z
   .object({
-    value: z.string(),
+    skip: z.number(),
+    take: z.number(),
   })
   .strict();
 
 function validateSchema({ data }: { data: any }) {
   try {
-    const parseData = createSchema.parse(data);
+    const parseData = Schema.parse(data);
     return parseData;
   } catch (error: any) {
     if (error.issues && error.issues.length > 0) {
@@ -52,24 +53,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, totalCount } = await findManyBoothFilter({
-        value: resultValid.value,
+      const { result, totalCount } = await manyProductPagination({
+        skip: resultValid.skip,
+        take: resultValid.take,
       });
 
-      const final = _.map(result, (item) => {
+      const finalResult = _.map(result, (item) => {
         return Object.assign(
           {
-            id: item.boothId,
-            photo: item.photoBooth,
+            id: item.productId,
           },
-          _.omit(item, "boothId", '"photoBooth"')
+          _.omit(item, "productId")
         );
       });
 
       return NextResponse.json(
         {
           result: "OK",
-          data: final,
+          data: finalResult,
           countUser: totalCount,
         },
         {

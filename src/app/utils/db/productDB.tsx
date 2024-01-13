@@ -60,3 +60,49 @@ export const addProduct = async ({
     await prisma.$disconnect();
   }
 };
+
+export const manyProductPagination = async ({
+  skip,
+  take,
+}: {
+  skip: number;
+  take: number;
+}) => {
+  try {
+    const result = await prisma.product.findMany({
+      skip,
+      take,
+      orderBy: { productName: "asc" },
+    });
+    const totalCount = await prisma.product.count();
+
+    return { result, totalCount };
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const findManyProductFilter = async ({ value }: { value: string }) => {
+  try {
+    const result = await prisma.product.findMany({
+      where: {
+        OR: [
+          {
+            productName: { contains: value },
+          },
+          { productCode: { contains: value } },
+        ],
+      },
+
+      orderBy: { productName: "asc" },
+    });
+
+    return { result, totalCount: _.size(result) };
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};

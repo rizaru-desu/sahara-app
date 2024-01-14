@@ -589,6 +589,19 @@ export default function Product() {
                   minWidth: 150,
                   align: "left",
                   headerAlign: "center",
+                  renderCell: (params) => {
+                    const onClick = (e: any) => {
+                      e.stopPropagation(); // don't select this row after clicking
+
+                      router.push(`/product/${params.id}`);
+                    };
+
+                    return (
+                      <button onClick={onClick}>
+                        <span className="text-red-700">{params.value}</span>
+                      </button>
+                    );
+                  },
                 },
                 {
                   field: "productName",
@@ -648,7 +661,9 @@ export default function Product() {
                   renderCell: (params) => {
                     return (
                       <span className="text-black">
-                        {moment(params.value).format("DD-MM-YYYY hh:mm")}
+                        {moment(params.value)
+                          .local()
+                          .format("DD-MM-YYYY HH:mm")}
                       </span>
                     );
                   },
@@ -662,7 +677,9 @@ export default function Product() {
                   renderCell: (params) => {
                     return (
                       <span className="text-black">
-                        {moment(params.value).format("DD-MM-YYYY hh:mm")}
+                        {moment(params.value)
+                          .local()
+                          .format("DD-MM-YYYY HH:mm")}
                       </span>
                     );
                   },

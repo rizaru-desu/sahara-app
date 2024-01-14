@@ -9,8 +9,11 @@ import Loading from "../../loading";
 import { AuthService } from "../../utils/services/auth.service";
 import { toastMessage } from "../../component/toasttify";
 import Loader from "../../component/loader";
+import { ProductService } from "@/app/utils/services/product.service";
+import moment from "moment";
 
 interface UserData {
+  fullname?: string;
   roleId?: {
     key: number;
   };
@@ -25,6 +28,19 @@ export default function Page({ params }: { params: { id: string } }) {
     undefined
   );
 
+  const [formDataProduct, setFormDataProduct] = React.useState({
+    productName: "",
+    productCode: "",
+    price: 0,
+    weight: 0,
+    unit: "",
+    expiredPeriod: 0,
+    createBy: "",
+    modifiedBy: "",
+    createdAt: undefined,
+    modifedAt: undefined,
+  });
+
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
   }, [menuOpen]);
@@ -35,7 +51,7 @@ export default function Page({ params }: { params: { id: string } }) {
       const authService = new AuthService();
       const responseApi = await authService.logout();
 
-      if (responseApi.data.result === "OK") {
+      if (responseApi.status === 200) {
         setLoading(false);
         router.replace("/");
       }
@@ -58,8 +74,8 @@ export default function Page({ params }: { params: { id: string } }) {
       const authService = new AuthService();
       const responseApi = await authService.userDetail();
 
-      const { result, data } = responseApi.data;
-      if (result === "OK") {
+      if (responseApi.status === 200) {
+        const { data } = responseApi.data;
         setLoading(false);
         setDataUser(data);
       }
@@ -78,9 +94,123 @@ export default function Page({ params }: { params: { id: string } }) {
     }
   }, [logoutUser]);
 
+  const findProduct = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const productService = new ProductService();
+      const responseApi = await productService.findProduct({
+        productId: params.id,
+      });
+
+      if (responseApi.status === 200) {
+        const { data } = responseApi.data;
+        setLoading(false);
+        setFormDataProduct(data);
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else if (e.response && e.response.status === 401) {
+        logoutUser();
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [logoutUser, params.id]);
+
+  const updateProduct = React.useCallback(
+    async ({
+      productId,
+      productName,
+      price,
+      weight,
+      unit,
+      expiredPeriod,
+      modifiedBy,
+    }: {
+      productId: string;
+      productName: string;
+      price: number;
+      weight: number;
+      unit: string;
+      expiredPeriod: number;
+      modifiedBy?: string;
+    }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.updateProduct({
+          productId,
+          productName,
+          price,
+          weight,
+          unit,
+          expiredPeriod,
+          modifiedBy,
+        });
+
+        if (responseApi.status === 200) {
+          const { message } = responseApi.data;
+          setLoading(false);
+          toastMessage({
+            message: message,
+            type: "success",
+          });
+          setTimeout(() => {
+            location.reload();
+          }, 3000);
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
-  }, [detailUser]);
+    findProduct();
+  }, [detailUser, findProduct]);
+
+  const handleInputChangeProduct = (e: any) => {
+    const { name, value } = e.target;
+
+    setFormDataProduct((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmitAddProduct = (event: any) => {
+    event.preventDefault();
+
+    const { productName, price, weight, unit, expiredPeriod, createBy } =
+      formDataProduct;
+
+    updateProduct({
+      productName,
+      productId: params.id,
+      price: parseFloat(price.toString()),
+      weight: parseFloat(weight.toString()),
+      unit,
+      expiredPeriod: parseFloat(expiredPeriod.toString()),
+      modifiedBy: dataUser?.fullname,
+    });
+  };
 
   return (
     <main className="dark:bg-white bg-white min-h-screen">
@@ -93,21 +223,30 @@ export default function Page({ params }: { params: { id: string } }) {
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-10">
-          <form className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col">
-            <h6 className="text-black">Edit Product</h6>
+          <form
+            className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col"
+            onSubmit={handleSubmitAddProduct}
+          >
+            <h6 className="text-black text-bold">
+              <strong>Update Product</strong>
+            </h6>
+
             <div>
               <label
-                htmlFor="kodeProduct"
+                htmlFor="productName"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Nama Produk
+                Product Name
               </label>
               <div className="mt-2">
                 <input
-                  id="kodeProduct"
-                  name="kodeProduct"
+                  id="productName"
+                  name="productName"
                   type="text"
+                  required
+                  value={formDataProduct.productName}
                   className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                  onChange={handleInputChangeProduct}
                 />
               </div>
             </div>
@@ -115,76 +254,136 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className="flex flex-row gap-5 flex-wrap">
               <div>
                 <label
-                  htmlFor="kodeProduct"
+                  htmlFor="productCode"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Kode Product
+                  Product Code
                 </label>
                 <div className="mt-2">
                   <input
-                    id="kodeProduct"
-                    name="kodeProduct"
+                    id="productCode"
+                    name="productCode"
                     type="text"
+                    disabled
+                    value={formDataProduct.productCode}
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeProduct}
                   />
                 </div>
               </div>
 
               <div>
                 <label
-                  htmlFor="variant"
+                  htmlFor="price"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Variant
+                  Price (Rupiah)
                 </label>
                 <div className="mt-2">
                   <input
-                    id="variant"
-                    name="variant"
-                    type="text"
+                    id="price"
+                    name="price"
+                    type="number"
+                    required
+                    value={formDataProduct.price}
+                    placeholder="Example: 10000"
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeProduct}
                   />
                 </div>
               </div>
 
               <div>
                 <label
-                  htmlFor="variant"
+                  htmlFor="weight"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Berat
+                  Weight (Kg)
                 </label>
                 <div className="mt-2 flex flex-row">
                   <input
-                    id="variant"
-                    name="variant"
-                    type="text"
+                    id="weight"
+                    name="weight"
+                    type="number"
+                    required
+                    step="0.1"
+                    placeholder="example: 0.1"
+                    value={formDataProduct.weight}
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeProduct}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="unit"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Unit
+                </label>
+                <div className="mt-2 flex flex-row">
+                  <input
+                    id="unit"
+                    name="unit"
+                    type="text"
+                    required
+                    value={formDataProduct.unit}
+                    placeholder="example: Pack/etc"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeProduct}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="expiredPeriod"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Expired Period (day)
+                </label>
+                <div className="mt-2 flex flex-row">
+                  <input
+                    id="expiredPeriod"
+                    name="expiredPeriod"
+                    type="number"
+                    required
+                    value={formDataProduct.expiredPeriod}
+                    placeholder="example: 20"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeProduct}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-row gap-5 my-10">
-              <button
-                type="submit"
-                className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-              >
-                Simpan
-              </button>
-              <button
-                type="submit"
-                className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-              >
-                batal
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+            >
+              Simpan
+            </button>
 
             <div className="grid grid-cols-2 grid-rows-2 text-black gap-4">
-              <span className="row-start-1">Tanggal disimpan: </span>
-              <span className="row-start-2">Tanggal diubah: </span>
-              <span className="row-start-1 col-start-2">Disimpan oleh: </span>
-              <span className="row-start-2 col-start-2">Diubah oleh: </span>
+              <span className="row-start-1">
+                Tanggal disimpan:{" "}
+                {moment(formDataProduct.createdAt)
+                  .local()
+                  .format("DD MMMM YYYY HH:mm")}
+              </span>
+              <span className="row-start-2">
+                Tanggal diubah:{" "}
+                {moment(formDataProduct.modifedAt)
+                  .local()
+                  .format("DD MMMM YYYY HH:mm")}
+              </span>
+              <span className="row-start-1 col-start-2">
+                Disimpan oleh: {formDataProduct.createBy}{" "}
+              </span>
+              <span className="row-start-2 col-start-2">
+                Diubah oleh: {formDataProduct.modifiedBy}{" "}
+              </span>
             </div>
           </form>
         </div>

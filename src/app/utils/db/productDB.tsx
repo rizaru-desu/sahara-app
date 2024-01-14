@@ -106,3 +106,59 @@ export const findManyProductFilter = async ({ value }: { value: string }) => {
     await prisma.$disconnect();
   }
 };
+
+export const findSingleProduct = async ({
+  productId,
+}: {
+  productId: string;
+}) => {
+  try {
+    const result = await prisma.product.findUnique({
+      where: { productId },
+    });
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const updateProduct = async ({
+  productId,
+  modifiedBy,
+  productName,
+  price,
+  expiredPeriod,
+  weight,
+  unit,
+}: {
+  productId: string;
+  modifiedBy?: string;
+  productName: string;
+  price: number;
+  expiredPeriod: number;
+  weight: number;
+  unit: string;
+}) => {
+  try {
+    const result = await prisma.product.update({
+      where: { productId },
+      data: {
+        productName,
+        price,
+        expiredPeriod,
+        weight,
+        modifiedBy,
+        unit,
+      },
+    });
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};

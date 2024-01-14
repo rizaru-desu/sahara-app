@@ -9,10 +9,6 @@ export const toastMessage = ({
   message: string;
   type: ToastType;
 }) => {
-  getToastFunction(type, message);
-};
-
-const getToastFunction = (type: ToastType, message: string) => {
   switch (type) {
     case "error":
       return toast(
@@ -26,48 +22,12 @@ const getToastFunction = (type: ToastType, message: string) => {
         { style: { backgroundColor: "#e74c3c" } }
       );
     case "success":
-      return toast.success(message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      return toast.success(message);
     case "info":
-      return toast.info(message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      return toast.info(message);
     case "warning":
-      return toast.warning(message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      return toast.warning(message);
     default:
-      return toast.info(message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      }); // Default to info for unknown types
+      return toast.info(message);
   }
 };

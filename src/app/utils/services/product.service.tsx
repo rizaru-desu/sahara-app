@@ -3,13 +3,8 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 export class ProductService {
   protected readonly instance: AxiosInstance;
   public constructor() {
-    const baseURL =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000/"
-        : "https://sahara-app.vercel.app/";
-
     this.instance = axios.create({
-      baseURL: baseURL,
+      baseURL: location.origin,
       timeout: 30000,
       timeoutErrorMessage: "Time out!",
     });
@@ -58,6 +53,14 @@ export class ProductService {
     return response;
   };
 
+  getAllProductLabel = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-all-product-no-pagination/"
+    );
+
+    return response;
+  };
+
   searchProduct = async ({ value }: { value: string }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/get-product-search/",
@@ -80,22 +83,14 @@ export class ProductService {
     productId,
     modifiedBy,
     productName,
-    price,
-    expiredPeriod,
-    weight,
-    unit,
   }: {
     productId: string;
     modifiedBy?: string;
     productName: string;
-    price: number;
-    expiredPeriod: number;
-    weight: number;
-    unit: string;
   }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/update-product/",
-      { productId, modifiedBy, productName, price, expiredPeriod, weight, unit }
+      { productId, modifiedBy, productName }
     );
 
     return response;

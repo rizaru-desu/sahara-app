@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
       });
       return NextResponse.json(
         {
-          result: "OK",
           message: `The String Map (${json.objectName}: ${json.value}) has been successfully created.`,
         },
         {
@@ -70,7 +69,6 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          result: "OK",
           message: "Invalid token. Authentication failed.",
         },
         {

@@ -126,18 +126,10 @@ export default function Page({ params }: { params: { id: string } }) {
     async ({
       productId,
       productName,
-      price,
-      weight,
-      unit,
-      expiredPeriod,
       modifiedBy,
     }: {
       productId: string;
       productName: string;
-      price: number;
-      weight: number;
-      unit: string;
-      expiredPeriod: number;
       modifiedBy?: string;
     }) => {
       try {
@@ -146,10 +138,7 @@ export default function Page({ params }: { params: { id: string } }) {
         const responseApi = await productService.updateProduct({
           productId,
           productName,
-          price,
-          weight,
-          unit,
-          expiredPeriod,
+
           modifiedBy,
         });
 
@@ -198,16 +187,11 @@ export default function Page({ params }: { params: { id: string } }) {
   const handleSubmitAddProduct = (event: any) => {
     event.preventDefault();
 
-    const { productName, price, weight, unit, expiredPeriod, createBy } =
-      formDataProduct;
+    const { productName } = formDataProduct;
 
     updateProduct({
       productName,
       productId: params.id,
-      price: parseFloat(price.toString()),
-      weight: parseFloat(weight.toString()),
-      unit,
-      expiredPeriod: parseFloat(expiredPeriod.toString()),
       modifiedBy: dataUser?.fullname,
     });
   };
@@ -266,7 +250,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     type="text"
                     disabled
                     value={formDataProduct.productCode}
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6 disabled:ring-gray-300"
                     onChange={handleInputChangeProduct}
                   />
                 </div>
@@ -284,10 +268,10 @@ export default function Page({ params }: { params: { id: string } }) {
                     id="price"
                     name="price"
                     type="number"
-                    required
+                    disabled
                     value={formDataProduct.price}
                     placeholder="Example: 10000"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6 disabled:ring-gray-300"
                     onChange={handleInputChangeProduct}
                   />
                 </div>
@@ -305,11 +289,11 @@ export default function Page({ params }: { params: { id: string } }) {
                     id="weight"
                     name="weight"
                     type="number"
-                    required
+                    disabled
                     step="0.1"
                     placeholder="example: 0.1"
                     value={formDataProduct.weight}
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6 disabled:ring-gray-300"
                     onChange={handleInputChangeProduct}
                   />
                 </div>
@@ -327,10 +311,10 @@ export default function Page({ params }: { params: { id: string } }) {
                     id="unit"
                     name="unit"
                     type="text"
-                    required
+                    disabled
                     value={formDataProduct.unit}
                     placeholder="example: Pack/etc"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6 disabled:ring-gray-300"
                     onChange={handleInputChangeProduct}
                   />
                 </div>
@@ -348,10 +332,10 @@ export default function Page({ params }: { params: { id: string } }) {
                     id="expiredPeriod"
                     name="expiredPeriod"
                     type="number"
-                    required
+                    disabled
                     value={formDataProduct.expiredPeriod}
                     placeholder="example: 20"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6 disabled:ring-gray-300"
                     onChange={handleInputChangeProduct}
                   />
                 </div>

@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          result: "OK",
           message: `client has successfully registered ${result.namaUsaha}`,
         },
         {
@@ -83,7 +82,6 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          result: "OK",
           message: "Invalid token. Authentication failed.",
         },
         {
@@ -92,15 +90,13 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error: any) {
-    // Return a JSON response with a specific HTTP status code
     return NextResponse.json(
       {
         message: error.message,
       },
       {
-        status: 500, // You can replace 500 with the desired status code
+        status: 500,
       }
     );
   }
 }
-//endregion

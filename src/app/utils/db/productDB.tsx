@@ -84,6 +84,28 @@ export const manyProductPagination = async ({
   }
 };
 
+export const manyProduct = async () => {
+  try {
+    const result = await prisma.product.findMany({
+      select: {
+        productId: true,
+        productName: true,
+        productCode: true,
+        weight: true,
+        unit: true,
+        expiredPeriod: true,
+      },
+      orderBy: { productName: "asc" },
+    });
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
 export const findManyProductFilter = async ({ value }: { value: string }) => {
   try {
     const result = await prisma.product.findMany({
@@ -129,29 +151,17 @@ export const updateProduct = async ({
   productId,
   modifiedBy,
   productName,
-  price,
-  expiredPeriod,
-  weight,
-  unit,
 }: {
   productId: string;
   modifiedBy?: string;
   productName: string;
-  price: number;
-  expiredPeriod: number;
-  weight: number;
-  unit: string;
 }) => {
   try {
     const result = await prisma.product.update({
       where: { productId },
       data: {
         productName,
-        price,
-        expiredPeriod,
-        weight,
         modifiedBy,
-        unit,
       },
     });
 

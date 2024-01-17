@@ -75,7 +75,6 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          result: "OK",
           message: "Invalid token. Authentication failed.",
         },
         {

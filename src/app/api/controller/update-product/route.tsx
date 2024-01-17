@@ -61,11 +61,7 @@ export async function POST(request: NextRequest) {
       const user = await updateProduct({
         productId: validated.productId,
         productName: validated.productName,
-        price: validated.price,
-        weight: validated.weight,
-        unit: validated.unit,
         modifiedBy: validated.modifiedBy,
-        expiredPeriod: validated.expiredPeriod,
       });
 
       return NextResponse.json(

@@ -1,18 +1,19 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { addBooth } from "@/app/utils/db/customerDB";
+import { addLabelProduct, addProduct } from "@/app/utils/db/productDB";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
+import moment from "moment";
+import { type NextRequest, NextResponse } from "next/server";
 import z from "zod";
-import { updateProduct } from "@/app/utils/db/productDB";
 
 const Schema = z
   .object({
     productId: z.string(),
-    productName: z.string(),
-    price: z.number(),
-    weight: z.number().multipleOf(0.01),
-    unit: z.string(),
-    expiredPeriod: z.number(),
-    modifiedBy: z.string().optional(),
+    productCode: z.string(),
+    barcodeType: z.number(),
+    status: z.number(),
+    bestBefore: z.date(),
+    createBy: z.string(),
   })
   .strict();
 
@@ -54,19 +55,30 @@ export async function POST(request: NextRequest) {
     const json = await request.json();
 
     const validated = validateSchema({
-      data: json,
+      data: {
+        productId: json.productId,
+        productCode: json.productCode,
+        status: json.status,
+        barcodeType: json.barcodeType,
+        bestBefore: moment(json.bestBefore).toDate(),
+        createBy: json.createBy,
+      },
     });
 
     if (tokenValidated) {
-      const user = await updateProduct({
+      const result = await addLabelProduct({
         productId: validated.productId,
-        productName: validated.productName,
-        modifiedBy: validated.modifiedBy,
+        productCode: validated.productCode,
+        status: validated.status,
+        barcodeType: validated.barcodeType,
+        bestBefore: validated.bestBefore,
+        createBy: validated.createBy,
       });
 
       return NextResponse.json(
         {
-          message: `${user.productName} account has been successfully updated`,
+          result: "OK",
+          message: `Succesfully add label ${result.productCode}`,
         },
         {
           status: 200,

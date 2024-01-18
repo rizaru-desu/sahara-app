@@ -95,4 +95,42 @@ export class ProductService {
 
     return response;
   };
+
+  getAllProductLabelPagination = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/get-all-product-label/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  addLabelProduct = async ({
+    productId,
+    productCode,
+    status,
+    barcodeType,
+    bestBefore,
+    createBy,
+  }: {
+    productId: string;
+    productCode: string;
+    barcodeType: number;
+    status: number;
+    bestBefore: Date;
+    createBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/add-label-product/",
+      { productId, productCode, status, barcodeType, bestBefore, createBy }
+    );
+
+    return response;
+  };
 }

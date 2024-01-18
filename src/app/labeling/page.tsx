@@ -7,18 +7,18 @@ import NavBar from "@/app/component/navBar";
 import Loading from "../loading";
 import Loader from "../component/loader";
 import Select from "react-select";
-import QRCode from "react-qr-code";
-import Table from "@mui/material/Table";
 import { AuthService } from "../utils/services/auth.service";
 import { toastMessage } from "../component/toasttify";
-import { useReactToPrint } from "react-to-print";
 import { ProductService } from "../utils/services/product.service";
 import { useRouter } from "next/navigation";
 import moment from "moment";
-import { Pagination, TableBody, TableCell } from "@mui/material";
+import { Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import { FaBan, FaCheck } from "react-icons/fa";
+import * as XLSX from "xlsx";
 
 interface UserData {
+  fullname: string;
   roleId?: {
     key: number;
   };
@@ -26,7 +26,6 @@ interface UserData {
 
 export default function Page() {
   const router = useRouter();
-  const componentRef = React.useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [menuOpen, isMenuOpen] = React.useState(false);
   const [dataUser, setDataUser] = React.useState<UserData | undefined>(
@@ -35,7 +34,15 @@ export default function Page() {
 
   const [isAllDataProduct, setAllDataProduct] = React.useState([]);
 
+  const [isTotalPage, setTotalPage] = React.useState(0);
+  const [isCurrentPage, setCurrentPage] = React.useState(1);
+  const [isAllDataLabel, setAllDataLabel] = React.useState([]);
+  const [selectLabel, setSelectLabel] = React.useState<any[]>([]);
+
+  const [inputValue, setInputValue] = React.useState("");
+
   const [formDataProduct, setFormDataProduct] = React.useState({
+    productId: "",
     productName: "",
     productCode: "",
     price: 0,
@@ -47,11 +54,6 @@ export default function Page() {
     createdAt: undefined,
     modifedAt: undefined,
   });
-
-  const [qrCode, setQRCode] = React.useState({
-    sku: undefined,
-    bestBefore: undefined,
-  } as any);
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -163,78 +165,104 @@ export default function Page() {
     [logoutUser]
   );
 
+  const getListLabel = React.useCallback(
+    async ({ skip, take }: { skip: number; take: number }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.getAllProductLabelPagination({
+          skip,
+          take,
+        });
+
+        if (responseApi.status === 200) {
+          const { data, countUser } = responseApi.data;
+          setLoading(false);
+          setAllDataLabel(data);
+          setTotalPage(Math.ceil(countUser / 100));
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser]
+  );
+
+  const addLabelProduct = React.useCallback(
+    async ({
+      productId,
+      productCode,
+      barcodeType,
+      status,
+      bestBefore,
+    }: {
+      productId: string;
+      productCode: string;
+      barcodeType: number;
+      status: number;
+      bestBefore: Date;
+    }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.addLabelProduct({
+          productId,
+          productCode,
+          status,
+          barcodeType,
+          bestBefore,
+          createBy: dataUser?.fullname,
+        });
+
+        if (responseApi.status === 200) {
+          const { message } = responseApi.data;
+          setLoading(false);
+          getListLabel({ skip: 0, take: 100 });
+          toastMessage({
+            message: message,
+            type: "success",
+          });
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [dataUser?.fullname, getListLabel, logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
     getAllProduct();
-  }, [detailUser, getAllProduct]);
+    getListLabel({ skip: 0, take: 100 });
+  }, [detailUser, getAllProduct, getListLabel]);
 
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-    bodyClass: "flex flex-wrap min-h-screen",
-    onAfterPrint: () => {
-      //alert("status print");
-    },
-    onPrintError: (error: any) => {
-      toastMessage({ message: error.message, type: "error" });
-    },
-    documentTitle: qrCode
-      ? `${qrCode.sku} ${moment().format("DD-MM-YYYY HH:mm:ss")}`
-      : "",
-    removeAfterPrint: true,
-    pageStyle: `
-      @page {
-        size: 25mm 15mm;
-        margin: 1mm;
-      }
-
-      @media all {
-        .page-break {
-          display: none;
-        }
-      }
-      
-      @media print {
-        .page-break {
-          display: block;
-          page-break-before: always;
-        }
-      }
-
-      div.parent {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-      div.parent p { 
-        color:black; 
-        font-size: 5px; 
-      }
-      div.parent p.code { 
-        color:black; 
-        font-size: 5px; 
-        font-weight: bold; 
-      }
-      div.container-print {
-        display: flex;
-        flex-direction: row;
-        gap: 1px;
-      }
-      div.container-body {
-        display: flex; 
-        flex-direction: column; 
-      }
-      .qrCode {
-        height: 40px; 
-        width: 40px;
-      }
-      .divider {
-        border-bottom: 0.2px solid black;
-        width: 100%;
-        margin-top: 1px; 
-        margin-bottom: 1px;
-      }
-    `,
-  });
+  const handleChangePagination = async (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPage(value);
+    getListLabel({ skip: Math.max(0, (value - 1) * 100), take: 100 });
+  };
 
   const handleChange = (selectedOption: any) => {
     if (selectedOption) {
@@ -242,28 +270,34 @@ export default function Page() {
     }
   };
 
-  const handleInputChangeProduct = (e: any) => {
-    const { name, value } = e.target;
-
-    setFormDataProduct((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
   const handleGenerateQRCode = (event: any) => {
     event.preventDefault();
 
-    const { productCode, expiredPeriod } = formDataProduct;
+    const { productCode, expiredPeriod, productId } = formDataProduct;
 
-    setQRCode({
-      sku: `SBI${moment().format("YYMMDD")}${productCode}${
+    addLabelProduct({
+      productId,
+      productCode: `SBI${moment().format("YYMMDD")}${productCode}${
         Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
       }`,
-      bestBefore: moment(new Date())
-        .add(expiredPeriod, "days")
-        .format("DD/MM/YYYY"),
+      barcodeType: 1,
+      bestBefore: moment(new Date()).add(expiredPeriod, "days").toDate(),
+      status: 1,
     });
+  };
+
+  const handleInputChange = (event: any) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleSubmitSearch = (event: any) => {
+    event.preventDefault();
+
+    if (!_.isEmpty(inputValue)) {
+      // searchProduct({ value: inputValue });
+    } else {
+      toastMessage({ message: "Please input value search...", type: "error" });
+    }
   };
 
   return (
@@ -277,45 +311,45 @@ export default function Page() {
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-5">
-          <div className="grid grid-cols-1 gap-5 place-content-center place-items-start md:grid-cols-2">
-            <form
-              className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col "
-              onSubmit={handleGenerateQRCode}
-            >
-              <h6 className="text-black text-bold">
-                <strong>Create label product</strong>
-              </h6>
+          <form
+            className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col "
+            onSubmit={handleGenerateQRCode}
+          >
+            <h6 className="text-black text-bold">
+              <strong>Create label product</strong>
+            </h6>
 
-              <Select
-                options={isAllDataProduct}
-                isSearchable
-                isClearable
-                placeholder="Select product ..."
-                theme={(theme) => ({
-                  ...theme,
-                  borderRadius: 5,
-                  colors: {
-                    ...theme.colors,
-                    primary75: "#F44336",
-                    primary25: "white",
-                    primary: "#F44336",
-                    primary50: "white",
-                  },
-                  borderWidth: 2,
-                })}
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    borderColor: "#F44336",
-                  }),
-                  option: (baseStyles, state) => ({
-                    ...baseStyles,
-                    color: state.isSelected ? "white" : "black",
-                  }),
-                }}
-                onChange={handleChange}
-              />
+            <Select
+              options={isAllDataProduct}
+              isSearchable
+              isClearable
+              placeholder="Select product ..."
+              theme={(theme) => ({
+                ...theme,
+                borderRadius: 5,
+                colors: {
+                  ...theme.colors,
+                  primary75: "#F44336",
+                  primary25: "white",
+                  primary: "#F44336",
+                  primary50: "white",
+                },
+                borderWidth: 2,
+              })}
+              styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: "#F44336",
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  color: state.isSelected ? "white" : "black",
+                }),
+              }}
+              onChange={handleChange}
+            />
 
+            {formDataProduct.productId !== "" ? (
               <div className="grid md:grid-cols-2 grid-cols-1 grid-rows-4 gap-3">
                 <div>
                   <label
@@ -430,67 +464,202 @@ export default function Page() {
                   type="submit"
                   className="rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 col-start-1 col-span-2 h-10"
                 >
-                  Generate
+                  Save
+                </button>
+              </div>
+            ) : null}
+          </form>
+
+          <div className="m-10 flex flex-col">
+            <form
+              className="flex flex-row items-center m-[2px] mb-3"
+              action="#"
+              method="POST"
+              onSubmit={handleSubmitSearch}
+            >
+              <div className="relative mr-5 float-left">
+                <label htmlFor="inputSearch" className="sr-only">
+                  Search{" "}
+                </label>
+                <input
+                  id="inputSearch"
+                  type="text"
+                  placeholder="Search product name/code ..."
+                  className="block w-[280px] text-black placeholder:text-black rounded-lg dark:border-red-700 border-2 py-2 pl-10 pr-4 text-sm focus:border-red-900 focus:outline-none focus:ring-1 focus:ring-red-900"
+                  onChange={handleInputChange}
+                  minLength={3}
+                />
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transform">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="h-4 w-4 text-red-700 dark:text-red-700"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                </span>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  className="flex w-full justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                >
+                  Search
                 </button>
               </div>
             </form>
 
-            <div className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col my-5">
-              <h6 className="text-black text-bold">
-                <strong>QR-Code Product</strong>
-              </h6>
-
-              {qrCode.sku ? (
-                <div className="gap-3 flex flex-col">
-                  <div ref={componentRef} className="hidden container-body">
-                    <div className="container-print">
-                      <QRCode value={qrCode.sku} level="H" className="qrCode" />
-                      <div className="parent">
-                        <p className="code">{qrCode.sku}</p>
-                        <div className="divider" />
-                        <p>Best Before.</p>
-                        <p>{qrCode.bestBefore}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row gap-2">
-                    <QRCode
-                      value={qrCode.sku}
-                      level="H"
-                      className="w-[150px] h-[150px]"
-                    />
-                    <div className="flex flex-col gap-2">
-                      <p className="text-black text-xl font-bold">
-                        {qrCode.sku}
-                      </p>
-                      <div className="border-b-[5px] border-black" />
-                      <p className="text-black text-md">Best Before.</p>
-                      <p className="text-black text-md">{qrCode.bestBefore}</p>
-                    </div>
-                  </div>
-                  <button
-                    className={`justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
-                    onClick={handlePrint}
-                  >
-                    Print this out!
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="h-[450px] m-10">
             <DataGrid
               pagination={true}
               autoHeight
-              rows={[]}
-              columns={[]}
-              rowSelection={false}
+              getRowHeight={() => "auto"}
+              rows={isAllDataLabel}
+              checkboxSelection
+              disableRowSelectionOnClick
+              onRowSelectionModelChange={(ids: any) => {
+                const arrayId = _.split(ids, ",");
+                const filteredData = _.filter(isAllDataLabel, (item: any) =>
+                  arrayId.includes(item.id)
+                );
+
+                setSelectLabel(filteredData);
+              }}
+              slots={{
+                toolbar: () => (
+                  <button
+                    onClick={() => {
+                      const ws = XLSX.utils.json_to_sheet(selectLabel);
+                      const wb = XLSX.utils.book_new();
+                      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+                      XLSX.writeFile(
+                        wb,
+                        `Sahara ${moment().format("DD-MM-YYYY")}.xlsx`
+                      );
+                    }}
+                    className={`${
+                      !_.isEmpty(selectLabel) ? "block" : "hidden"
+                    } self-start m-2 justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
+                  >
+                    Export
+                  </button>
+                ),
+              }}
+              columns={[
+                {
+                  field: "productCode",
+                  headerName: "SKU (Product Code)",
+                  minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
+                },
+                {
+                  field: "bestBefore",
+                  headerName: "Best Before",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {moment(params.value)
+                          .local()
+                          .format("DD-MM-YYYY HH:mm")}
+                      </span>
+                    );
+                  },
+                },
+                {
+                  field: "barcodeType",
+                  headerName: "Barcode Type",
+                  minWidth: 150,
+                  align: "left",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {params.value === 1 ? "Product Barcode" : "Box Barcode"}
+                      </span>
+                    );
+                  },
+                },
+                {
+                  field: "status",
+                  headerName: "Has printed",
+                  minWidth: 150,
+                  align: "center",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return params.value === 2 ? (
+                      <FaCheck size={25} color={"black"} />
+                    ) : (
+                      <FaBan size={25} color={"black"} />
+                    );
+                  },
+                },
+                {
+                  field: "createBy",
+                  headerName: "createBy",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                },
+                {
+                  field: "modifiedBy",
+                  headerName: "modifiedBy",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                },
+                {
+                  field: "createdAt",
+                  headerName: "createdAt",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {moment(params.value)
+                          .local()
+                          .format("DD-MM-YYYY HH:mm")}
+                      </span>
+                    );
+                  },
+                },
+                {
+                  field: "modifedAt",
+                  headerName: "modifedAt",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {moment(params.value)
+                          .local()
+                          .format("DD-MM-YYYY HH:mm")}
+                      </span>
+                    );
+                  },
+                },
+              ]}
             />
 
             <div className="flex justify-center py-4">
-              <Pagination count={1} page={1} shape="rounded" />
+              <Pagination
+                count={isTotalPage}
+                page={isCurrentPage}
+                onChange={handleChangePagination}
+                shape="rounded"
+              />
             </div>
           </div>
         </div>

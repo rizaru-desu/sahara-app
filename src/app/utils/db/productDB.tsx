@@ -172,3 +172,79 @@ export const updateProduct = async ({
     await prisma.$disconnect();
   }
 };
+
+export const manyProductLabelPagination = async ({
+  skip,
+  take,
+}: {
+  skip: number;
+  take: number;
+}) => {
+  try {
+    const result = await prisma.labelProduct.findMany({
+      skip,
+      take,
+      orderBy: { createdAt: "asc" },
+    });
+    const totalCount = await prisma.labelProduct.count();
+
+    return { result, totalCount };
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const addLabelProduct = async ({
+  productId,
+  productCode,
+  barcodeType,
+  status,
+  bestBefore,
+  createBy,
+}: {
+  productId: string;
+  productCode: string;
+  barcodeType: number;
+  status: number;
+  bestBefore: Date;
+  createBy: string;
+}) => {
+  try {
+    const result = await prisma.labelProduct.create({
+      data: {
+        productId,
+        productCode,
+        barcodeType,
+        status,
+        bestBefore,
+        createBy,
+      },
+    });
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const updateStatusLabelProduct = async ({
+  labelData,
+}: {
+  labelData: any[];
+}) => {
+  try {
+    const result = await prisma.labelProduct.updateMany({
+      data: labelData,
+    });
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};

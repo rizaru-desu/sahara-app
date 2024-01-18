@@ -2,17 +2,12 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
-import { updateProduct } from "@/app/utils/db/productDB";
+import { manyProductLabelPagination } from "@/app/utils/db/productDB";
 
 const Schema = z
   .object({
-    productId: z.string(),
-    productName: z.string(),
-    price: z.number(),
-    weight: z.number().multipleOf(0.01),
-    unit: z.string(),
-    expiredPeriod: z.number(),
-    modifiedBy: z.string().optional(),
+    skip: z.number(),
+    take: z.number(),
   })
   .strict();
 
@@ -53,20 +48,30 @@ export async function POST(request: NextRequest) {
 
     const json = await request.json();
 
-    const validated = validateSchema({
+    const resultValid = validateSchema({
       data: json,
     });
 
     if (tokenValidated) {
-      const user = await updateProduct({
-        productId: validated.productId,
-        productName: validated.productName,
-        modifiedBy: validated.modifiedBy,
+      const { result, totalCount } = await manyProductLabelPagination({
+        skip: resultValid.skip,
+        take: resultValid.take,
+      });
+
+      const finalResult = _.map(result, (item) => {
+        return Object.assign(
+          {
+            id: item.labelId,
+          },
+          _.omit(item, "labelId")
+        );
       });
 
       return NextResponse.json(
         {
-          message: `${user.productName} account has been successfully updated`,
+          result: "OK",
+          data: finalResult,
+          countUser: totalCount,
         },
         {
           status: 200,
@@ -75,6 +80,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
+          result: "OK",
           message: "Invalid token. Authentication failed.",
         },
         {

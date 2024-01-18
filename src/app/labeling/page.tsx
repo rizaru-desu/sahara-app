@@ -182,10 +182,9 @@ export default function Page() {
       : "",
     removeAfterPrint: true,
     pageStyle: `
-      @page 
-      {
-        size: auto;   /* auto is the initial value */
-        margin: 1.5mm;  /* this affects the margin in the printer settings */
+      @page {
+        size: 25mm 15mm;
+        margin: 1mm;
       }
 
       @media all {
@@ -443,7 +442,7 @@ export default function Page() {
 
               {qrCode.sku ? (
                 <div className="gap-3 flex flex-col">
-                  <div className="hidden container-body">
+                  <div ref={componentRef} className="hidden container-body">
                     <div className="container-print">
                       <QRCode value={qrCode.sku} level="H" className="qrCode" />
                       <div className="parent">
@@ -455,23 +454,19 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div ref={componentRef} className="flex flex-col gap-2">
-                    <div className="flex flex-row">
-                      <QRCode
-                        value={qrCode.sku}
-                        level="H"
-                        className="w-[150px] h-[150px]"
-                      />
-                      <div className="flex flex-col gap-2">
-                        <p className="text-black text-xl font-bold">
-                          {qrCode.sku}
-                        </p>
-                        <div className="border-b-[5px] border-black" />
-                        <p className="text-black text-md">Best Before.</p>
-                        <p className="text-black text-md">
-                          {qrCode.bestBefore}
-                        </p>
-                      </div>
+                  <div className="flex flex-row gap-2">
+                    <QRCode
+                      value={qrCode.sku}
+                      level="H"
+                      className="w-[150px] h-[150px]"
+                    />
+                    <div className="flex flex-col gap-2">
+                      <p className="text-black text-xl font-bold">
+                        {qrCode.sku}
+                      </p>
+                      <div className="border-b-[5px] border-black" />
+                      <p className="text-black text-md">Best Before.</p>
+                      <p className="text-black text-md">{qrCode.bestBefore}</p>
                     </div>
                   </div>
                   <button

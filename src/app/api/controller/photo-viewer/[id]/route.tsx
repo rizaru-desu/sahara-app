@@ -6,7 +6,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const slug = params.id;
+ 
+    const slug = params.id === null ? '': params.id;
     const result = await findPhoto({ boothId: slug });
 
     if (!result?.photoBooth) {

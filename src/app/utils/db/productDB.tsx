@@ -231,6 +231,28 @@ export const addLabelProduct = async ({
   }
 };
 
+export const findManyLabelFilter = async ({ value }: { value: string }) => {
+  try {
+    const result = await prisma.labelProduct.findMany({
+      where: {
+        OR: [
+          {
+            productCode: { contains: value },
+          },
+        ],
+      },
+
+      orderBy: { modifiedBy: "asc" },
+    });
+
+    return { result, totalCount: _.size(result) };
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
 export const updateStatusLabelProduct = async ({
   labelData,
 }: {

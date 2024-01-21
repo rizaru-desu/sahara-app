@@ -2,39 +2,6 @@ import { addBooth } from "@/app/utils/db/customerDB";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import { type NextRequest, NextResponse } from "next/server";
-import z from "zod";
-
-const Schema = z
-  .object({
-    alamatBooth: z.string(),
-    gelocation: z.string(),
-    photoBooth: z.string(),
-    customerId: z.string(),
-    createBy: z.string().optional(),
-  })
-  .strict();
-
-function validateSchema({ data }: { data: any }) {
-  try {
-    const parseData = Schema.parse(data);
-    return parseData;
-  } catch (error: any) {
-    if (error.issues && error.issues.length > 0) {
-      const validationErrors = error.issues.map((issue: any) => ({
-        path: issue.path.join("."),
-        message: issue.message,
-      }));
-
-      const errorMessage = validationErrors
-        .map((error: any) => `Field '${error.path}' ${error.message}`)
-        .join(" \n");
-
-      throw new Error(errorMessage);
-    } else {
-      throw new Error("Invalid Schema.");
-    }
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,20 +16,19 @@ export async function POST(request: NextRequest) {
         : tokenWithoutBearer,
     })) as any;
 
-    const json = await request.json();
+    const formData = await request.formData();
 
-    const validated = validateSchema({
-      data: json,
-    });
+    const files = formData.getAll("photoBooth") as File[];
+    const alamatBooth = formData.get("alamatBooth");
+    const createBy = formData.get("createBy");
+    const customerId = formData.get("customerId");
+
+    console.log("Files:", files);
+    console.log("Alamat Booth:", alamatBooth);
+    console.log("Create By:", createBy);
+    console.log("Customer ID:", customerId);
 
     if (tokenValidated) {
-      await addBooth({
-        alamatBooth: validated.alamatBooth,
-        geolocation: validated.gelocation,
-        photoBooth: validated.photoBooth,
-        customerId: validated.customerId,
-      });
-
       return NextResponse.json(
         {
           result: "OK",

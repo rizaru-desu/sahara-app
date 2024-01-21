@@ -541,7 +541,9 @@ export default function Page() {
                       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
                       XLSX.writeFile(
                         wb,
-                        `Sahara ${moment().format("DD-MM-YYYY")}.xlsx`
+                        `Sahara ${moment().format("DD-MM-YYYY")}-${
+                          Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
+                        }.xlsx`
                       );
                     }}
                     className={`${

@@ -48,13 +48,13 @@ model Customer {
   instagram   String?  @db.VarChar(255)
   ecommerce   String?  @db.VarChar(255)
   facebook    String?  @db.VarChar(255)
-  userId      String   @db.VarChar(255)
+  userId      String?   @db.VarChar(255)
   createBy    String?  @default("bySystem") @db.VarChar(255)
   createdAt   DateTime @default(now())
   modifedAt   DateTime @updatedAt
   modifiedBy  String?  @db.VarChar(255)
   booth       Booth[]
-  user        User     @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  user        User?     @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([userId])
 }

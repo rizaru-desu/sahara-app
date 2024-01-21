@@ -13,8 +13,11 @@ import Loader from "../component/loader";
 import { IconButton, Pagination } from "@mui/material";
 import { CustomerService } from "../utils/services/customer.service";
 import { FaInstagram, FaFacebook, FaShopify } from "react-icons/fa";
+import { number } from "zod";
+import moment from "moment";
 
 interface UserData {
+  fullname: string;
   roleId?: {
     key: number;
   };
@@ -27,6 +30,16 @@ export default function Product() {
   const [dataUser, setDataUser] = React.useState<UserData | undefined>(
     undefined
   );
+
+  const [formData, setFormData] = React.useState({
+    namaUsaha: "",
+    namaMerek: "",
+    lamaUsaha: 0,
+    totalBooth: 0,
+    instagram: "",
+    facebook: "",
+    ecommerce: "",
+  });
 
   const [isTotalPage, setTotalPage] = React.useState(0);
   const [isCurrentPage, setCurrentPage] = React.useState(1);
@@ -153,6 +166,65 @@ export default function Product() {
     [logoutUser]
   );
 
+  const addCustomer = React.useCallback(
+    async ({
+      namaUsaha,
+      namaMerek,
+      lamaUsaha,
+      totalBooth,
+      instagram,
+      facebook,
+      ecommerce,
+    }: {
+      namaUsaha: string;
+      namaMerek: string;
+      lamaUsaha: number;
+      totalBooth: number;
+      instagram: string;
+      facebook: string;
+      ecommerce: string;
+    }) => {
+      try {
+        setLoading(true);
+        const customerService = new CustomerService();
+
+        const responseApi = await customerService.addCustomer({
+          namaUsaha,
+          namaMerek,
+          lamaUsaha,
+          totalBooth,
+          instagram,
+          facebook,
+          ecommerce,
+          createBy: dataUser?.fullname,
+        });
+
+        if (responseApi.status === 200) {
+          const { message } = responseApi.data;
+          setLoading(false);
+          getCurrentListCustomer({ skip: 0, take: 100 });
+          toastMessage({
+            message: message,
+            type: "success",
+          });
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [dataUser?.fullname, getCurrentListCustomer, logoutUser]
+  );
+
   React.useEffect(() => {
     detailUser();
     getCurrentListCustomer({ skip: 0, take: 100 });
@@ -180,6 +252,38 @@ export default function Product() {
     }
   };
 
+  const handleInputChangeCustomer = (e: any) => {
+    const { name, value } = e.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmitAddCustomer = (event: any) => {
+    event.preventDefault();
+
+    const {
+      namaUsaha,
+      namaMerek,
+      lamaUsaha,
+      totalBooth,
+      instagram,
+      facebook,
+      ecommerce,
+    } = formData;
+    addCustomer({
+      namaUsaha,
+      namaMerek,
+      lamaUsaha,
+      totalBooth,
+      instagram,
+      facebook,
+      ecommerce,
+    });
+  };
+
   return (
     <main className="dark:bg-white bg-white min-h-screen">
       <SideBar opens={menuOpen} closeds={open} roles={dataUser?.roleId?.key} />
@@ -191,6 +295,166 @@ export default function Product() {
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-5">
+          <form
+            className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col"
+            onSubmit={handleSubmitAddCustomer}
+          >
+            <h6 className="text-black text-bold">
+              <strong>Add Customer</strong>
+            </h6>
+
+            <div className="grid grid-cols-2 grid-rows-4 place-content-evenly gap-3">
+              <div>
+                <label
+                  htmlFor="namaUsaha"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Nama Pengusaha
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="namaUsaha"
+                    name="namaUsaha"
+                    type="text"
+                    required
+                    placeholder="example: PT. ..../CV. ..../etc"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeCustomer}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="namaMerek"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Nama Merek
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="namaMerek"
+                    name="namaMerek"
+                    type="text"
+                    required
+                    placeholder="example: Kebab Enak/etc"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeCustomer}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lamaUsaha"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Lama Usaha (Bulan)
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="lamaUsaha"
+                    name="lamaUsaha"
+                    type="number"
+                    min={0}
+                    required
+                    placeholder="example: 10 bulan"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeCustomer}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="totalBooth"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Total Booth
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="totalBooth"
+                    name="totalBooth"
+                    type="number"
+                    min={0}
+                    required
+                    placeholder="example: 10"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeCustomer}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="instagram"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Instagram
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="instagram"
+                    name="instagram"
+                    type="text"
+                    required
+                    placeholder="Url: https://www.instagram.com/kebab.official"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeCustomer}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="facebook"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  facebok
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="facebook"
+                    name="facebook"
+                    type="text"
+                    required
+                    placeholder="Url: https://www.facebook.com/kebab.official"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeCustomer}
+                  />
+                </div>
+              </div>
+
+              <div className="col-span-2 place-self-center">
+                <label
+                  htmlFor="ecommerce"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  e-commerce
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="ecommerce"
+                    name="ecommerce"
+                    type="text"
+                    required
+                    placeholder="Url E-Commerce"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
+                    onChange={handleInputChangeCustomer}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+            >
+              Simpan
+            </button>
+          </form>
+
           <div className="m-10 flex flex-col">
             <form
               className="flex flex-row items-center m-[2px] mb-3"
@@ -276,7 +540,7 @@ export default function Product() {
                   disableColumnMenu: true,
                   renderCell: (params) => {
                     const onClick = (e: any) => {
-                      e.stopPropagation(); // don't select this row after clicking
+                      e.stopPropagation();
 
                       router.push(`/customer/booth/${params.id}`);
                     };
@@ -329,7 +593,7 @@ export default function Product() {
                 },
                 {
                   field: "ecommerce",
-                  headerName: "ecommerce",
+                  headerName: "E-Commerce",
                   minWidth: 150,
                   align: "center",
                   headerAlign: "center",
@@ -347,20 +611,51 @@ export default function Product() {
                     );
                   },
                 },
-
                 {
                   field: "createBy",
-                  headerName: "Create By",
+                  headerName: "createBy",
                   minWidth: 150,
-                  align: "left",
+                  align: "right",
                   headerAlign: "center",
                 },
                 {
                   field: "modifiedBy",
-                  headerName: "Modified By",
+                  headerName: "modifiedBy",
                   minWidth: 150,
-                  align: "left",
+                  align: "right",
                   headerAlign: "center",
+                },
+                {
+                  field: "createdAt",
+                  headerName: "createdAt",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {moment(params.value)
+                          .local()
+                          .format("DD-MM-YYYY HH:mm")}
+                      </span>
+                    );
+                  },
+                },
+                {
+                  field: "modifedAt",
+                  headerName: "modifedAt",
+                  minWidth: 150,
+                  align: "right",
+                  headerAlign: "center",
+                  renderCell: (params) => {
+                    return (
+                      <span className="text-black">
+                        {moment(params.value)
+                          .local()
+                          .format("DD-MM-YYYY HH:mm")}
+                      </span>
+                    );
+                  },
                 },
               ]}
             />

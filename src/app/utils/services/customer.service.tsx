@@ -10,6 +10,42 @@ export class CustomerService {
     });
   }
 
+  addCustomer = async ({
+    namaUsaha,
+    namaMerek,
+    lamaUsaha,
+    totalBooth,
+    instagram,
+    facebook,
+    ecommerce,
+    createBy,
+  }: {
+    namaUsaha: string;
+    namaMerek: string;
+    lamaUsaha: number;
+    totalBooth: number;
+    instagram: string;
+    facebook: string;
+    ecommerce: string;
+    createBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/add-customer/",
+      {
+        namaUsaha,
+        namaMerek,
+        lamaUsaha: Number(lamaUsaha),
+        totalBooth: Number(totalBooth),
+        instagram,
+        facebook,
+        ecommerce,
+        createBy,
+      }
+    );
+
+    return response;
+  };
+
   getCustomer = async ({ skip, take }: { skip: number; take: number }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/get-all-customer/",
@@ -25,6 +61,14 @@ export class CustomerService {
       { value }
     );
 
+    return response;
+  };
+
+  addBooth = async ({ data }: { data: any }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/add-booth/",
+      data
+    );
     return response;
   };
 

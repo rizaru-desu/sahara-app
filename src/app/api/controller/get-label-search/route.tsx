@@ -1,26 +1,18 @@
-import { addCustomer } from "@/app/utils/db/customerDB";
+import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
-import { type NextRequest, NextResponse } from "next/server";
 import z from "zod";
+import { findManyProductFilter } from "@/app/utils/db/productDB";
 
-const Schema = z
+const createSchema = z
   .object({
-    namaUsaha: z.string(),
-    namaMerek: z.string(),
-    lamaUsaha: z.number(),
-    totalBooth: z.number(),
-    instagram: z.string().url().optional(),
-    facebook: z.string().url().optional(),
-    ecommerce: z.string().url().optional(),
-    userId: z.string().optional(),
-    createBy: z.string().optional(),
+    value: z.string(),
   })
   .strict();
 
 function validateSchema({ data }: { data: any }) {
   try {
-    const parseData = Schema.parse(data);
+    const parseData = createSchema.parse(data);
     return parseData;
   } catch (error: any) {
     if (error.issues && error.issues.length > 0) {
@@ -55,25 +47,29 @@ export async function POST(request: NextRequest) {
 
     const json = await request.json();
 
-    const validated = validateSchema({
+    const resultValid = validateSchema({
       data: json,
     });
 
     if (tokenValidated) {
-      const result = await addCustomer({
-        namaUsaha: validated.namaUsaha,
-        merekUsaha: validated.namaMerek,
-        lamaUsaha: validated.lamaUsaha,
-        jumlahBooth: validated.totalBooth,
-        instagram: validated.instagram,
-        facebook: validated.facebook,
-        ecommerce: validated.ecommerce,
-        userId: validated.userId,
+      const { result, totalCount } = await findManyProductFilter({
+        value: resultValid.value,
+      });
+
+      const final = _.map(result, (item) => {
+        return Object.assign(
+          {
+            id: item.productId,
+          },
+          _.omit(item, "boothId")
+        );
       });
 
       return NextResponse.json(
         {
-          message: `client has successfully registered ${result.namaUsaha}`,
+          result: "OK",
+          data: final,
+          countUser: totalCount,
         },
         {
           status: 200,
@@ -82,6 +78,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
+          result: "OK",
           message: "Invalid token. Authentication failed.",
         },
         {

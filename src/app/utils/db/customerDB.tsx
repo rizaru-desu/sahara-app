@@ -11,7 +11,7 @@ interface AddCustomerInput {
   namaUsaha: string;
   merekUsaha: string;
   jumlahBooth: number;
-  userId: string;
+  userId?: string;
 }
 
 export const addCustomer = async ({
@@ -48,28 +48,19 @@ export const addCustomer = async ({
 
 interface AddBoothInput {
   alamatBooth: string;
-  geolocation: string;
-  photoBooth: string;
+  photoBooth: Buffer;
   customerId: string;
 }
 
 export const addBooth = async ({
   alamatBooth,
-  geolocation,
   photoBooth,
   customerId,
 }: AddBoothInput) => {
   try {
-    const decodedPhotoBooth = Buffer.from(photoBooth, "base64");
+    //const decodedPhotoBooth = Buffer.from(photoBooth, "base64");
 
-    const result = await prisma.booth.create({
-      data: {
-        alamatBooth,
-        geolocation,
-        photoBooth: decodedPhotoBooth,
-        customerId,
-      },
-    });
+    const result = "";
 
     return result;
   } catch (error: any) {
@@ -120,7 +111,7 @@ export const manyBoothPagination = async ({
       orderBy: { alamatBooth: "asc" },
     });
 
-    const totalCount = await prisma.booth.count();
+    const totalCount = _.size(result);
 
     return { result, totalCount };
   } catch (error: any) {

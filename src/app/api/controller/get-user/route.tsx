@@ -11,7 +11,7 @@ interface User {
   email: string;
   password: string;
   roleId: string;
-  verification: boolean;
+  inActive: boolean;
   createBy: string | null;
   modifiedBy: string | null;
   createdAt: Date;

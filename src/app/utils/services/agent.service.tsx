@@ -10,7 +10,7 @@ export class CustomerService {
     });
   }
 
-  addCustomer = async ({
+  addAgent = async ({
     namaUsaha,
     namaMerek,
     lamaUsaha,
@@ -24,13 +24,13 @@ export class CustomerService {
     namaMerek: string;
     lamaUsaha: number;
     totalBooth: number;
-    instagram: string;
-    facebook: string;
-    ecommerce: string;
+    instagram?: string;
+    facebook?: string;
+    ecommerce?: string;
     createBy?: string;
   }) => {
     const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/add-customer/",
+      "api/controller/add-agent/",
       {
         namaUsaha,
         namaMerek,
@@ -46,18 +46,18 @@ export class CustomerService {
     return response;
   };
 
-  getCustomer = async ({ skip, take }: { skip: number; take: number }) => {
+  getAgent = async ({ skip, take }: { skip: number; take: number }) => {
     const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/get-all-customer/",
+      "api/controller/get-all-agent/",
       { skip, take }
     );
 
     return response;
   };
 
-  searchCustomer = async ({ value }: { value: string }) => {
+  searchAgent = async ({ value }: { value: string }) => {
     const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/get-customer-search/",
+      "api/controller/get-agent-search/",
       { value }
     );
 
@@ -75,15 +75,15 @@ export class CustomerService {
   getBooth = async ({
     skip,
     take,
-    customerId,
+    agentId,
   }: {
     skip: number;
     take: number;
-    customerId: string;
+    agentId: string;
   }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/get-all-booth/",
-      { skip, take, customerId }
+      { skip, take, agentId }
     );
 
     return response;

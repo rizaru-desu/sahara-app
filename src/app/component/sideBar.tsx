@@ -39,8 +39,8 @@ function SideBar({
       roles: [0],
     },
     {
-      title: "Customer",
-      href: "/customer",
+      title: "Agent",
+      href: "/agent",
       header: false,
       icon: <FaUserFriends size={25} color={"#fff"} />,
       roles: [0],

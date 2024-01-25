@@ -149,9 +149,7 @@ export default function Page({ params }: { params: { id: string } }) {
             message: message,
             type: "success",
           });
-          setTimeout(() => {
-            location.reload();
-          }, 3000);
+          findProduct();
         }
       } catch (e: any) {
         setLoading(false);
@@ -167,7 +165,7 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       }
     },
-    [logoutUser]
+    [findProduct, logoutUser]
   );
 
   React.useEffect(() => {

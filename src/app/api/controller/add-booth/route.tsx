@@ -1,4 +1,4 @@
-import { addBooth } from "@/app/utils/db/customerDB";
+import { addBooth } from "@/app/utils/db/agentDB";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import { type NextRequest, NextResponse } from "next/server";
@@ -19,16 +19,25 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
 
     const files = formData.getAll("photoBooth") as File[];
-    const alamatBooth = formData.get("alamatBooth");
-    const createBy = formData.get("createBy");
-    const customerId = formData.get("customerId");
-
-    console.log("Files:", files);
-    console.log("Alamat Booth:", alamatBooth);
-    console.log("Create By:", createBy);
-    console.log("Customer ID:", customerId);
+    const alamatBooth = formData.get("alamatBooth") as string;
+    const createBy = formData.get("createBy") as string;
+    const agentId = formData.get("agentId") as string;
+    const geolocation = formData.get("latlong") as string;
 
     if (tokenValidated) {
+      const fileToStorage = files[0];
+
+      const arrayBuffer = await fileToStorage.arrayBuffer();
+
+      const base64String = arrayBufferToBase64(arrayBuffer);
+
+      await addBooth({
+        alamatBooth,
+        photoBooth: base64String,
+        geolocation,
+        agentId,
+        createBy,
+      });
       return NextResponse.json(
         {
           result: "OK",
@@ -58,4 +67,13 @@ export async function POST(request: NextRequest) {
       }
     );
   }
+}
+
+function arrayBufferToBase64(arrayBuffer: ArrayBuffer): string {
+  const uint8Array = new Uint8Array(arrayBuffer);
+  let binary = "";
+  uint8Array.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
 }

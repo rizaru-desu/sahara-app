@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
-import { findManyBoothFilter } from "@/app/utils/db/customerDB";
+import { findManyBoothFilter } from "@/app/utils/db/agentDB";
 
 const createSchema = z
   .object({
@@ -34,6 +34,7 @@ function validateSchema({ data }: { data: any }) {
 
 export async function POST(request: NextRequest) {
   try {
+    const baseURL = `${request.nextUrl.origin}`;
     const token = request.headers.get("Authorization") as any;
 
     const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
         return Object.assign(
           {
             id: item.boothId,
-            photo: item.photoBooth,
+            photo: `${baseURL}/api/controller/photo-viewer/${item.boothId}`,
           },
           _.omit(item, "boothId", '"photoBooth"')
         );

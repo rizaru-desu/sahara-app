@@ -1,19 +1,17 @@
 "use client";
 
 import React, { Suspense } from "react";
-import _ from "lodash";
 import { useRouter } from "next/navigation";
-import SideBar from "@/app/component/sideBar";
-import NavBar from "@/app/component/navBar";
 import { DataGrid } from "@mui/x-data-grid";
-import Loading from "../loading";
 import { AuthService } from "../utils/services/auth.service";
 import { toastMessage } from "../component/toasttify";
+import { Checkbox, Pagination } from "@mui/material";
 import Loader from "../component/loader";
 import moment from "moment";
-import { FaTrash } from "react-icons/fa";
-import { IconButton, Pagination } from "@mui/material";
-
+import Loading from "../loading";
+import SideBar from "@/app/component/sideBar";
+import NavBar from "@/app/component/navBar";
+import _ from "lodash";
 interface UserData {
   fullname?: string;
   roleId?: {
@@ -30,13 +28,13 @@ export default function Page() {
   );
   const [isTotalPage, setTotalPage] = React.useState(0);
   const [isCurrentPage, setCurrentPage] = React.useState(1);
+
   const [isAllDataUser, setAllDataUser] = React.useState([]);
 
   const [isAllRole, setAllRole] = React.useState([]);
 
   const [inputValue, setInputValue] = React.useState("");
 
-  // Define state variables for form fields
   const [formDataUser, setFormDataUser] = React.useState({
     email: "",
     fullname: "",
@@ -181,7 +179,7 @@ export default function Page() {
         const { message } = responseApi.data;
         setLoading(false);
         toastMessage({ message, type: "success" });
-        location.reload();
+        getCurrentListUser({ skip: 0, take: 100 });
       }
     } catch (e: any) {
       setLoading(false);
@@ -203,21 +201,30 @@ export default function Page() {
     formDataUser.fullname,
     formDataUser.phone,
     formDataUser.roles,
+    getCurrentListUser,
     logoutUser,
   ]);
 
-  const deletUser = React.useCallback(
-    async ({ userId }: { userId: string }) => {
+  const activeUser = React.useCallback(
+    async ({ userId, value }: { userId: string; value: boolean }) => {
       try {
         setLoading(true);
         const authService = new AuthService();
-        const responseApi = await authService.deleteUser({ userId });
+        const responseApi = await authService.activeUser({ userId, value });
 
         if (responseApi.status === 200) {
           const { message } = responseApi.data;
           setLoading(false);
           toastMessage({ message, type: "success" });
-          location.reload();
+
+          const updateData = _.map(isAllDataUser, (user: any) => {
+            if (user.id === userId) {
+              user.inActive = value;
+            }
+            return user;
+          }) as [];
+
+          setAllDataUser(updateData);
         }
       } catch (e: any) {
         setLoading(false);
@@ -233,7 +240,7 @@ export default function Page() {
         }
       }
     },
-    [logoutUser]
+    [isAllDataUser, logoutUser]
   );
 
   const updateUserRole = React.useCallback(
@@ -452,23 +459,28 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="relative float-right block">
-                <label htmlFor="roles" className="sr-only">
+              <div>
+                <label
+                  htmlFor="Roles"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
                   Roles
                 </label>
-                <select
-                  id="roles"
-                  name="roles"
-                  className="block w-40 text-white rounded-lg border dark:border-none dark:bg-red-700 bg-red-700 p-2 text-sm focus:border-white-400 focus:outline-none focus:ring-1 focus:ring-white-400"
-                  onChange={handleInputChangeAddUser}
-                  required
-                >
-                  {_.map(isAllRole, (_item: any, index: number) => (
-                    <option key={index.toString()} value={_item.stringId}>
-                      {_item.value}
-                    </option>
-                  ))}
-                </select>
+                <div className="mt-2">
+                  <select
+                    id="roles"
+                    name="roles"
+                    className="block w-40 text-white rounded-lg border dark:border-none dark:bg-red-700 bg-red-700 p-2 text-sm focus:border-white-400 focus:outline-none focus:ring-1 focus:ring-white-400"
+                    onChange={handleInputChangeAddUser}
+                    required
+                  >
+                    {_.map(isAllRole, (_item: any, index: number) => (
+                      <option key={index.toString()} value={_item.stringId}>
+                        {_item.value}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -534,24 +546,29 @@ export default function Page() {
               rows={isAllDataUser}
               columns={[
                 {
-                  field: "id",
-                  headerName: "Action",
-                  minWidth: 150,
+                  field: "inActive",
+                  headerName: "Active",
+                  type: "actions",
+                  minWidth: 100,
                   align: "center",
                   headerAlign: "center",
                   hideSortIcons: true,
                   disableColumnMenu: true,
                   renderCell: (params) => {
-                    const onClick = (e: any) => {
-                      e.stopPropagation(); // don't select this row after clicking
-
-                      deletUser({ userId: params.id.toString() });
-                    };
-
                     return (
-                      <IconButton aria-label="delete" onClick={onClick}>
-                        <FaTrash color="#2D3250" size={20} />
-                      </IconButton>
+                      <Checkbox
+                        checked={params.value}
+                        onChange={(
+                          event: React.ChangeEvent<HTMLInputElement>
+                        ) => {
+                          event.stopPropagation();
+                          activeUser({
+                            userId: params.id.toString(),
+                            value: event.target.checked,
+                          });
+                        }}
+                        inputProps={{ "aria-label": "controlled" }}
+                      />
                     );
                   },
                 },
@@ -561,24 +578,28 @@ export default function Page() {
                   minWidth: 150,
                   align: "left",
                   headerAlign: "center",
+                  editable: false,
                 },
                 {
                   field: "email",
                   headerName: "Email",
                   minWidth: 150,
                   headerAlign: "center",
+                  editable: false,
                 },
                 {
                   field: "phone",
                   headerName: "No. HP",
                   minWidth: 150,
                   headerAlign: "center",
+                  editable: false,
                 },
                 {
                   field: "dateOfBirth",
                   headerName: "Tanggal Lahir",
                   minWidth: 150,
                   headerAlign: "center",
+                  editable: false,
                 },
 
                 {
@@ -586,6 +607,7 @@ export default function Page() {
                   headerName: "Verifikasi",
                   minWidth: 150,
                   headerAlign: "center",
+                  editable: false,
                 },
                 {
                   field: "roleId",
@@ -634,12 +656,14 @@ export default function Page() {
                   field: "createBy",
                   headerName: "Create By",
                   minWidth: 150,
+                  editable: false,
                 },
                 {
                   field: "createdAt",
                   headerName: "Created At",
                   headerAlign: "center",
                   minWidth: 150,
+                  editable: false,
                   renderCell: (params) => {
                     return (
                       <span className="text-black">
@@ -653,12 +677,14 @@ export default function Page() {
                   headerName: "Modified By",
                   headerAlign: "center",
                   minWidth: 150,
+                  editable: false,
                 },
                 {
                   field: "modifedAt",
                   headerName: "Modifed At",
                   headerAlign: "center",
                   minWidth: 150,
+                  editable: false,
                   renderCell: (params) => {
                     return (
                       <span className="text-black">

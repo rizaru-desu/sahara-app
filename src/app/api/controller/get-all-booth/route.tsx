@@ -2,11 +2,11 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
-import { manyBoothPagination } from "@/app/utils/db/customerDB";
+import { manyBoothPagination } from "@/app/utils/db/agentDB";
 
 const createUserSchema = z
   .object({
-    customerId: z.string(),
+    agentId: z.string(),
     skip: z.number(),
     take: z.number(),
   })
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       const { result, totalCount } = await manyBoothPagination({
         skip: resultValid.skip,
         take: resultValid.take,
-        customerId: resultValid.customerId,
+        agentId: resultValid.agentId,
       });
 
       const finalResult = _.map(result, (item) => {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         {
           result: "OK",
           data: finalResult,
-          countUser: totalCount,
+          count: totalCount,
         },
         {
           status: 200,

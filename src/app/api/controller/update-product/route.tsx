@@ -8,10 +8,6 @@ const Schema = z
   .object({
     productId: z.string(),
     productName: z.string(),
-    price: z.number(),
-    weight: z.number().multipleOf(0.01),
-    unit: z.string(),
-    expiredPeriod: z.number(),
     modifiedBy: z.string().optional(),
   })
   .strict();

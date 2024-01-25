@@ -48,7 +48,7 @@ export const findManyUserFilter = async ({ value }: { value: string }) => {
           { fullname: { contains: value } },
           { phone: { contains: value } },
         ],
-        NOT: { userId: "f9442d7a-5715-4fbf-ba77-947208a8c03e" },
+        NOT: { userId: "b97feb85-c552-43cb-807b-68d1ffa0a69d" },
       },
       select: {
         userId: true,
@@ -57,7 +57,7 @@ export const findManyUserFilter = async ({ value }: { value: string }) => {
         dateOfBirth: true,
         email: true,
         roleId: true,
-        verification: true,
+        inActive: true,
         createBy: true,
         modifiedBy: true,
         createdAt: true,
@@ -92,14 +92,14 @@ export const manyUserPagination = async ({
         dateOfBirth: true,
         email: true,
         roleId: true,
-        verification: true,
+        inActive: true,
         createBy: true,
         modifiedBy: true,
         createdAt: true,
         modifedAt: true,
       },
       where: {
-        NOT: { userId: "f9442d7a-5715-4fbf-ba77-947208a8c03e" },
+        NOT: { userId: "b97feb85-c552-43cb-807b-68d1ffa0a69d" },
       },
       orderBy: { fullname: "asc" },
     });
@@ -176,11 +176,20 @@ export const batchCreateUser = async ({ dataUser }: { dataUser: [] }) => {
   }
 };
 
-export const deleteUser = async ({ userId }: { userId: string }) => {
+export const activeUser = async ({
+  userId,
+  value,
+}: {
+  userId: string;
+  value: boolean;
+}) => {
   try {
-    const result = await prisma.user.delete({
+    const result = await prisma.user.update({
       where: {
         userId,
+      },
+      data: {
+        inActive: value,
       },
     });
     return result;

@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { createUser, findByEmail } from "@/app/utils/db/userDB";
 import sendMailer from "@/app/utils/services/node.mailer";
 import moment from "moment";
+import { validateToken } from "@/app/utils/token/validate";
+import _ from "lodash";
 
 const createUserSchema = z
   .object({
@@ -45,59 +47,77 @@ function validateSchema({ data }: { data: any }) {
 
 export async function POST(request: NextRequest) {
   try {
+    const token = request.headers.get("Authorization") as any;
+
+    const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
+    const userData = request.cookies.get("userData");
+
+    const tokenValidated = (await validateToken({
+      token: _.isEmpty(tokenWithoutBearer)
+        ? userData?.value
+        : tokenWithoutBearer,
+    })) as any;
+
     const json = await request.json();
 
     const resultValid = validateSchema({
       data: json,
     });
 
-    const user = (await findByEmail({ email: resultValid.email })) as any;
+    if (tokenValidated) {
+      const user = (await findByEmail({ email: resultValid.email })) as any;
 
-    const randomTime =
-      Math.random() * (moment().valueOf() - moment("01-01-1990").valueOf());
+      const startDate = moment("2022-01-01");
+      const endDate = moment();
 
-    const finalDate = `${moment("01-01-1990")
-      .add(randomTime, "ms")
-      .format("DDMMMMYYYY")}!.`;
+      const daysDiff = endDate.diff(startDate, "days");
 
-    const hashedPassword = await bcrypt.hash(finalDate, 10);
+      const randomDays = Math.floor(Math.random() * (daysDiff + 1));
 
-    if (!user) {
-      await createUser({
-        dataUser: {
-          email: resultValid.email,
-          password: hashedPassword,
-          fullname: resultValid.fullname,
-          dateOfBirth: moment(resultValid.bod).format("DD-MM-YYYY"),
-          phone: resultValid.phone,
-          roleId: resultValid.roles,
-          createBy: resultValid.createBy,
-        },
-      });
+      const randomDate = startDate.clone().add(randomDays, "days");
 
-      await sendMailer({
-        send: resultValid.email,
-        subject: `${resultValid.fullname} account has been successfully created`,
-        html: html({
-          email: resultValid.email,
-          fullname: resultValid.fullname,
-          password: finalDate,
-        }),
-      });
+      const dateString = `${randomDate.format("DDMMMMYYYY")}!`;
 
-      return NextResponse.json(
-        {
-          result: "OK",
-          message: `User ${resultValid.email} has been successfully created.`,
-        },
-        {
-          status: 200,
-        }
-      );
+      const hashedPassword = await bcrypt.hash(dateString, 10);
+
+      if (!user) {
+        await createUser({
+          dataUser: {
+            email: resultValid.email,
+            password: hashedPassword,
+            fullname: resultValid.fullname,
+            dateOfBirth: moment().format("DD-MM-YYYY"),
+            phone: resultValid.phone,
+            roleId: resultValid.roles,
+            createBy: resultValid.createBy,
+          },
+        });
+
+        await sendMailer({
+          send: resultValid.email,
+          subject: `${resultValid.fullname} account has been successfully created`,
+          html: html({
+            email: resultValid.email,
+            fullname: resultValid.fullname,
+            password: dateString,
+          }),
+        });
+
+        return NextResponse.json(
+          {
+            result: "OK",
+            message: `User ${resultValid.email} has been successfully created.`,
+          },
+          {
+            status: 200,
+          }
+        );
+      } else {
+        throw new Error(
+          "This email address is already in use. Please choose a different one."
+        );
+      }
     } else {
-      throw new Error(
-        "This email address is already in use. Please choose a different one."
-      );
     }
   } catch (error: any) {
     return NextResponse.json(

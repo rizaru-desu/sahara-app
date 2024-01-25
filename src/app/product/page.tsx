@@ -100,21 +100,21 @@ export default function Product() {
     }
   }, [logoutUser]);
 
-  const uploadFile = React.useCallback(
-    async ({ formData }: { formData: any }) => {
+  const getAllProduct = React.useCallback(
+    async ({ skip, take }: { skip: number; take: number }) => {
       try {
         setLoading(true);
         const productService = new ProductService();
-        const responseApi = await productService.uploadProduct({ formData });
+        const responseApi = await productService.getAllProduct({
+          skip,
+          take,
+        });
 
         if (responseApi.status === 200) {
-          const { data } = responseApi.data;
+          const { data, countUser } = responseApi.data;
           setLoading(false);
-          toastMessage({
-            message: data,
-            type: "success",
-          });
-          location.reload();
+          setAllDataProduct(data);
+          setTotalPage(Math.ceil(countUser / 100));
         }
       } catch (e: any) {
         setLoading(false);
@@ -131,6 +131,39 @@ export default function Product() {
       }
     },
     [logoutUser]
+  );
+
+  const uploadFile = React.useCallback(
+    async ({ formData }: { formData: any }) => {
+      try {
+        setLoading(true);
+        const productService = new ProductService();
+        const responseApi = await productService.uploadProduct({ formData });
+
+        if (responseApi.status === 200) {
+          const { data } = responseApi.data;
+          setLoading(false);
+          toastMessage({
+            message: data,
+            type: "success",
+          });
+          getAllProduct({ skip: 0, take: 100 });
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [getAllProduct, logoutUser]
   );
 
   const addProduct = React.useCallback(
@@ -171,7 +204,7 @@ export default function Product() {
             message: message,
             type: "success",
           });
-          location.reload();
+          getAllProduct({ skip: 0, take: 100 });
         }
       } catch (e: any) {
         setLoading(false);
@@ -187,40 +220,7 @@ export default function Product() {
         }
       }
     },
-    [logoutUser]
-  );
-
-  const getAllProduct = React.useCallback(
-    async ({ skip, take }: { skip: number; take: number }) => {
-      try {
-        setLoading(true);
-        const productService = new ProductService();
-        const responseApi = await productService.getAllProduct({
-          skip,
-          take,
-        });
-
-        if (responseApi.status === 200) {
-          const { data, countUser } = responseApi.data;
-          setLoading(false);
-          setAllDataProduct(data);
-          setTotalPage(Math.ceil(countUser / 100));
-        }
-      } catch (e: any) {
-        setLoading(false);
-        if (e.response && e.response.status === 500) {
-          toastMessage({
-            message: e.response.data.message,
-            type: "error",
-          });
-        } else if (e.response && e.response.status === 401) {
-          logoutUser();
-        } else {
-          toastMessage({ message: e.message, type: "error" });
-        }
-      }
-    },
-    [logoutUser]
+    [getAllProduct, logoutUser]
   );
 
   const searchProduct = React.useCallback(
@@ -294,15 +294,8 @@ export default function Product() {
   const handleSubmitAddProduct = (event: any) => {
     event.preventDefault();
 
-    const {
-      productName,
-      productCode,
-      price,
-      weight,
-      unit,
-      expiredPeriod,
-      createBy,
-    } = formDataProduct;
+    const { productName, productCode, price, weight, unit, expiredPeriod } =
+      formDataProduct;
 
     addProduct({
       productName,
@@ -311,7 +304,7 @@ export default function Product() {
       weight: parseFloat(weight.toString()),
       unit,
       expiredPeriod: parseFloat(expiredPeriod.toString()),
-      createBy,
+      createBy: dataUser?.fullname,
     });
   };
 

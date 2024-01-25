@@ -51,29 +51,33 @@ export async function POST(request: NextRequest) {
 
     const findRoles = await findStringMap({ id: findAccount?.roleId || "" });
 
-    if (findRoles?.key !== 100) {
-      const userCookie = serialize("userData", String(userData.token), {
-        httpOnly: process.env.NODE_ENV === "development" ? false : true,
-        secure: true,
-        maxAge: 60 * 60 * 24, //maxAge: 60 * 60 * 24,  // Cookie will expire in 1 day (adjust as needed), 3 * 60 * 60 // 3 hourss
-        sameSite: true,
-        path: "/",
-      });
+    if (findAccount?.inActive) {
+      if (findRoles?.key !== 100) {
+        const userCookie = serialize("userData", String(userData.token), {
+          httpOnly: process.env.NODE_ENV === "development" ? false : true,
+          secure: true,
+          maxAge: 60 * 60 * 24, //maxAge: 60 * 60 * 24,  // Cookie will expire in 1 day (adjust as needed), 3 * 60 * 60 // 3 hourss
+          sameSite: true,
+          path: "/",
+        });
 
-      return NextResponse.json(
-        {
-          result: "OK",
-          userData,
-        },
-        {
-          status: 200,
-          headers: {
-            "Set-Cookie": userCookie,
+        return NextResponse.json(
+          {
+            result: "OK",
+            userData,
           },
-        }
-      );
+          {
+            status: 200,
+            headers: {
+              "Set-Cookie": userCookie,
+            },
+          }
+        );
+      } else {
+        throw new Error("Sorry, but your account has no access.");
+      }
     } else {
-      throw new Error("Sorry, your account does not have access.");
+      throw new Error("Unfortunately, your account is no longer active.");
     }
   } catch (error: any) {
     return NextResponse.json(

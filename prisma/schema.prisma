@@ -9,21 +9,20 @@ datasource db {
 }
 
 model User {
-  userId       String      @id @default(uuid()) @db.VarChar(255)
-  fullname     String?     @db.VarChar(255)
-  phone        String?     @db.VarChar(50)
-  dateOfBirth  String?     @db.VarChar(50)
-  email        String      @unique @db.VarChar(255)
-  password     String      @db.VarChar(255)
-  roleId       String      @db.VarChar(255)
-  verification Boolean     @default(false)
-  createBy     String?     @default("bySystem") @db.VarChar(255)
-  modifiedBy   String?     @db.VarChar(255)
-  createdAt    DateTime    @default(now())
-  modifedAt    DateTime    @updatedAt
-  token        AuthToken[]
-  customer     Customer[]
-  StringMap    StringMap   @relation(fields: [roleId], references: [stringId], onDelete: NoAction, onUpdate: NoAction)
+  userId      String      @id @default(uuid()) @db.VarChar(255)
+  fullname    String?     @db.VarChar(255)
+  phone       String?     @db.VarChar(50)
+  dateOfBirth String?     @db.VarChar(50)
+  email       String      @unique @db.VarChar(255)
+  password    String      @db.VarChar(255)
+  roleId      String      @db.VarChar(255)
+  inActive    Boolean     @default(true) 
+  createBy    String?     @default("bySystem") @db.VarChar(255)
+  modifiedBy  String?     @db.VarChar(255)
+  createdAt   DateTime    @default(now())
+  modifedAt   DateTime    @updatedAt
+  token       AuthToken[]
+  StringMap   StringMap   @relation(fields: [roleId], references: [stringId], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([roleId])
 }
@@ -39,8 +38,8 @@ model AuthToken {
   @@index([userId], map: "authToken_userId_fkey")
 }
 
-model Customer {
-  customerId  String   @id @default(uuid()) @db.VarChar(255)
+model Agent {
+  agentId     String   @id @default(uuid()) @db.VarChar(255)
   namaUsaha   String   @unique @db.VarChar(500)
   merekUsaha  String   @db.VarChar(500)
   lamaUsaha   Int
@@ -48,15 +47,13 @@ model Customer {
   instagram   String?  @db.VarChar(255)
   ecommerce   String?  @db.VarChar(255)
   facebook    String?  @db.VarChar(255)
-  userId      String?   @db.VarChar(255)
   createBy    String?  @default("bySystem") @db.VarChar(255)
   createdAt   DateTime @default(now())
   modifedAt   DateTime @updatedAt
   modifiedBy  String?  @db.VarChar(255)
   booth       Booth[]
-  user        User?     @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
 
-  @@index([userId])
+  @@index([agentId])
 }
 
 model Product {
@@ -81,16 +78,16 @@ model Product {
 model Booth {
   boothId     String   @id @default(uuid()) @db.VarChar(255)
   alamatBooth String   @db.VarChar(500)
-  geolocation String   @db.VarChar(255)
-  photoBooth  Bytes
-  customerId  String   @db.VarChar(255)
+  geolocation String?  @db.VarChar(255)
+  photoBooth  Bytes?   @db.LongBlob
+  agentId     String   @db.VarChar(255)
   createBy    String?  @default("bySystem") @db.VarChar(255)
   modifiedBy  String?  @db.VarChar(255)
   createdAt   DateTime @default(now())
   modifedAt   DateTime @updatedAt
-  customer    Customer @relation(fields: [customerId], references: [customerId], onDelete: NoAction, onUpdate: NoAction)
+  agent       Agent    @relation(fields: [agentId], references: [agentId], onDelete: NoAction, onUpdate: NoAction)
 
-  @@index([customerId])
+  @@index([agentId])
 }
 
 model StringMap {
@@ -125,20 +122,19 @@ model LabelBatch {
 }
 
 model LabelProduct {
-  productId   String     @db.VarChar(255)
-  productCode String     @db.VarChar(255)
-  barcodeType Int     
-  status      Int    
-  bestBefore  DateTime   
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  createBy    String?    @default("bySystem") @db.VarChar(255)
-  modifiedBy  String?    @db.VarChar(255)
-  labelId     String     @id @default(uuid()) @db.VarChar(255)
-  batchId     String?    @db.VarChar(255)
-  product     Product    @relation(fields: [productId], references: [productId], onDelete: NoAction, onUpdate: NoAction)
+  productId   String      @db.VarChar(255)
+  productCode String      @db.VarChar(255)
+  barcodeType Int
+  status      Int
+  bestBefore  DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  createBy    String?     @default("bySystem") @db.VarChar(255)
+  modifiedBy  String?     @db.VarChar(255)
+  labelId     String      @id @default(uuid()) @db.VarChar(255)
+  batchId     String?     @db.VarChar(255)
+  product     Product     @relation(fields: [productId], references: [productId], onDelete: NoAction, onUpdate: NoAction)
   labelBatch  LabelBatch? @relation(fields: [batchId], references: [batchId], onDelete: NoAction, onUpdate: NoAction)
-
 
   @@index([labelId])
   @@index([productId])

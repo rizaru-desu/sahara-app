@@ -1,4 +1,4 @@
-import { findPhoto } from "@/app/utils/db/customerDB";
+import { findPhoto } from "@/app/utils/db/agentDB";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -6,8 +6,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
- 
-    const slug = params.id === null ? '': params.id;
+    const slug = params.id;
     const result = await findPhoto({ boothId: slug });
 
     if (!result?.photoBooth) {

@@ -1,18 +1,25 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { addAgent } from "@/app/utils/db/agentDB";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
+import { type NextRequest, NextResponse } from "next/server";
 import z from "zod";
-import { findManyCustomerFilter } from "@/app/utils/db/customerDB";
 
-const createSchema = z
+const Schema = z
   .object({
-    value: z.string(),
+    namaUsaha: z.string(),
+    namaMerek: z.string(),
+    lamaUsaha: z.number(),
+    totalBooth: z.number(),
+    instagram: z.string().url().optional(),
+    facebook: z.string().url().optional(),
+    ecommerce: z.string().url().optional(),
+    createBy: z.string().optional(),
   })
   .strict();
 
 function validateSchema({ data }: { data: any }) {
   try {
-    const parseData = createSchema.parse(data);
+    const parseData = Schema.parse(data);
     return parseData;
   } catch (error: any) {
     if (error.issues && error.issues.length > 0) {
@@ -47,29 +54,24 @@ export async function POST(request: NextRequest) {
 
     const json = await request.json();
 
-    const resultValid = validateSchema({
+    const validated = validateSchema({
       data: json,
     });
 
     if (tokenValidated) {
-      const { result, totalCount } = await findManyCustomerFilter({
-        value: resultValid.value,
-      });
-
-      const final = _.map(result, (item) => {
-        return Object.assign(
-          {
-            id: item.customerId,
-          },
-          _.omit(item, "customerId")
-        );
+      const result = await addAgent({
+        namaUsaha: validated.namaUsaha,
+        merekUsaha: validated.namaMerek,
+        lamaUsaha: validated.lamaUsaha,
+        jumlahBooth: validated.totalBooth,
+        instagram: validated.instagram,
+        facebook: validated.facebook,
+        ecommerce: validated.ecommerce,
       });
 
       return NextResponse.json(
         {
-          result: "OK",
-          data: final,
-          countUser: totalCount,
+          message: `Agent has successfully registered ${result.namaUsaha}`,
         },
         {
           status: 200,
@@ -78,7 +80,6 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          result: "OK",
           message: "Invalid token. Authentication failed.",
         },
         {

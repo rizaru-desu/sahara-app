@@ -80,10 +80,16 @@ export class AuthService {
     return response;
   };
 
-  deleteUser = async ({ userId }: { userId: string }) => {
+  activeUser = async ({
+    userId,
+    value,
+  }: {
+    userId: string;
+    value: boolean;
+  }) => {
     const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/delete-user/",
-      { userId }
+      "api/controller/active-user/",
+      { userId, value }
     );
 
     return response;

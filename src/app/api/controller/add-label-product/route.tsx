@@ -1,4 +1,4 @@
-import { addBooth } from "@/app/utils/db/customerDB";
+import { addBooth } from "@/app/utils/db/agentDB";
 import { addLabelProduct, addProduct } from "@/app/utils/db/productDB";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";

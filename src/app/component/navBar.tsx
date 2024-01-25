@@ -1,10 +1,15 @@
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { FaPowerOff, FaUserCircle } from "react-icons/fa";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { toastMessage } from "./toasttify";
 import { AuthService } from "../utils/services/auth.service";
+
 import Loader from "./loader";
+import Typography from "@mui/material/Typography";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import _ from "lodash";
 
 function NavBar({
   items,
@@ -16,6 +21,7 @@ function NavBar({
   data?: any;
 }) {
   const router = useRouter();
+  const params = usePathname();
   const [loading, setLoading] = React.useState(false);
 
   const logoutUser = React.useCallback(async () => {
@@ -41,11 +47,46 @@ function NavBar({
     }
   }, [router]);
 
+  const pathSegments = params.split("/").filter((segment) => segment !== "");
+
+  const toTitleCase = (str: any) => {
+    return str.replace(/\b\w/g, (char: any) => char.toUpperCase());
+  };
+
+  const handleClick = (index: any) => {
+    const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
+    router.push(path);
+  };
+
   return (
     <div className="p-4 xl:ml-80">
       <nav className="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
         <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
-          <div className="capitalize">
+          <Breadcrumbs aria-label="breadcrumb">
+            {pathSegments.map((segment, index) => {
+              const isLast = index === pathSegments.length - 1;
+              const linkPath = `/${pathSegments.slice(0, index + 1).join("/")}`;
+
+              const title = toTitleCase(segment);
+
+              return isLast ? (
+                <Typography key={index} color="text.primary">
+                  {title}
+                </Typography>
+              ) : (
+                <Link
+                  key={index}
+                  underline="hover"
+                  color="inherit"
+                  href={linkPath}
+                  //onClick={() => handleClick(index)}
+                >
+                  {title}
+                </Link>
+              );
+            })}
+          </Breadcrumbs>
+          {/* <div className="capitalize">
             <nav aria-label="breadcrumb" className="w-max">
               <ol className="flex flex-wrap items-center w-full bg-opacity-60 rounded-md bg-transparent p-0 transition-all">
                 <li className="flex items-center text-blue-gray-900 antialiased font-sans text-sm font-normal leading-normal cursor-pointer transition-colors duration-300 hover:text-light-blue-500">
@@ -72,7 +113,7 @@ function NavBar({
             <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-gray-900">
               {items.label}
             </h6>
-          </div>
+          </div> */}
           <div className="flex items-center">
             <button
               className="relative middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 grid xl:hidden"

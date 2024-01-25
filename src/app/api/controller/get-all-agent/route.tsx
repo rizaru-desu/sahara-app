@@ -1,20 +1,13 @@
-import { addCustomer } from "@/app/utils/db/customerDB";
+import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
-import { type NextRequest, NextResponse } from "next/server";
 import z from "zod";
+import { manyAgentPagination } from "@/app/utils/db/agentDB";
 
 const Schema = z
   .object({
-    namaUsaha: z.string(),
-    namaMerek: z.string(),
-    lamaUsaha: z.number(),
-    totalBooth: z.number(),
-    instagram: z.string().url().optional(),
-    facebook: z.string().url().optional(),
-    ecommerce: z.string().url().optional(),
-    userId: z.string().optional(),
-    createBy: z.string().optional(),
+    skip: z.number(),
+    take: z.number(),
   })
   .strict();
 
@@ -55,25 +48,30 @@ export async function POST(request: NextRequest) {
 
     const json = await request.json();
 
-    const validated = validateSchema({
+    const resultValid = validateSchema({
       data: json,
     });
 
     if (tokenValidated) {
-      const result = await addCustomer({
-        namaUsaha: validated.namaUsaha,
-        merekUsaha: validated.namaMerek,
-        lamaUsaha: validated.lamaUsaha,
-        jumlahBooth: validated.totalBooth,
-        instagram: validated.instagram,
-        facebook: validated.facebook,
-        ecommerce: validated.ecommerce,
-        userId: validated.userId,
+      const { result, totalCount } = await manyAgentPagination({
+        skip: resultValid.skip,
+        take: resultValid.take,
+      });
+
+      const finalResult = _.map(result, (item) => {
+        return Object.assign(
+          {
+            id: item.agentId,
+          },
+          _.omit(item, "agentId")
+        );
       });
 
       return NextResponse.json(
         {
-          message: `client has successfully registered ${result.namaUsaha}`,
+          result: "OK",
+          data: finalResult,
+          countUser: totalCount,
         },
         {
           status: 200,
@@ -82,6 +80,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
+          result: "OK",
           message: "Invalid token. Authentication failed.",
         },
         {

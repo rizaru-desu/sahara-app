@@ -1,20 +1,25 @@
 "use client";
 
 import React, { Suspense } from "react";
-import _ from "lodash";
 import { useRouter } from "next/navigation";
-import SideBar from "@/app/component/sideBar";
-import NavBar from "@/app/component/navBar";
 import { DataGrid } from "@mui/x-data-grid";
-import Loading from "../loading";
 import { AuthService } from "../utils/services/auth.service";
 import { toastMessage } from "../component/toasttify";
-import Loader from "../component/loader";
 import { IconButton, Pagination } from "@mui/material";
-import { CustomerService } from "../utils/services/customer.service";
-import { FaInstagram, FaFacebook, FaShopify } from "react-icons/fa";
-import { number } from "zod";
+import { CustomerService } from "../utils/services/agent.service";
+import {
+  FaInstagram,
+  FaFacebook,
+  FaShopify,
+  FaPersonBooth,
+  FaEdit,
+} from "react-icons/fa";
 import moment from "moment";
+import _ from "lodash";
+import Loader from "../component/loader";
+import Loading from "../loading";
+import SideBar from "@/app/component/sideBar";
+import NavBar from "@/app/component/navBar";
 
 interface UserData {
   fullname: string;
@@ -36,9 +41,9 @@ export default function Product() {
     namaMerek: "",
     lamaUsaha: 0,
     totalBooth: 0,
-    instagram: "",
-    facebook: "",
-    ecommerce: "",
+    instagram: undefined,
+    facebook: undefined,
+    ecommerce: undefined,
   });
 
   const [isTotalPage, setTotalPage] = React.useState(0);
@@ -100,12 +105,12 @@ export default function Product() {
     }
   }, [logoutUser]);
 
-  const getCurrentListCustomer = React.useCallback(
+  const getCurrentListAgent = React.useCallback(
     async ({ skip, take }: { skip: number; take: number }) => {
       try {
         setLoading(true);
         const customerService = new CustomerService();
-        const responseApi = await customerService.getCustomer({
+        const responseApi = await customerService.getAgent({
           skip,
           take,
         });
@@ -133,13 +138,13 @@ export default function Product() {
     [logoutUser]
   );
 
-  const searchCustomer = React.useCallback(
+  const searchAgent = React.useCallback(
     async ({ value }: { value: any }) => {
       try {
         setLoading(true);
         const customerService = new CustomerService();
 
-        const responseApi = await customerService.searchCustomer({
+        const responseApi = await customerService.searchAgent({
           value,
         });
 
@@ -166,7 +171,7 @@ export default function Product() {
     [logoutUser]
   );
 
-  const addCustomer = React.useCallback(
+  const addAgent = React.useCallback(
     async ({
       namaUsaha,
       namaMerek,
@@ -180,15 +185,15 @@ export default function Product() {
       namaMerek: string;
       lamaUsaha: number;
       totalBooth: number;
-      instagram: string;
-      facebook: string;
-      ecommerce: string;
+      instagram?: string;
+      facebook?: string;
+      ecommerce?: string;
     }) => {
       try {
         setLoading(true);
         const customerService = new CustomerService();
 
-        const responseApi = await customerService.addCustomer({
+        const responseApi = await customerService.addAgent({
           namaUsaha,
           namaMerek,
           lamaUsaha,
@@ -202,11 +207,12 @@ export default function Product() {
         if (responseApi.status === 200) {
           const { message } = responseApi.data;
           setLoading(false);
-          getCurrentListCustomer({ skip: 0, take: 100 });
+
           toastMessage({
             message: message,
             type: "success",
           });
+          getCurrentListAgent({ skip: 0, take: 100 });
         }
       } catch (e: any) {
         setLoading(false);
@@ -222,20 +228,20 @@ export default function Product() {
         }
       }
     },
-    [dataUser?.fullname, getCurrentListCustomer, logoutUser]
+    [dataUser?.fullname, getCurrentListAgent, logoutUser]
   );
 
   React.useEffect(() => {
     detailUser();
-    getCurrentListCustomer({ skip: 0, take: 100 });
-  }, [detailUser, getCurrentListCustomer]);
+    getCurrentListAgent({ skip: 0, take: 100 });
+  }, [detailUser, getCurrentListAgent]);
 
   const handleChange = async (
     event: React.ChangeEvent<unknown>,
     value: number
   ) => {
     setCurrentPage(value);
-    getCurrentListCustomer({ skip: Math.max(0, (value - 1) * 100), take: 100 });
+    getCurrentListAgent({ skip: Math.max(0, (value - 1) * 100), take: 100 });
   };
 
   const handleInputSearchChange = (event: any) => {
@@ -246,7 +252,7 @@ export default function Product() {
     event.preventDefault();
 
     if (!_.isEmpty(inputValue)) {
-      searchCustomer({ value: inputValue });
+      searchAgent({ value: inputValue });
     } else {
       toastMessage({ message: "Please input value search...", type: "error" });
     }
@@ -273,7 +279,8 @@ export default function Product() {
       facebook,
       ecommerce,
     } = formData;
-    addCustomer({
+
+    addAgent({
       namaUsaha,
       namaMerek,
       lamaUsaha,
@@ -288,7 +295,7 @@ export default function Product() {
     <main className="dark:bg-white bg-white min-h-screen">
       <SideBar opens={menuOpen} closeds={open} roles={dataUser?.roleId?.key} />
       <NavBar
-        items={{ label: "Customer", link: "#" }}
+        items={{ label: "Agent", link: "#" }}
         opens={open}
         data={dataUser}
       />
@@ -300,7 +307,7 @@ export default function Product() {
             onSubmit={handleSubmitAddCustomer}
           >
             <h6 className="text-black text-bold">
-              <strong>Add Customer</strong>
+              <strong>Add Agent</strong>
             </h6>
 
             <div className="grid grid-cols-2 grid-rows-4 place-content-evenly gap-3">
@@ -398,7 +405,6 @@ export default function Product() {
                     id="instagram"
                     name="instagram"
                     type="text"
-                    required
                     placeholder="Url: https://www.instagram.com/kebab.official"
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
                     onChange={handleInputChangeCustomer}
@@ -418,7 +424,6 @@ export default function Product() {
                     id="facebook"
                     name="facebook"
                     type="text"
-                    required
                     placeholder="Url: https://www.facebook.com/kebab.official"
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
                     onChange={handleInputChangeCustomer}
@@ -438,7 +443,6 @@ export default function Product() {
                     id="ecommerce"
                     name="ecommerce"
                     type="text"
-                    required
                     placeholder="Url E-Commerce"
                     className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
                     onChange={handleInputChangeCustomer}
@@ -510,6 +514,28 @@ export default function Product() {
               rows={isAllDataCustomer}
               columns={[
                 {
+                  field: "inActive",
+                  headerName: "Active",
+                  type: "actions",
+                  minWidth: 100,
+                  align: "center",
+                  headerAlign: "center",
+                  hideSortIcons: true,
+                  disableColumnMenu: true,
+                  renderCell: (params) => {
+                    return (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/agent/${params.id}`);
+                        }}
+                      >
+                        <FaEdit size={20} />
+                      </button>
+                    );
+                  },
+                },
+                {
                   field: "namaUsaha",
                   headerName: "Nama Usaha",
                   minWidth: 150,
@@ -537,29 +563,19 @@ export default function Product() {
                   align: "center",
                   headerAlign: "center",
                   hideSortIcons: true,
-                  disableColumnMenu: true,
-                  renderCell: (params) => {
-                    const onClick = (e: any) => {
-                      e.stopPropagation();
-
-                      router.push(`/customer/booth/${params.id}`);
-                    };
-                    return (
-                      <button onClick={onClick}>
-                        <span className="text-blue-700">{params.value}</span>
-                      </button>
-                    );
-                  },
                 },
                 {
                   field: "instagram",
-                  headerName: "instagram",
+                  headerName: "Instagram",
                   minWidth: 150,
                   align: "center",
                   headerAlign: "center",
                   hideSortIcons: true,
                   disableColumnMenu: true,
                   renderCell: (params) => {
+                    if (params.value === null) {
+                      return <span className="text-black">Empty</span>;
+                    }
                     return (
                       <IconButton
                         aria-label="delete"
@@ -573,13 +589,16 @@ export default function Product() {
                 },
                 {
                   field: "facebook",
-                  headerName: "facebook",
+                  headerName: "Facebook",
                   minWidth: 150,
                   align: "center",
                   headerAlign: "center",
                   hideSortIcons: true,
                   disableColumnMenu: true,
                   renderCell: (params) => {
+                    if (params.value === null) {
+                      return <span className="text-black">Empty</span>;
+                    }
                     return (
                       <IconButton
                         aria-label="delete"
@@ -600,6 +619,9 @@ export default function Product() {
                   hideSortIcons: true,
                   disableColumnMenu: true,
                   renderCell: (params) => {
+                    if (params.value === null) {
+                      return <span className="text-black">Empty</span>;
+                    }
                     return (
                       <IconButton
                         aria-label="delete"

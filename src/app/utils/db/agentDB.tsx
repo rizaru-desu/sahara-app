@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { Buffer } from "buffer";
 import _ from "lodash";
+import { number } from "zod";
 const prisma = new PrismaClient();
 
-interface AddCustomerInput {
+interface AddAgentInput {
   facebook?: string;
   instagram?: string;
   ecommerce?: string;
@@ -11,10 +12,9 @@ interface AddCustomerInput {
   namaUsaha: string;
   merekUsaha: string;
   jumlahBooth: number;
-  userId?: string;
 }
 
-export const addCustomer = async ({
+export const addAgent = async ({
   facebook,
   instagram,
   ecommerce,
@@ -22,10 +22,9 @@ export const addCustomer = async ({
   namaUsaha,
   merekUsaha,
   jumlahBooth,
-  userId,
-}: AddCustomerInput) => {
+}: AddAgentInput) => {
   try {
-    const result = await prisma.customer.create({
+    const result = await prisma.agent.create({
       data: {
         facebook,
         instagram,
@@ -34,7 +33,6 @@ export const addCustomer = async ({
         namaUsaha,
         merekUsaha,
         jumlahBooth,
-        userId,
       },
     });
 
@@ -48,19 +46,29 @@ export const addCustomer = async ({
 
 interface AddBoothInput {
   alamatBooth: string;
-  photoBooth: Buffer;
-  customerId: string;
+  photoBooth?: any;
+  agentId: string;
+  createBy: string;
+  geolocation?: string;
 }
 
 export const addBooth = async ({
   alamatBooth,
   photoBooth,
-  customerId,
+  agentId,
+  createBy,
+  geolocation,
 }: AddBoothInput) => {
   try {
-    //const decodedPhotoBooth = Buffer.from(photoBooth, "base64");
-
-    const result = "";
+    const result = await prisma.booth.create({
+      data: {
+        createBy,
+        alamatBooth,
+        photoBooth,
+        agentId,
+        geolocation,
+      },
+    });
 
     return result;
   } catch (error: any) {
@@ -70,7 +78,7 @@ export const addBooth = async ({
   }
 };
 
-export const manyCustomerPagination = async ({
+export const manyAgentPagination = async ({
   skip,
   take,
 }: {
@@ -78,13 +86,13 @@ export const manyCustomerPagination = async ({
   take: number;
 }) => {
   try {
-    const result = await prisma.customer.findMany({
+    const result = await prisma.agent.findMany({
       skip,
       take,
       orderBy: { namaUsaha: "asc" },
     });
 
-    const totalCount = await prisma.customer.count();
+    const totalCount = await prisma.agent.count();
 
     return { result, totalCount };
   } catch (error: any) {
@@ -97,23 +105,24 @@ export const manyCustomerPagination = async ({
 export const manyBoothPagination = async ({
   skip,
   take,
-  customerId,
+  agentId,
 }: {
   skip: number;
   take: number;
-  customerId: string;
+  agentId: string;
 }) => {
   try {
+    const findAgent = await prisma.agent.findUnique({ where: { agentId } });
     const result = await prisma.booth.findMany({
       skip,
       take,
-      where: { customerId },
+      where: { agentId },
       orderBy: { alamatBooth: "asc" },
     });
 
     const totalCount = _.size(result);
 
-    return { result, totalCount };
+    return { result, totalCount, findAgent };
   } catch (error: any) {
     throw new Error(error.message);
   } finally {
@@ -136,9 +145,9 @@ export const findPhoto = async ({ boothId }: { boothId: string }) => {
   }
 };
 
-export const findManyCustomerFilter = async ({ value }: { value: string }) => {
+export const findManyAgentFilter = async ({ value }: { value: string }) => {
   try {
-    const result = await prisma.customer.findMany({
+    const result = await prisma.agent.findMany({
       where: {
         OR: [
           {
@@ -172,6 +181,31 @@ export const findManyBoothFilter = async ({ value }: { value: string }) => {
     });
 
     return { result, totalCount: _.size(result) };
+  } catch (error: any) {
+    throw new Error(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const updateTotalBooth = async ({
+  value,
+  agentId,
+}: {
+  value: number;
+  agentId: string;
+}) => {
+  try {
+    const result = await prisma.agent.update({
+      where: {
+        agentId,
+      },
+      data: {
+        jumlahBooth: value,
+      },
+    });
+
+    return result;
   } catch (error: any) {
     throw new Error(error.message);
   } finally {

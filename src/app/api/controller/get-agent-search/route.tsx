@@ -2,18 +2,17 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import _ from "lodash";
 import z from "zod";
-import { manyCustomerPagination } from "@/app/utils/db/customerDB";
+import { findManyAgentFilter } from "@/app/utils/db/agentDB";
 
-const createUserSchema = z
+const createSchema = z
   .object({
-    skip: z.number(),
-    take: z.number(),
+    value: z.string(),
   })
   .strict();
 
 function validateSchema({ data }: { data: any }) {
   try {
-    const parseData = createUserSchema.parse(data);
+    const parseData = createSchema.parse(data);
     return parseData;
   } catch (error: any) {
     if (error.issues && error.issues.length > 0) {
@@ -53,24 +52,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, totalCount } = await manyCustomerPagination({
-        skip: resultValid.skip,
-        take: resultValid.take,
+      const { result, totalCount } = await findManyAgentFilter({
+        value: resultValid.value,
       });
 
-      const finalResult = _.map(result, (item) => {
+      const final = _.map(result, (item) => {
         return Object.assign(
           {
-            id: item.customerId,
+            id: item.agentId,
           },
-          _.omit(item, "customerId")
+          _.omit(item, "agentId")
         );
       });
 
       return NextResponse.json(
         {
           result: "OK",
-          data: finalResult,
+          data: final,
           countUser: totalCount,
         },
         {

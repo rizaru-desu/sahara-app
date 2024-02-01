@@ -3,14 +3,12 @@ import { useRouter, usePathname } from "next/navigation";
 import { FaPowerOff, FaUserCircle } from "react-icons/fa";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { toastMessage } from "./toasttify";
-import { AuthService } from "../utils/services/auth.service";
-
+import { Services } from "../utils/services/service";
 import Loader from "./loader";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
 import _ from "lodash";
-import { Services } from "../utils/services/service";
 
 function NavBar({ opens, data }: { opens: () => void; data?: any }) {
   const router = useRouter();

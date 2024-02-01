@@ -1,14 +1,19 @@
 "use client";
 import React from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useRouter } from "next/navigation";
-import { AuthService } from "./utils/services/auth.service";
-import { ToastContainer } from "react-toastify";
+import moment from "moment";
 import Loader from "./component/loader";
+import Image from "next/image";
+import { FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 import { toastMessage } from "./component/toasttify";
+import { Services } from "./utils/services/service";
+import { InputAdornment, TextField } from "@mui/material";
+import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { customTheme } from "./component/theme";
 
 export default function Home() {
   const router = useRouter();
+  const outerTheme = useTheme();
   const [loading, setLoading] = React.useState(false);
   const [isShowPassword, setShowPassword] = React.useState<boolean>(false);
 
@@ -32,12 +37,12 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const authService = new AuthService();
-      const responseApi = await authService.login(formData);
+      const services = new Services();
+      const responseApi = await services.loginUser(formData);
 
-      if (responseApi.data.result === "OK") {
+      if (responseApi.status === 200) {
         setLoading(false);
-        router.replace("/dashboard");
+        router.replace("/page/dashboard");
       }
     } catch (e: any) {
       setLoading(false);
@@ -53,10 +58,12 @@ export default function Home() {
     <main className="flex min-h-screen items-center justify-center p-24 flex-col  bg-white dark:bg-white">
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-32 w-auto"
+          <Image
+            className="mx-auto"
             src="/image/logo.png"
-            alt="Your Company"
+            alt="Sahara"
+            width={70}
+            height={70}
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign in to your account
@@ -70,61 +77,64 @@ export default function Home() {
             method="POST"
             onSubmit={handleSubmit}
           >
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Password
-                </label>
-              </div>
-              <div className="relative mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type={isShowPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 px-3  text-black shadow-sm ring-1 ring-inset ring-red-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700 sm:text-sm sm:leading-6"
-                  onChange={handleInputChange}
-                />
-
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={() => {
-                    setShowPassword(!isShowPassword);
-                  }}
-                >
-                  {isShowPassword ? (
-                    <FaEyeSlash className="mx-auto h-5 w-auto" color="black" />
-                  ) : (
-                    <FaEye className="mx-auto h-5 w-auto" color="black" />
-                  )}
-                </button>
-              </div>
-            </div>
+            <ThemeProvider theme={customTheme(outerTheme)}>
+              <TextField
+                name="email"
+                id="email"
+                label="Email"
+                type="email"
+                size="small"
+                fullWidth
+                required
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <div
+                        className="text-black"
+                        aria-label="toggle password visibility"
+                      >
+                        <FaEnvelope size={20} />
+                      </div>
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={handleInputChange}
+              />
+              <TextField
+                name="password"
+                id="password"
+                label="Password"
+                type={isShowPassword ? "text" : "password"}
+                size="small"
+                fullWidth
+                required
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <button
+                        className="text-black"
+                        aria-label="toggle password visibility"
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          setShowPassword(!isShowPassword);
+                        }}
+                      >
+                        {isShowPassword ? (
+                          <FaEyeSlash size={20} />
+                        ) : (
+                          <FaEye size={20} />
+                        )}
+                      </button>
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={handleInputChange}
+              />
+            </ThemeProvider>
 
             <div>
               <button
@@ -139,7 +149,8 @@ export default function Home() {
       </div>
 
       <footer className="bg-white text-black text-center py-4">
-        &copy; 2023 PT. SAHARA BOGATAMA All rights reserved.
+        &copy; {moment().format("YYYY")} PT. SAHARA BOGATAMA All rights
+        reserved.
       </footer>
       <Loader active={loading} />
     </main>

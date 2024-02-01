@@ -1,6 +1,7 @@
 import _ from "lodash";
 import React from "react";
 import { MdSpaceDashboard } from "react-icons/md";
+import { FaShop } from "react-icons/fa6";
 import {
   FaUserFriends,
   FaUserCog,
@@ -18,92 +19,109 @@ function SideBar({
   opens,
   closeds,
 }: {
-  roles?: number;
+  roles?: string[];
   opens: boolean;
   closeds: () => void;
 }) {
   const router = useRouter();
-  const SideMenu = [
-    {
-      title: "Master Data",
-      href: "#",
-      header: true,
-      icon: undefined,
-      roles: [0],
-    },
-    {
-      title: "Product",
-      href: "/product",
-      header: false,
-      icon: <FaBox size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    {
-      title: "Agent",
-      href: "/agent",
-      header: false,
-      icon: <FaUserFriends size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    {
-      title: "All User",
-      href: "/list-user",
-      header: false,
-      icon: <FaUserCog size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    {
-      title: "Setting",
-      href: "/setting",
-      header: false,
-      icon: <FaCog size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    { title: "Inventory", href: "#", header: true, roles: [0] },
-    {
-      title: "Stock",
-      href: "/stock",
-      header: false,
-      icon: <FaWarehouse size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    {
-      title: "Labeling",
-      href: "/labeling",
-      header: false,
-      icon: <FaQrcode size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    {
-      title: "Distribution",
-      href: "#",
-      header: true,
-      icon: undefined,
-      roles: [0],
-    },
-    {
-      title: "Delivery Order",
-      href: "/delivery-order",
-      header: false,
-      icon: <FaBoxesPacking size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    { title: "Reports", href: "#", header: true, icon: undefined, roles: [0] },
-    {
-      title: "Point By",
-      href: "/pointby-report",
-      header: false,
-      icon: <RiMoneyEuroCircleFill size={25} color={"#fff"} />,
-      roles: [0],
-    },
-    {
-      title: "Customer",
-      href: "/customer-report",
-      header: false,
-      icon: <RiMoneyDollarCircleFill size={25} color={"#fff"} />,
-      roles: [0],
-    },
-  ];
+
+  const SideMenu = React.useMemo(
+    () => [
+      {
+        title: "Master Data",
+        href: "#",
+        header: true,
+        icon: undefined,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Product",
+        href: "/page/product",
+        header: false,
+        icon: <FaBox size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Agent",
+        href: "/page/agent",
+        header: false,
+        icon: <FaUserFriends size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Owner Booth",
+        href: "/page/owner-booth",
+        header: false,
+        icon: <FaShop size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "All Users",
+        href: "/page/all-users",
+        header: false,
+        icon: <FaUserCog size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Setting",
+        href: "/setting",
+        header: false,
+        icon: <FaCog size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      { title: "Inventory", href: "#", header: true, roles: [0] },
+      {
+        title: "Stock",
+        href: "/stock",
+        header: false,
+        icon: <FaWarehouse size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Labeling",
+        href: "/labeling",
+        header: false,
+        icon: <FaQrcode size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Distribution",
+        href: "#",
+        header: true,
+        icon: undefined,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Delivery Order",
+        href: "/delivery-order",
+        header: false,
+        icon: <FaBoxesPacking size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Reports",
+        href: "#",
+        header: true,
+        icon: undefined,
+        roles: [0],
+      },
+      {
+        title: "Point By",
+        href: "/pointby-report",
+        header: false,
+        icon: <RiMoneyEuroCircleFill size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Agent",
+        href: "/customer-report",
+        header: false,
+        icon: <RiMoneyDollarCircleFill size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+    ],
+    []
+  );
 
   return (
     <aside
@@ -171,9 +189,13 @@ function SideBar({
                 </p>
               ) : (
                 <a
-                  className={`${i.roles.includes(roles) ? "block" : "hidden"}`}
+                  className={`${
+                    _.intersection(i.roles, roles).length > 0
+                      ? "block"
+                      : "hidden"
+                  }`}
                   onClick={() => {
-                    router.replace(i.href);
+                    router.push(i.href);
                   }}
                 >
                   <button

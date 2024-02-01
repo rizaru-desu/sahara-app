@@ -1,12 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { validateToken } from "@/app/utils/token/validate";
+import { updateDataUser } from "@/app/utils/db/controllerDB";
 import z from "zod";
-import bcrypt from "bcrypt";
-import { createUser, findByEmail } from "@/app/utils/db/userDB";
+import _ from "lodash";
 
 const Schema = z
   .object({
+    userId: z.string(),
     email: z.string().email(),
-    password: z.string(),
     fullname: z.string(),
     phone: z.string().refine(
       (value) => {
@@ -14,8 +15,9 @@ const Schema = z
       },
       { message: "Invalid phone number format" }
     ),
-    dateOfBirth: z.string(),
-    createBy: z.string().optional(),
+    bod: z.string(),
+    leader: z.string().optional(),
+    modifiedBy: z.string().optional(),
   })
   .strict();
 
@@ -43,40 +45,50 @@ function validateSchema({ data }: { data: any }) {
 
 export async function POST(request: NextRequest) {
   try {
+    const token = request.headers.get("Authorization") as any;
+
+    const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
+    const userData = request.cookies.get("userData");
+
+    const tokenValidated = (await validateToken({
+      token: _.isEmpty(tokenWithoutBearer)
+        ? userData?.value
+        : tokenWithoutBearer,
+    })) as any;
+
     const json = await request.json();
 
     const resultValid = validateSchema({
       data: json,
     });
 
-    const user = (await findByEmail({ email: resultValid.email })) as any;
-
-    const hashedPassword = await bcrypt.hash(resultValid.password, 10);
-
-    if (!user) {
-      await createUser({
-        dataUser: {
-          email: resultValid.email,
-          password: hashedPassword,
-          fullname: resultValid.fullname,
-          dateOfBirth: resultValid.dateOfBirth,
-          phone: resultValid.phone,
-          roleId: "062208b4-94f8-440f-8599-07aee4121fe0", //User Only
-        },
+    if (tokenValidated) {
+      const result = await updateDataUser({
+        userId: resultValid.userId,
+        fullname: resultValid.fullname,
+        phone: resultValid.phone,
+        dateOfBirth: resultValid.bod,
+        leader: resultValid.leader,
+        email: resultValid.email,
+        modifiedBy: resultValid.modifiedBy,
       });
 
       return NextResponse.json(
         {
-          result: "OK",
-          message: `User ${resultValid.email} has been successfully created.`,
+          message: `This user ${result.email} information was updated successfully.`,
         },
         {
           status: 200,
         }
       );
     } else {
-      throw new Error(
-        "This email address is already in use. Please choose a different one."
+      return NextResponse.json(
+        {
+          message: "Invalid token. Authentication failed.",
+        },
+        {
+          status: 401,
+        }
       );
     }
   } catch (error: any) {

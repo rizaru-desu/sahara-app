@@ -1,21 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { validateToken } from "@/app/utils/token/validate";
+import { agentPagination } from "@/app/utils/db/controllerDB";
+import _ from "lodash";
 import z from "zod";
-import bcrypt from "bcrypt";
-import { createUser, findByEmail } from "@/app/utils/db/userDB";
 
 const Schema = z
   .object({
-    email: z.string().email(),
-    password: z.string(),
-    fullname: z.string(),
-    phone: z.string().refine(
-      (value) => {
-        return /^\+62\d{9,}$/.test(value);
-      },
-      { message: "Invalid phone number format" }
-    ),
-    dateOfBirth: z.string(),
-    createBy: z.string().optional(),
+    skip: z.number(),
+    take: z.number(),
   })
   .strict();
 
@@ -43,40 +35,55 @@ function validateSchema({ data }: { data: any }) {
 
 export async function POST(request: NextRequest) {
   try {
+    const token = request.headers.get("Authorization") as any;
+
+    const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
+    const userData = request.cookies.get("userData");
+
+    const tokenValidated = (await validateToken({
+      token: _.isEmpty(tokenWithoutBearer)
+        ? userData?.value
+        : tokenWithoutBearer,
+    })) as any;
+
     const json = await request.json();
 
     const resultValid = validateSchema({
       data: json,
     });
 
-    const user = (await findByEmail({ email: resultValid.email })) as any;
+    if (tokenValidated) {
+      const { result, count } = await agentPagination({
+        skip: resultValid.skip,
+        take: resultValid.take,
+      });
 
-    const hashedPassword = await bcrypt.hash(resultValid.password, 10);
-
-    if (!user) {
-      await createUser({
-        dataUser: {
-          email: resultValid.email,
-          password: hashedPassword,
-          fullname: resultValid.fullname,
-          dateOfBirth: resultValid.dateOfBirth,
-          phone: resultValid.phone,
-          roleId: "062208b4-94f8-440f-8599-07aee4121fe0", //User Only
-        },
+      const finalResult = _.map(result, (item) => {
+        return Object.assign(
+          {
+            id: item.agentId,
+          },
+          _.omit(item, "agentId")
+        );
       });
 
       return NextResponse.json(
         {
-          result: "OK",
-          message: `User ${resultValid.email} has been successfully created.`,
+          allAgent: finalResult,
+          countAgent: count,
         },
         {
           status: 200,
         }
       );
     } else {
-      throw new Error(
-        "This email address is already in use. Please choose a different one."
+      return NextResponse.json(
+        {
+          message: "Invalid token. Authentication failed.",
+        },
+        {
+          status: 401,
+        }
       );
     }
   } catch (error: any) {

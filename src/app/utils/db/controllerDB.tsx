@@ -70,7 +70,7 @@ const generateToken = async ({
   dbPassword,
 }: generateTokens) => {
   try {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const password = await bcrypt.compare(userPassword, dbPassword);
       console.log(password, dbPassword, userPassword);
       if (password) {
@@ -225,7 +225,7 @@ const addUser = async ({
   createdBy,
 }: AddUserInput) => {
   try {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const findEmail = await tx.user.findUnique({
         where: { email: email },
       });
@@ -267,7 +267,7 @@ const addRoleUser = async ({
   createdBy,
 }: addRoleUserInput) => {
   try {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const findRoleExist = await tx.roles.findFirst({
         where: {
           userId,
@@ -313,7 +313,7 @@ interface deleteRoleUserInput {
 
 const deleteRoleUser = async ({ userId, roleId }: deleteRoleUserInput) => {
   try {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const result = await tx.user.update({
         where: { userId },
         data: {
@@ -350,7 +350,7 @@ const updateDataUser = async ({
   modifiedBy,
 }: updateDataUserInput) => {
   try {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const result = await tx.user.update({
         where: { userId },
         data: { modifiedBy, fullname, dateOfBirth, email, phone, leader },
@@ -370,7 +370,7 @@ interface activeUserInput {
 }
 const activeUser = async ({ userId, value, modifiedBy }: activeUserInput) => {
   try {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const result = await tx.user.update({
         where: { userId },
         data: { modifiedBy, inActive: value },
@@ -385,7 +385,7 @@ const activeUser = async ({ userId, value, modifiedBy }: activeUserInput) => {
 
 const roles = async () => {
   try {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const result = await prisma.stringMap.findMany({
         where: { objectName: "Roles" },
         select: { stringId: true, value: true },

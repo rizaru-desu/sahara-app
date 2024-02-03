@@ -53,7 +53,7 @@ function NavBar({ opens, data }: { opens: () => void; data?: any }) {
           <Breadcrumbs aria-label="breadcrumb">
             {updatedPathSegments.map((segment, index) => {
               const isLast = index === updatedPathSegments.length - 1;
-              const linkPath = `/${updatedPathSegments
+              const linkPath = `/page/${updatedPathSegments
                 .slice(0, index + 1)
                 .join("/")}`;
 

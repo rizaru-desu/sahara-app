@@ -581,10 +581,9 @@ export default function Home() {
                     renderCell: (params) => {
                       return (
                         <div className="grid grid-cols-2 gap-2 my-2 place-content-center place-items-center">
-                          <Button
-                            className="bg-red-700 text-sm hover:bg-red-300"
-                            variant="contained"
-                            size="small"
+                          <button
+                            type="button"
+                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
                             onClick={(e: any) => {
                               e.preventDefault();
 
@@ -598,11 +597,10 @@ export default function Home() {
                             }}
                           >
                             Edit
-                          </Button>
-                          <Button
-                            className="bg-red-700 text-sm hover:bg-red-300"
-                            variant="contained"
-                            size="small"
+                          </button>
+                          <button
+                            type="button"
+                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
                             onClick={(e: any) => {
                               e.preventDefault();
 
@@ -628,7 +626,7 @@ export default function Home() {
                             }}
                           >
                             Role
-                          </Button>
+                          </button>
                         </div>
                       );
                     },

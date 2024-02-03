@@ -6,15 +6,9 @@ import { toastMessage } from "@/app/component/toasttify";
 import { Services } from "@/app/utils/services/service";
 import {
   Button,
-  Checkbox,
   Dialog,
   DialogContent,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
   Pagination,
-  Select,
   TextField,
 } from "@mui/material";
 import { ThemeProvider, useTheme } from "@mui/material/styles";
@@ -27,6 +21,7 @@ import Loader from "@/app/component/loader";
 import Loading from "@/app/loading";
 import Search from "@/app/component/search";
 import moment from "moment";
+import * as XLSX from "xlsx";
 
 interface AgentInput {
   agentId?: string;
@@ -298,6 +293,40 @@ export default function Home() {
     [detailUsers?.fullname, getAllAgent, logoutUser]
   );
 
+  const exportAgent = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const authService = new Services();
+      const responseApi = await authService.exportAgent();
+
+      if (responseApi.status === 200) {
+        setLoading(false);
+
+        const ws = XLSX.utils.json_to_sheet(responseApi.data.data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(
+          wb,
+          `Agent ${moment().format("DD-MM-YYYY")}-${
+            Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
+          }.xlsx`
+        );
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else if (e.response && e.response.status === 401) {
+        logoutUser();
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [logoutUser]);
+
   React.useEffect(() => {
     getPageData({ skip: 0, take: 100 });
   }, [getPageData]);
@@ -439,11 +468,24 @@ export default function Home() {
             </form>
 
             <div className="m-10 flex flex-col">
-              <Search
-                onSearch={({ value }) => {
-                  searchAgent({ value });
-                }}
-              />
+              <div className="flex flex-row justify-between  my-3">
+                <Search
+                  onSearch={({ value }) => {
+                    searchAgent({ value });
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    exportAgent();
+                  }}
+                  className="flex justify-center self-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                >
+                  Export
+                </button>
+              </div>
 
               <DataGrid
                 pagination={true}

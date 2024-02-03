@@ -1,10 +1,8 @@
-// prismaModule.ts
 import { PrismaClient } from "@prisma/client";
+import { env } from "process";
+const prisma = new PrismaClient();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { env } from "process";
-
-const prisma = new PrismaClient();
 
 //** SECTION USER */
 interface pageAllUsers {
@@ -70,7 +68,7 @@ const generateToken = async ({
   dbPassword,
 }: generateTokens) => {
   try {
-    return prisma.$transaction(async (tx: any) => {
+    return prisma.$transaction(async (tx) => {
       const password = await bcrypt.compare(userPassword, dbPassword);
       console.log(password, dbPassword, userPassword);
       if (password) {
@@ -225,7 +223,7 @@ const addUser = async ({
   createdBy,
 }: AddUserInput) => {
   try {
-    return prisma.$transaction(async (tx: any) => {
+    return prisma.$transaction(async (tx) => {
       const findEmail = await tx.user.findUnique({
         where: { email: email },
       });
@@ -267,7 +265,7 @@ const addRoleUser = async ({
   createdBy,
 }: addRoleUserInput) => {
   try {
-    return prisma.$transaction(async (tx: any) => {
+    return prisma.$transaction(async (tx) => {
       const findRoleExist = await tx.roles.findFirst({
         where: {
           userId,
@@ -313,7 +311,7 @@ interface deleteRoleUserInput {
 
 const deleteRoleUser = async ({ userId, roleId }: deleteRoleUserInput) => {
   try {
-    return prisma.$transaction(async (tx: any) => {
+    return prisma.$transaction(async (tx) => {
       const result = await tx.user.update({
         where: { userId },
         data: {
@@ -350,7 +348,7 @@ const updateDataUser = async ({
   modifiedBy,
 }: updateDataUserInput) => {
   try {
-    return prisma.$transaction(async (tx: any) => {
+    return prisma.$transaction(async (tx) => {
       const result = await tx.user.update({
         where: { userId },
         data: { modifiedBy, fullname, dateOfBirth, email, phone, leader },
@@ -370,7 +368,7 @@ interface activeUserInput {
 }
 const activeUser = async ({ userId, value, modifiedBy }: activeUserInput) => {
   try {
-    return prisma.$transaction(async (tx: any) => {
+    return prisma.$transaction(async (tx) => {
       const result = await tx.user.update({
         where: { userId },
         data: { modifiedBy, inActive: value },
@@ -385,7 +383,7 @@ const activeUser = async ({ userId, value, modifiedBy }: activeUserInput) => {
 
 const roles = async () => {
   try {
-    return prisma.$transaction(async (tx: any) => {
+    return prisma.$transaction(async (tx) => {
       const result = await prisma.stringMap.findMany({
         where: { objectName: "Roles" },
         select: { stringId: true, value: true },
@@ -569,6 +567,20 @@ const editAgent = async ({
     throw new Error(e.message);
   }
 };
+
+const agentExport = async () => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.agent.findMany({
+        orderBy: { customerName: "asc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
 /** END SECTION AGENT */
 
 /** SECTION PRODUCT */
@@ -660,8 +672,6 @@ const addProduct = async ({
     return result;
   } catch (error: any) {
     throw new Error(error.message);
-  } finally {
-    await prisma.$disconnect();
   }
 };
 
@@ -681,8 +691,6 @@ const batchAddProduct = async ({ dataProduct }: batchAddProducts) => {
     return result;
   } catch (error: any) {
     throw new Error(error.message);
-  } finally {
-    await prisma.$disconnect();
   }
 };
 
@@ -708,10 +716,340 @@ const productSearch = async ({ value }: valueSearch) => {
     throw new Error(e.message);
   }
 };
+
+const productExport = async () => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.product.findMany({
+        orderBy: { productName: "asc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
 /** END SECTION PRODUCT */
 
-/** SECTION LABEL */
-/** END SECTION LABEL */
+/** SECTION BOOTH OWNER */
+interface pageAllOwnerBooths {
+  userId: string;
+  skip: number;
+  take: number;
+}
+
+const pageAllOwnerBooth = async ({
+  userId,
+  skip,
+  take,
+}: pageAllOwnerBooths) => {
+  try {
+    const [detail, allBoothOwner, totalBoothOwner] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        include: { roles: { select: { stringId: true } } },
+      }),
+      prisma.boothOwner.findMany({
+        skip,
+        take,
+
+        orderBy: { fullname: "asc" },
+      }),
+      prisma.boothOwner.count(),
+    ]);
+
+    return { detail, allBoothOwner, totalBoothOwner };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface pageAllMemberBooths {
+  userId: string;
+  skip: number;
+  take: number;
+  boothOwnerId: string;
+}
+
+const pageAllMemberBooth = async ({
+  userId,
+  skip,
+  take,
+  boothOwnerId,
+}: pageAllMemberBooths) => {
+  try {
+    const [detail, allBoothMember, totalBoothMember] =
+      await prisma.$transaction([
+        prisma.user.findUnique({
+          where: { userId },
+          include: { roles: { select: { stringId: true } } },
+        }),
+        prisma.booth.findMany({
+          skip,
+          take,
+          where: { boothOwnerId },
+          orderBy: { fullname: "asc" },
+        }),
+        prisma.booth.count(),
+      ]);
+
+    return { detail, allBoothMember, totalBoothMember };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface boothOwnerPaginations {
+  skip: number;
+  take: number;
+}
+
+const boothOwnerPagination = async ({ skip, take }: boothOwnerPaginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.boothOwner.findMany({
+        skip,
+        take,
+
+        orderBy: { fullname: "asc" },
+      }),
+      prisma.boothOwner.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface boothMemberPaginations {
+  skip: number;
+  take: number;
+}
+
+const boothMemberPagination = async ({
+  skip,
+  take,
+}: boothMemberPaginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.booth.findMany({
+        skip,
+        take,
+
+        orderBy: { fullname: "asc" },
+      }),
+      prisma.booth.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface boothMemberImages {
+  boothId: string;
+}
+
+const boothMemberImage = async ({ boothId }: boothMemberImages) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.booth.findUnique({
+        where: { boothId },
+        select: { photoBooth: true },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const boothOwnerSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.boothOwner.findMany({
+        where: {
+          OR: [
+            {
+              fullname: { contains: value },
+            },
+            { alamatOwner: { contains: value } },
+            { phone: { contains: value } },
+            { email: { contains: value } },
+          ],
+        },
+
+        orderBy: { fullname: "asc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const boothMemberSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.booth.findMany({
+        where: {
+          OR: [
+            {
+              fullname: { contains: value },
+            },
+            { alamatBooth: { contains: value } },
+            { phone: { contains: value } },
+            { email: { contains: value } },
+          ],
+        },
+
+        orderBy: { fullname: "asc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const boothOwnerExport = async () => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.boothOwner.findMany({
+        orderBy: { fullname: "asc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const boothMemberExport = async () => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.booth.findMany({
+        orderBy: { fullname: "asc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface boothOwners {
+  boothOwnerId?: string;
+  userId: string;
+  fullname?: string | null;
+  alamatOwner?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  dateEstablishment?: string | null;
+  totalBooth?: number | null;
+  instagram?: string | null;
+  facebook?: string | null;
+  ecommerce?: string | null;
+  modifiedBy?: string | null;
+  createdBy?: string;
+}
+
+const addBoothOwner = async ({
+  userId,
+  fullname,
+  alamatOwner,
+  phone,
+  email,
+  dateEstablishment,
+  instagram,
+  facebook,
+  ecommerce,
+  createdBy,
+}: boothOwners) => {
+  try {
+    const result = await prisma.$transaction([
+      prisma.boothOwner.create({
+        data: {
+          userId,
+          fullname,
+          alamatOwner,
+          phone,
+          email,
+          dateEstablishment,
+          instagram,
+          facebook,
+          ecommerce,
+          createdBy,
+        },
+      }),
+    ]);
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+const editBoothOwner = async ({
+  boothOwnerId,
+  fullname,
+  alamatOwner,
+  phone,
+  email,
+  dateEstablishment,
+  instagram,
+  facebook,
+  ecommerce,
+  modifiedBy,
+}: boothOwners) => {
+  try {
+    const result = await prisma.$transaction([
+      prisma.boothOwner.update({
+        where: { boothOwnerId },
+        data: {
+          fullname,
+          alamatOwner,
+          phone,
+          email,
+          dateEstablishment,
+          instagram,
+          facebook,
+          ecommerce,
+          modifiedBy,
+        },
+      }),
+    ]);
+
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+interface Booths {
+  boothId: string;
+  alamatBooth: string;
+  geolocation?: string | null;
+  photoBooth?: Buffer | null;
+  modifiedBy?: string | null;
+  createdAt: Date;
+  modifedAt: Date;
+  createdBy: string;
+  email?: string | null;
+  fullname?: string | null;
+  phone?: string | null;
+  userId: string;
+  boothOwnerId: string;
+}
+/** END BOOTH OWNER */
 
 export {
   //** USER */
@@ -727,16 +1065,31 @@ export {
   roles,
   pageAllUser,
   userSearch,
+
   //** AGENT */
   pageAllAgent,
   agentSearch,
   agentPagination,
   addAgent,
   editAgent,
+  agentExport,
+
   //** PRODUCT */
   pageAllProduct,
+  pageAllMemberBooth,
   productSearch,
   addProduct,
   productPagination,
   batchAddProduct,
+  productExport,
+
+  //** BOOTH OWNER */
+  pageAllOwnerBooth,
+  boothOwnerPagination,
+  boothMemberPagination,
+  boothOwnerSearch,
+  boothMemberSearch,
+  boothMemberImage,
+  boothOwnerExport,
+  boothMemberExport,
 };

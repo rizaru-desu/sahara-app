@@ -245,6 +245,15 @@ export class Services {
 
     return response;
   };
+
+  exportAgent = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/agent/export/",
+      {}
+    );
+
+    return response;
+  };
   //** END SECTION AGENT */
 
   //** SECTION PRODUCT */
@@ -314,6 +323,104 @@ export class Services {
 
     return response;
   };
+
+  exportProduct = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/product/export/",
+      {}
+    );
+
+    return response;
+  };
+  //** END SECTION PRODUCT */
+
+  //** SECTION BOOTH OWNER */
+  getPageBoothOwnerData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getPageBoothMemberData = async ({
+    skip,
+    take,
+    boothOwnerId,
+  }: {
+    skip: number;
+    take: number;
+    boothOwnerId: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/member/",
+      { skip, take, boothOwnerId }
+    );
+
+    return response;
+  };
+
+  getBoothOwner = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/all-boothOwner",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getBoothMember = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/member/all-boothMember/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  searchBoothOwner = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  searchBoothMember = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/member/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  exportBoothOwner = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/export/",
+      {}
+    );
+
+    return response;
+  };
+
+  exportBoothMember = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/boothOwner/member/export/",
+      {}
+    );
+
+    return response;
+  };
+  //** END  SECTION BOOTH OWNER */
 }
 
 interface AgentInput {

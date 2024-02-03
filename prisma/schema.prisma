@@ -19,7 +19,7 @@ model User {
   modifiedBy  String?     @db.VarChar(255)
   createdAt   DateTime    @default(now())
   modifedAt   DateTime    @updatedAt
-  createdBy   String?     @default("bySystem") @db.VarChar(255)
+  createdBy   String      @default("bySystem") @db.VarChar(255)
   leader      String?     @db.VarChar(255)
   token       AuthToken[]
   roles       Roles[]
@@ -32,7 +32,7 @@ model Roles {
   stringId   String   @db.VarChar(255)
   userId     String   @db.VarChar(255)
   value      String?  @db.VarChar(255)
-  createdBy  String?  @default("bySystem") @db.VarChar(255)
+  createdBy  String   @default("bySystem") @db.VarChar(255)
   modifiedBy String?  @db.VarChar(255)
   createdAt  DateTime @default(now())
   modifedAt  DateTime @updatedAt
@@ -58,7 +58,7 @@ model Agent {
   createdAt    DateTime @default(now())
   modifedAt    DateTime @updatedAt
   modifiedBy   String?  @db.VarChar(255)
-  createdBy    String?  @default("bySystem") @db.VarChar(255)
+  createdBy    String   @default("bySystem") @db.VarChar(255)
   alamatToko   String   @db.VarChar(1000)
   customerName String   @unique(map: "customerName") @db.VarChar(255)
   email        String   @db.VarChar(255)
@@ -76,7 +76,7 @@ model BoothOwner {
   alamatOwner        String?  @db.VarChar(1000)
   phone              String?  @db.VarChar(255)
   email              String?  @db.VarChar(255)
-  dateeEstablishment String?  @db.VarChar(255)
+  dateEstablishment  String?  @db.VarChar(255)
   totalBooth         Int?
   instagram          String?  @db.VarChar(255)
   facebook           String?  @db.VarChar(255)
@@ -84,7 +84,7 @@ model BoothOwner {
   modifiedBy         String?  @db.VarChar(255)
   createdAt          DateTime @default(now())
   modifedAt          DateTime @updatedAt
-  createdBy          String?  @default("bySystem") @db.VarChar(255)
+  createdBy          String  @default("bySystem") @db.VarChar(255)
   boothMember        Booth[]
 
   @@index([boothOwnerId])
@@ -98,7 +98,7 @@ model Booth {
   modifiedBy   String?    @db.VarChar(255)
   createdAt    DateTime   @default(now())
   modifedAt    DateTime   @updatedAt
-  createdBy    String?    @default("bySystem") @db.VarChar(255)
+  createdBy    String      @default("bySystem") @db.VarChar(255)
   email        String?    @db.VarChar(255)
   fullname     String?    @db.VarChar(255)
   phone        String?    @db.VarChar(255)
@@ -121,7 +121,7 @@ model Product {
   createdAt         DateTime            @default(now())
   modifedAt         DateTime            @updatedAt
   modifiedBy        String?             @db.VarChar(255)
-  createdBy         String?             @default("bySystem") @db.VarChar(255)
+  createdBy         String              @default("bySystem") @db.VarChar(255)
 
   @@index([productId])
 }
@@ -134,7 +134,7 @@ model StringMap {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   modifiedBy String?  @db.VarChar(255)
-  createdBy  String?  @default("bySystem") @db.VarChar(255)
+  createdBy  String   @default("bySystem") @db.VarChar(255)
 
   @@index([stringId])
 }

@@ -255,6 +255,40 @@ export default function Home() {
     [getAllProduct, logoutUser]
   );
 
+  const exportProduct = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const authService = new Services();
+      const responseApi = await authService.exportProduct();
+
+      if (responseApi.status === 200) {
+        setLoading(false);
+
+        const ws = XLSX.utils.json_to_sheet(responseApi.data.data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(
+          wb,
+          `Product ${moment().format("DD-MM-YYYY")}-${
+            Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
+          }.xlsx`
+        );
+      }
+    } catch (e: any) {
+      setLoading(false);
+      if (e.response && e.response.status === 500) {
+        toastMessage({
+          message: e.response.data.message,
+          type: "error",
+        });
+      } else if (e.response && e.response.status === 401) {
+        logoutUser();
+      } else {
+        toastMessage({ message: e.message, type: "error" });
+      }
+    }
+  }, [logoutUser]);
+
   React.useEffect(() => {
     getPageData({ skip: 0, take: 100 });
   }, [getPageData]);
@@ -419,7 +453,7 @@ export default function Home() {
                   }}
                 />
 
-                <div className="flex flex-row gap-5 justify-center items-center">
+                <div className="flex flex-row flex-wrap gap-5 justify-center items-center">
                   <TextField
                     type="file"
                     inputRef={inputFileRef}
@@ -435,6 +469,17 @@ export default function Home() {
                     className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
                   >
                     Upload Product
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      exportProduct();
+                    }}
+                    className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                  >
+                    Export
                   </button>
 
                   <button
@@ -463,7 +508,7 @@ export default function Home() {
                     }}
                     className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
                   >
-                    template
+                    Template
                   </button>
                 </div>
               </div>

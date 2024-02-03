@@ -16,6 +16,7 @@ import Loader from "@/app/component/loader";
 import Loading from "@/app/loading";
 import Search from "@/app/component/search";
 import moment from "moment";
+import ImageViewer from "awesome-image-viewer";
 import * as XLSX from "xlsx";
 
 export default function Home({ params }: { params: { id: string } }) {
@@ -290,14 +291,29 @@ export default function Home({ params }: { params: { id: string } }) {
                     headerAlign: "center",
                     editable: false,
                     renderCell: (params) => {
+                      const onClick = (e: any) => {
+                        e.stopPropagation();
+
+                        new ImageViewer({
+                          images: [
+                            {
+                              mainUrl: params.value,
+                            },
+                          ],
+                          showThumbnails: false,
+                          isZoomable: false,
+                          stretchImages: false,
+                        });
+                      };
+
                       return (
-                        <div className="grid grid-cols-1 place-content-center place-items-center">
+                        <button className="m-4" onClick={onClick}>
                           <img
                             src={params.value}
                             alt="PhotoBooth"
                             className="w-full max-w-[400px] h-auto"
                           />
-                        </div>
+                        </button>
                       );
                     },
                   },

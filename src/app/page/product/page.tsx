@@ -20,7 +20,6 @@ import * as XLSX from "xlsx";
 interface addProducts {
   productName: string;
   productCode: string;
-  price: number;
   weight: number;
   unit: string;
   expiredPeriod: number;
@@ -41,7 +40,6 @@ export default function Home() {
   const [productInput, setProductInput] = React.useState<addProducts>({
     productName: "",
     productCode: "",
-    price: 0,
     weight: 0,
     unit: "",
     expiredPeriod: 0,
@@ -146,7 +144,6 @@ export default function Home() {
     async ({
       productName,
       productCode,
-      price,
       weight,
       unit,
       expiredPeriod,
@@ -157,7 +154,6 @@ export default function Home() {
         const responseApi = await authService.addProduct({
           productName: productName,
           productCode: productCode,
-          price: Number(price),
           weight: Number(weight),
           unit: unit,
           expiredPeriod: Number(expiredPeriod),
@@ -337,7 +333,7 @@ export default function Home() {
                 addProduct({
                   productName: productInput.productName,
                   productCode: productInput.productCode,
-                  price: productInput.price,
+
                   weight: productInput.weight,
                   unit: productInput.unit,
                   expiredPeriod: productInput.expiredPeriod,
@@ -370,24 +366,6 @@ export default function Home() {
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
-                  onChange={handleInputChangeAddProduct}
-                />
-
-                <TextField
-                  name="price"
-                  id="price"
-                  label="Prices"
-                  type={"number"}
-                  size="small"
-                  required
-                  InputLabelProps={{ shrink: true }}
-                  variant="outlined"
-                  fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">Rp.</InputAdornment>
-                    ),
-                  }}
                   onChange={handleInputChangeAddProduct}
                 />
 
@@ -491,7 +469,6 @@ export default function Home() {
                         {
                           productName: "Daging Burger Sapi1",
                           weight: Number("2.5"),
-                          price: 100000,
                           unit: "pack",
                           productCode: "SB1",
                           expiredPeriod: 100,
@@ -523,7 +500,7 @@ export default function Home() {
                   {
                     field: "productCode",
                     headerName: "Product Code",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -532,15 +509,7 @@ export default function Home() {
                   {
                     field: "productName",
                     headerName: "Product Name",
-                    minWidth: 150,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "price",
-                    headerName: "Price (Rp)",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -548,7 +517,7 @@ export default function Home() {
                   {
                     field: "weight",
                     headerName: "Weight",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -556,14 +525,14 @@ export default function Home() {
                   {
                     field: "unit",
                     headerName: "Unit",
-                    minWidth: 150,
+                    minWidth: 250,
                     headerAlign: "center",
                     editable: false,
                   },
                   {
                     field: "expiredPeriod",
                     headerName: "Expired Period",
-                    minWidth: 150,
+                    minWidth: 250,
                     headerAlign: "center",
                     editable: false,
                   },
@@ -571,14 +540,14 @@ export default function Home() {
                     field: "createdBy",
                     headerName: "Created By",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                   },
                   {
                     field: "createdAt",
                     headerName: "Created At",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                     valueFormatter: (params: any) =>
                       moment(params?.value).format("DD/MM/YYYY hh:mm"),
@@ -587,14 +556,14 @@ export default function Home() {
                     field: "modifiedBy",
                     headerName: "Modified By",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                   },
                   {
                     field: "modifedAt",
                     headerName: "Modifed At",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                     valueFormatter: (params: any) =>
                       moment(params?.value).format("DD/MM/YYYY hh:mm"),

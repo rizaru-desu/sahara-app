@@ -275,7 +275,6 @@ export class Services {
   addProduct = async ({
     productName,
     productCode,
-    price,
     weight,
     unit,
     expiredPeriod,
@@ -286,7 +285,6 @@ export class Services {
       {
         productName,
         productCode,
-        price,
         weight,
         unit,
         expiredPeriod,
@@ -421,6 +419,390 @@ export class Services {
     return response;
   };
   //** END  SECTION BOOTH OWNER */
+
+  //** SECTION LABELING */
+  getPageLabelProductData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-product/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getLabelProduct = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-product/all-labeling/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  addLabelProduct = async ({
+    productId,
+    productCode,
+    labelCode,
+    bestBefore,
+    createdBy,
+  }: {
+    productId: string;
+    productCode: string;
+    labelCode: string;
+    bestBefore: Date;
+    createdBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-product/add",
+      {
+        productId,
+        productCode,
+        labelCode,
+        bestBefore,
+        createdBy,
+      }
+    );
+
+    return response;
+  };
+
+  searchLabelProduct = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-product/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  printerLabelProduct = async ({
+    labelIds,
+    modifiedBy,
+  }: {
+    labelIds: string[];
+    modifiedBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-product/printer",
+      { labelIds, modifiedBy }
+    );
+
+    return response;
+  };
+  //** END SECTION LABELING */
+
+  //** SECTION LABELING Box */
+  getPageLabelBoxData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getPageLabelBoxChildData = async ({
+    labelBoxId,
+    skip,
+    take,
+  }: {
+    labelBoxId: string;
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/child",
+      { labelBoxId, skip, take }
+    );
+
+    return response;
+  };
+
+  getLabelingBox = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/all-labeling-box/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getLabelingBoxProducts = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/all-labeling-product/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getLabelingBoxFind = async ({ labelBoxId }: { labelBoxId: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/child/find-box",
+      { labelBoxId }
+    );
+
+    return response;
+  };
+
+  searchLabelBox = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/search-box",
+      { value }
+    );
+
+    return response;
+  };
+
+  searchLabelBoxProducts = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/search-product",
+      { value }
+    );
+
+    return response;
+  };
+
+  addLabelBox = async ({
+    labelIds,
+    labelCodeBox,
+    leader,
+    location,
+    createdBy,
+  }: {
+    labelIds: string[];
+    labelCodeBox: string;
+    location: string;
+    leader: string;
+    createdBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/add",
+      {
+        labelCodeBox,
+        labelIds,
+        leader,
+        location,
+        createdBy,
+      }
+    );
+
+    return response;
+  };
+
+  addLabelToBox = async ({
+    labelIds,
+    labelBoxId,
+    createdBy,
+  }: {
+    labelIds: string[];
+    labelBoxId: string;
+    createdBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/child/add",
+      {
+        labelBoxId,
+        labelIds,
+
+        createdBy,
+      }
+    );
+
+    return response;
+  };
+
+  removeLabelFromBox = async ({
+    labelIds,
+    createdBy,
+  }: {
+    labelIds: string[];
+    createdBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/child/remove",
+      {
+        labelIds,
+        createdBy,
+      }
+    );
+
+    return response;
+  };
+
+  printerLabelBox = async ({
+    labelIds,
+    modifiedBy,
+  }: {
+    labelIds: string[];
+    modifiedBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/labeling-box/printer",
+      { labelIds, modifiedBy }
+    );
+
+    return response;
+  };
+
+  //** SECTION  STOCK PRODUCT */
+  getPageStockProductData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/stock-product/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getStockProduct = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/stock-product/all-stock/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  searchStockProduct = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/stock-product/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  searchRangeStockProduct = async ({ rangeDate }: { rangeDate: any }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/stock-product/search-range",
+      { rangeDate }
+    );
+
+    return response;
+  };
+  //** END SECTION STOCK PRODUCTION*/
+
+  //** SECTION  LOYALTY POINT*/
+  getPageLoyaltyPointData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/loyalty-point/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getPageLoyaltyPointLogData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/loyalty-point/log",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getLoyaltyPoint = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/loyalty-point/all-loyalty",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getLoyaltyPointLog = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/loyalty-point/log/all-log",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  searchLoyalty = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/loyalty-point/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  searchLoyaltyLog = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/loyalty-point/log/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  addPenaltyLoyalty = async ({
+    pointId,
+    userId,
+    point,
+    loyaltyPoint,
+    remarks,
+    createdBy,
+  }: {
+    pointId: string;
+    userId: string;
+    point: number;
+    loyaltyPoint: string;
+    remarks: string;
+    createdBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/loyalty-point/penalty",
+      { pointId, userId, point, loyaltyPoint, remarks, createdBy }
+    );
+
+    return response;
+  };
+  /** END SECTION  LOYALTY POINT*/
 }
 
 interface AgentInput {
@@ -438,7 +820,6 @@ interface AgentInput {
 interface addProducts {
   productName: string;
   productCode: string;
-  price: number;
   weight: number;
   unit: string;
   expiredPeriod: number;

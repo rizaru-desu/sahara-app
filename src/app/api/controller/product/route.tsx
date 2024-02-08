@@ -1,10 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import {
-  pageAllAgent,
-  pageAllProduct,
-  pageAllUser,
-} from "@/app/utils/db/controllerDB";
+import { pageAllProduct } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
 

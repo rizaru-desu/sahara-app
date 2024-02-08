@@ -4,14 +4,23 @@ const prisma = new PrismaClient();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-//** SECTION USER */
-interface pageAllUsers {
+interface paginations {
+  skip: number;
+  take: number;
+}
+
+interface valueSearch {
+  value: string;
+}
+
+interface pageAll {
   userId: string;
   skip: number;
   take: number;
 }
 
-const pageAllUser = async ({ userId, skip, take }: pageAllUsers) => {
+//** SECTION USER */
+const pageAllUser = async ({ userId, skip, take }: pageAll) => {
   try {
     const [detail, roles, allUser, totalUser] = await prisma.$transaction([
       prisma.user.findUnique({
@@ -70,7 +79,7 @@ const generateToken = async ({
   try {
     return prisma.$transaction(async (tx) => {
       const password = await bcrypt.compare(userPassword, dbPassword);
-      console.log(password, dbPassword, userPassword);
+
       if (password) {
         const token = jwt.sign({ userId: userId }, env?.JWT_SECRET || "", {
           expiresIn: "24hr",
@@ -95,12 +104,7 @@ const generateToken = async ({
   }
 };
 
-interface userPaginations {
-  skip: number;
-  take: number;
-}
-
-const userPagination = async ({ skip, take }: userPaginations) => {
+const userPagination = async ({ skip, take }: paginations) => {
   try {
     const [result, count] = await prisma.$transaction([
       prisma.user.findMany({
@@ -136,10 +140,6 @@ const userPagination = async ({ skip, take }: userPaginations) => {
     throw new Error(e.message);
   }
 };
-
-interface valueSearch {
-  value: string;
-}
 
 const userSearch = async ({ value }: valueSearch) => {
   try {
@@ -384,7 +384,7 @@ const activeUser = async ({ userId, value, modifiedBy }: activeUserInput) => {
 const roles = async () => {
   try {
     return prisma.$transaction(async (tx) => {
-      const result = await prisma.stringMap.findMany({
+      const result = await tx.stringMap.findMany({
         where: { objectName: "Roles" },
         select: { stringId: true, value: true },
       });
@@ -418,13 +418,7 @@ const loginUser = async ({ email }: { email: string }) => {
 /** END  SECTION USER */
 
 /** SECTION AGENT */
-interface pageAllAgents {
-  userId: string;
-  skip: number;
-  take: number;
-}
-
-const pageAllAgent = async ({ userId, skip, take }: pageAllAgents) => {
+const pageAllAgent = async ({ userId, skip, take }: pageAll) => {
   try {
     const [detail, allAgent, totalAgent] = await prisma.$transaction([
       prisma.user.findUnique({
@@ -472,12 +466,7 @@ const agentSearch = async ({ value }: valueSearch) => {
   }
 };
 
-interface agentPaginations {
-  skip: number;
-  take: number;
-}
-
-const agentPagination = async ({ skip, take }: agentPaginations) => {
+const agentPagination = async ({ skip, take }: paginations) => {
   try {
     const [result, count] = await prisma.$transaction([
       prisma.agent.findMany({
@@ -584,13 +573,7 @@ const agentExport = async () => {
 /** END SECTION AGENT */
 
 /** SECTION PRODUCT */
-interface pageAllProducts {
-  userId: string;
-  skip: number;
-  take: number;
-}
-
-const pageAllProduct = async ({ userId, skip, take }: pageAllProducts) => {
+const pageAllProduct = async ({ userId, skip, take }: pageAll) => {
   try {
     const [detail, allProduct, totalProduct] = await prisma.$transaction([
       prisma.user.findUnique({
@@ -612,12 +595,7 @@ const pageAllProduct = async ({ userId, skip, take }: pageAllProducts) => {
   }
 };
 
-interface productPaginations {
-  skip: number;
-  take: number;
-}
-
-const productPagination = async ({ skip, take }: productPaginations) => {
+const productPagination = async ({ skip, take }: paginations) => {
   try {
     const [result, count] = await prisma.$transaction([
       prisma.product.findMany({
@@ -638,7 +616,6 @@ const productPagination = async ({ skip, take }: productPaginations) => {
 interface addProducts {
   productName: string;
   productCode: string;
-  price: number;
   weight: number;
   unit: string;
   expiredPeriod: number;
@@ -648,7 +625,6 @@ interface addProducts {
 const addProduct = async ({
   productName,
   productCode,
-  price,
   weight,
   unit,
   expiredPeriod,
@@ -660,7 +636,6 @@ const addProduct = async ({
         data: {
           productName,
           productCode,
-          price,
           weight,
           expiredPeriod,
           unit,
@@ -733,17 +708,8 @@ const productExport = async () => {
 /** END SECTION PRODUCT */
 
 /** SECTION BOOTH OWNER */
-interface pageAllOwnerBooths {
-  userId: string;
-  skip: number;
-  take: number;
-}
 
-const pageAllOwnerBooth = async ({
-  userId,
-  skip,
-  take,
-}: pageAllOwnerBooths) => {
+const pageAllOwnerBooth = async ({ userId, skip, take }: pageAll) => {
   try {
     const [detail, allBoothOwner, totalBoothOwner] = await prisma.$transaction([
       prisma.user.findUnique({
@@ -766,7 +732,7 @@ const pageAllOwnerBooth = async ({
 };
 
 interface pageAllMemberBooths {
-  userId: string;
+  userId?: string;
   skip: number;
   take: number;
   boothOwnerId: string;
@@ -800,12 +766,7 @@ const pageAllMemberBooth = async ({
   }
 };
 
-interface boothOwnerPaginations {
-  skip: number;
-  take: number;
-}
-
-const boothOwnerPagination = async ({ skip, take }: boothOwnerPaginations) => {
+const boothOwnerPagination = async ({ skip, take }: paginations) => {
   try {
     const [result, count] = await prisma.$transaction([
       prisma.boothOwner.findMany({
@@ -823,21 +784,17 @@ const boothOwnerPagination = async ({ skip, take }: boothOwnerPaginations) => {
   }
 };
 
-interface boothMemberPaginations {
-  skip: number;
-  take: number;
-}
-
 const boothMemberPagination = async ({
   skip,
   take,
-}: boothMemberPaginations) => {
+  boothOwnerId,
+}: pageAllMemberBooths) => {
   try {
     const [result, count] = await prisma.$transaction([
       prisma.booth.findMany({
         skip,
         take,
-
+        where: { boothOwnerId },
         orderBy: { fullname: "asc" },
       }),
       prisma.booth.count(),
@@ -946,110 +903,715 @@ const boothMemberExport = async () => {
   }
 };
 
-interface boothOwners {
-  boothOwnerId?: string;
-  userId: string;
-  fullname?: string | null;
-  alamatOwner?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  dateEstablishment?: string | null;
-  totalBooth?: number | null;
-  instagram?: string | null;
-  facebook?: string | null;
-  ecommerce?: string | null;
-  modifiedBy?: string | null;
+/** END BOOTH OWNER */
+
+/** LABELING */
+const pageAllLabeling = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, allProduct, allLabel, totalLabel] =
+      await prisma.$transaction([
+        prisma.user.findUnique({
+          where: { userId },
+          include: { roles: { select: { stringId: true } } },
+        }),
+        prisma.product.findMany({
+          orderBy: { productName: "asc" },
+        }),
+        prisma.labelProduct.findMany({
+          skip,
+          take,
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.labelProduct.count(),
+      ]);
+
+    return { detail, allProduct, allLabel, totalLabel };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface addLabelsProduct {
+  productId: string;
+  productCode: string;
+  labelCode: string;
+  bestBefore: string;
   createdBy?: string;
 }
 
-const addBoothOwner = async ({
-  userId,
-  fullname,
-  alamatOwner,
-  phone,
-  email,
-  dateEstablishment,
-  instagram,
-  facebook,
-  ecommerce,
+const addLabelProduct = async ({
+  productId,
+  productCode,
+  labelCode,
+  bestBefore,
   createdBy,
-}: boothOwners) => {
+}: addLabelsProduct) => {
   try {
-    const result = await prisma.$transaction([
-      prisma.boothOwner.create({
+    return prisma.$transaction(async (tx) => {
+      const insertLabelProduct = await tx.labelProduct.create({
         data: {
-          userId,
-          fullname,
-          alamatOwner,
-          phone,
-          email,
-          dateEstablishment,
-          instagram,
-          facebook,
-          ecommerce,
+          productCode,
+          productId,
+          labelCode,
+          bestBefore,
           createdBy,
         },
-      }),
-    ]);
+      });
 
-    return result;
+      if (insertLabelProduct) {
+        const findProduct = await tx.product.findUnique({
+          where: { productId: insertLabelProduct.productId },
+        });
+
+        const insertStock = await tx.stokPorudct.create({
+          data: {
+            productId: findProduct?.productId ?? "",
+            productName: findProduct?.productName ?? "",
+            productCode: findProduct?.productCode ?? "",
+            weight: findProduct?.weight ?? 0,
+            unit: findProduct?.unit ?? "",
+            expiredDate: insertLabelProduct.bestBefore,
+            labelProducts: insertLabelProduct.labelCode,
+            labelId: insertLabelProduct.labelId,
+            createdBy,
+          },
+        });
+
+        return insertStock;
+      } else {
+        throw new Error("Failed add label product");
+      }
+    });
   } catch (error: any) {
     throw new Error(error.message);
   }
 };
 
-const editBoothOwner = async ({
-  boothOwnerId,
-  fullname,
-  alamatOwner,
-  phone,
-  email,
-  dateEstablishment,
-  instagram,
-  facebook,
-  ecommerce,
-  modifiedBy,
-}: boothOwners) => {
+const labelProductPagination = async ({ skip, take }: paginations) => {
   try {
-    const result = await prisma.$transaction([
-      prisma.boothOwner.update({
-        where: { boothOwnerId },
+    const [result, count] = await prisma.$transaction([
+      prisma.labelProduct.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.labelProduct.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const labelProductSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.labelProduct.findMany({
+        where: {
+          OR: [
+            {
+              productCode: { contains: value },
+            },
+            { labelCode: { contains: value } },
+          ],
+        },
+
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface printabelsProduct {
+  labelId: string[];
+  modifiedBy?: string;
+}
+
+const labelProductPrinter = async ({
+  labelId,
+  modifiedBy,
+}: printabelsProduct) => {
+  try {
+    const [result, labelExport] = await prisma.$transaction([
+      prisma.labelProduct.updateMany({
+        where: { labelId: { in: labelId } },
+        data: { printed: 1, modifiedBy: modifiedBy },
+      }),
+      prisma.labelProduct.findMany({
+        where: { labelId: { in: labelId } },
+        orderBy: { createdAt: "asc" },
+      }),
+    ]);
+
+    return { result, labelExport };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+/** END LABELING */
+
+/** SECTION LABELING BOX */
+const pageAllLabelingBox = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, allLabelBox, totalLabelBox, allLabel, totalLabel] =
+      await prisma.$transaction([
+        prisma.user.findUnique({
+          where: { userId },
+          include: { roles: { select: { stringId: true } } },
+        }),
+        prisma.labelBox.findMany({
+          skip,
+          take,
+          include: { labelProduct: true },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.labelBox.count(),
+        prisma.labelProduct.findMany({
+          where: { AND: [{ labelBoxId: null }] },
+          skip,
+          take,
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.labelProduct.count({
+          where: { AND: [{ labelBoxId: null }] },
+        }),
+      ]);
+
+    return { detail, allLabelBox, totalLabelBox, allLabel, totalLabel };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const pageAllLabelingBoxChild = async ({
+  userId,
+  labelBoxId,
+  skip,
+  take,
+}: {
+  userId: string;
+  labelBoxId: string;
+  skip: number;
+  take: number;
+}) => {
+  try {
+    const [detail, allLabelBox, allLabelProduct, totalLabelProduct] =
+      await prisma.$transaction([
+        prisma.user.findUnique({
+          where: { userId },
+          include: { roles: { select: { stringId: true } } },
+        }),
+        prisma.labelBox.findUnique({
+          where: { labelBoxId },
+          include: { labelProduct: { orderBy: { createdAt: "desc" } } },
+        }),
+        prisma.labelProduct.findMany({
+          where: { AND: [{ labelBoxId: null }] },
+          skip,
+          take,
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.labelProduct.count({
+          where: { AND: [{ labelBoxId: null }] },
+        }),
+      ]);
+
+    return { detail, allLabelBox, allLabelProduct, totalLabelProduct };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const labelBoxPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.labelBox.findMany({
+        skip,
+        take,
+        include: { labelProduct: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.labelBox.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const labelBoxFind = async ({ labelBoxId }: { labelBoxId: string }) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.labelBox.findUnique({
+        where: { labelBoxId },
+        include: { labelProduct: { orderBy: { createdAt: "desc" } } },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const labelBoxSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.labelBox.findMany({
+        where: {
+          OR: [
+            {
+              labelCodeBox: { contains: value },
+            },
+          ],
+        },
+        include: { labelProduct: true },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const labelBoxProductPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.labelProduct.findMany({
+        where: { AND: [{ labelBoxId: null }] },
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.labelProduct.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const labelBoxProductSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.labelProduct.findMany({
+        where: {
+          OR: [
+            { productCode: { contains: value } },
+            { labelCode: { contains: value } },
+            { NOT: { AND: [{ labelBoxId: undefined }] } },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+interface addLabelsBox {
+  labelId: string[];
+  labelCodeBox: string;
+  leader: string;
+  location: string;
+  createdBy?: string;
+}
+
+const addLabelBox = async ({
+  labelId,
+  labelCodeBox,
+  location,
+  leader,
+  createdBy,
+}: addLabelsBox) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const insertLabelBox = await tx.labelBox.create({
+        data: { labelCodeBox, createdBy, leader },
+      });
+
+      if (insertLabelBox) {
+        const updateProduct = await tx.labelProduct.updateMany({
+          where: { labelId: { in: labelId } },
+          data: {
+            labelBoxId: insertLabelBox.labelBoxId,
+            modifiedBy: createdBy,
+          },
+        });
+
+        const updateStock = await tx.stokPorudct.updateMany({
+          where: { labelId: { in: labelId } },
+          data: {
+            labelBoxId: insertLabelBox.labelBoxId,
+            labelBoxs: insertLabelBox.labelCodeBox,
+            location,
+            status: 2,
+            modifiedBy: createdBy,
+          },
+        });
+
+        return { insertLabelBox, updateProduct, updateStock };
+      } else {
+        throw new Error("Failed add label box");
+      }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+interface addLabelsToBox {
+  labelId: string[];
+  labelBoxId: string;
+  createdBy?: string;
+}
+
+const addLabelToBox = async ({
+  labelId,
+  labelBoxId,
+  createdBy,
+}: addLabelsToBox) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const updateProduct = await tx.labelProduct.updateMany({
+        where: { labelId: { in: labelId } },
         data: {
-          fullname,
-          alamatOwner,
-          phone,
-          email,
-          dateEstablishment,
-          instagram,
-          facebook,
-          ecommerce,
-          modifiedBy,
+          labelBoxId,
+          modifiedBy: createdBy,
+        },
+      });
+
+      return updateProduct;
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+const removeProductBox = async ({
+  labelId,
+  createdBy,
+}: {
+  labelId: string[];
+  createdBy?: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const removeProduct = await tx.labelProduct.updateMany({
+        where: { labelId: { in: labelId } },
+        data: {
+          labelBoxId: null,
+          modifiedBy: createdBy,
+        },
+      });
+
+      return { removeProduct };
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+const labelBoxPrinter = async ({ labelId, modifiedBy }: printabelsProduct) => {
+  try {
+    const [result, labelExport] = await prisma.$transaction([
+      prisma.labelBox.updateMany({
+        where: { labelBoxId: { in: labelId } },
+        data: { statusBox: 1, modifiedBy: modifiedBy },
+      }),
+      prisma.labelBox.findMany({
+        where: { labelBoxId: { in: labelId } },
+        orderBy: { createdAt: "asc" },
+      }),
+    ]);
+
+    return { result, labelExport };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+/** END SECTION LABELING BOX*/
+
+/** SECTION STOCK PRODUCT */
+const pageAllStockProdut = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, allStock, totalStock] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        include: { roles: { select: { stringId: true } } },
+      }),
+      prisma.stokPorudct.findMany({
+        skip,
+        take,
+        orderBy: { productName: "asc" },
+      }),
+      prisma.stokPorudct.count(),
+    ]);
+
+    return { detail, allStock, totalStock };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const stockProdutPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.stokPorudct.findMany({
+        skip,
+        take,
+        orderBy: { productName: "asc" },
+      }),
+      prisma.stokPorudct.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const stockProdutSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.stokPorudct.findMany({
+        where: {
+          OR: [
+            { productCode: { contains: value } },
+            { productName: { contains: value } },
+            { labelBoxs: { contains: value } },
+            { labelProducts: { contains: value } },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const stockProdutRangeSearch = async ({
+  rangeDate,
+}: {
+  rangeDate: { startDate: string; endDate: string };
+}) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.stokPorudct.findMany({
+        where: {
+          OR: [
+            { createdAt: { gte: rangeDate.startDate, lte: rangeDate.endDate } },
+            {
+              modifedAt: { gte: rangeDate.startDate, lte: rangeDate.endDate },
+            },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+/** END SECTION STOCK PRODUCT */
+
+/** END SECTION LOYALTY */
+const pageAllLoyalty = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, allLoyalty, totalLoyalty] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        include: { roles: { select: { stringId: true } } },
+      }),
+      prisma.loyaltyPoint.findMany({
+        skip,
+        take,
+        include: {
+          userIdData: { select: { fullname: true, email: true, phone: true } },
+        },
+        orderBy: { modifedAt: "desc" },
+      }),
+      prisma.loyaltyPoint.count(),
+    ]);
+
+    return { detail, allLoyalty, totalLoyalty };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const pageAllLoyaltyLog = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, allLoyaltyLog, totalLoyaltyLog] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        include: { roles: { select: { stringId: true } } },
+      }),
+      prisma.loyaltyPointLog.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.loyaltyPointLog.count(),
+    ]);
+
+    return { detail, allLoyaltyLog, totalLoyaltyLog };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const loyaltyPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.loyaltyPoint.findMany({
+        skip,
+        take,
+        include: {
+          userIdData: { select: { fullname: true, email: true, phone: true } },
+        },
+        orderBy: { modifedAt: "desc" },
+      }),
+      prisma.loyaltyPoint.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const loyaltyLogPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.loyaltyPointLog.findMany({
+        skip,
+        take,
+
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.loyaltyPointLog.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const loyaltyLogSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.loyaltyPointLog.findMany({
+        where: {
+          OR: [
+            { productCode: { contains: value } },
+            { productName: { contains: value } },
+            { labelProducts: { contains: value } },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const loyaltySearch = async ({ value }: valueSearch) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const insertLabelBox = await tx.user.findMany({
+        where: {
+          OR: [
+            {
+              email: { contains: value },
+            },
+            { fullname: { contains: value } },
+            { phone: { contains: value } },
+          ],
+        },
+      });
+
+      if (insertLabelBox) {
+        const userIds = insertLabelBox.map((user) => user.userId);
+        const findPoint = await tx.loyaltyPoint.findMany({
+          where: { userId: { in: userIds } },
+          include: {
+            userIdData: {
+              select: { fullname: true, email: true, phone: true },
+            },
+          },
+          orderBy: { modifedAt: "desc" },
+        });
+
+        return findPoint;
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const loyaltyPenaltyPoint = async ({
+  pointId,
+  userId,
+  point,
+  loyaltyPoint,
+  remark,
+  createdBy,
+}: {
+  pointId: string;
+  userId: string;
+  point: number;
+  loyaltyPoint: string;
+  remark: string;
+  createdBy?: string;
+}) => {
+  try {
+    const [resultLog, result] = await prisma.$transaction([
+      prisma.loyaltyPointLog.create({
+        data: { userId, pointId, loyaltyPoint, remark, createdBy },
+      }),
+      prisma.loyaltyPoint.update({
+        where: { pointId },
+        data: {
+          loyaltyPoint: point,
+          modifiedBy: createdBy,
+        },
+        include: {
+          userIdData: {
+            select: { fullname: true, email: true, phone: true },
+          },
         },
       }),
     ]);
 
-    return result;
-  } catch (error: any) {
-    throw new Error(error.message);
+    return { result, resultLog };
+  } catch (e: any) {
+    throw new Error(e.message);
   }
 };
-
-interface Booths {
-  boothId: string;
-  alamatBooth: string;
-  geolocation?: string | null;
-  photoBooth?: Buffer | null;
-  modifiedBy?: string | null;
-  createdAt: Date;
-  modifedAt: Date;
-  createdBy: string;
-  email?: string | null;
-  fullname?: string | null;
-  phone?: string | null;
-  userId: string;
-  boothOwnerId: string;
-}
-/** END BOOTH OWNER */
+/** END SECTION LOYALTY */
 
 export {
   //** USER */
@@ -1092,4 +1654,39 @@ export {
   boothMemberImage,
   boothOwnerExport,
   boothMemberExport,
+
+  /** LABELING */
+  pageAllLabeling,
+  addLabelProduct,
+  labelProductPagination,
+  labelProductSearch,
+  labelProductPrinter,
+
+  /** LABELING BOX */
+  pageAllLabelingBox,
+  pageAllLabelingBoxChild,
+  labelBoxFind,
+  labelBoxPagination,
+  labelBoxSearch,
+  addLabelBox,
+  addLabelToBox,
+  removeProductBox,
+  labelBoxProductPagination,
+  labelBoxProductSearch,
+  labelBoxPrinter,
+
+  /** STOCK PRODUCT */
+  pageAllStockProdut,
+  stockProdutPagination,
+  stockProdutRangeSearch,
+  stockProdutSearch,
+
+  //** POINT LOYALTY */
+  pageAllLoyalty,
+  pageAllLoyaltyLog,
+  loyaltyPagination,
+  loyaltyLogPagination,
+  loyaltySearch,
+  loyaltyLogSearch,
+  loyaltyPenaltyPoint,
 };

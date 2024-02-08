@@ -1,17 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { addProduct } from "@/app/utils/db/controllerDB";
-import z from "zod";
+import { pageAllLabelingBox } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
+import z from "zod";
 
 const Schema = z
   .object({
-    productName: z.string(),
-    productCode: z.string(),
-    weight: z.number().multipleOf(0.01),
-    unit: z.string(),
-    expiredPeriod: z.number(),
-    createdBy: z.string().optional(),
+    skip: z.number(),
+    take: z.number(),
   })
   .strict();
 
@@ -57,18 +53,40 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addProduct({
-        productName: resultValid.productName,
-        productCode: resultValid.productCode,
-        weight: resultValid.weight,
-        unit: resultValid.unit,
-        expiredPeriod: resultValid.expiredPeriod,
-        createdBy: resultValid.createdBy,
+      const { userId } = tokenValidated;
+      const { detail, allLabelBox, totalLabelBox, allLabel, totalLabel } =
+        await pageAllLabelingBox({
+          skip: resultValid.skip,
+          take: resultValid.take,
+          userId: userId,
+        });
+
+      const labelBoxResult = _.map(allLabelBox, (item) => {
+        return Object.assign(
+          {
+            id: item.labelBoxId,
+            totalProduct: _.size(item.labelProduct),
+          },
+          _.omit(item, "labelBoxId", "labelProduct")
+        );
+      });
+
+      const labelResult = _.map(allLabel, (item) => {
+        return Object.assign(
+          {
+            id: item.labelId,
+          },
+          _.omit(item, "labelId")
+        );
       });
 
       return NextResponse.json(
         {
-          message: `Product ${resultValid.productName} has been successfully add.`,
+          allLabelBox: labelBoxResult,
+          userDetail: detail,
+          allLabel: labelResult,
+          countLabel: totalLabel,
+          countLabelBox: totalLabelBox,
         },
         {
           status: 200,

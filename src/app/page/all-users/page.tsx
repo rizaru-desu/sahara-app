@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { toastMessage } from "@/app/component/toasttify";
 import { Services } from "@/app/utils/services/service";
 import {
-  Button,
   Checkbox,
   Dialog,
   DialogContent,
@@ -634,7 +633,7 @@ export default function Home() {
                   {
                     field: "fullname",
                     headerName: "Nama Lengkap",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -642,28 +641,28 @@ export default function Home() {
                   {
                     field: "email",
                     headerName: "Email",
-                    minWidth: 150,
+                    minWidth: 250,
                     headerAlign: "center",
                     editable: false,
                   },
                   {
                     field: "phone",
                     headerName: "No. HP",
-                    minWidth: 150,
+                    minWidth: 250,
                     headerAlign: "center",
                     editable: false,
                   },
                   {
                     field: "dateOfBirth",
                     headerName: "Tanggal Lahir",
-                    minWidth: 150,
+                    minWidth: 250,
                     headerAlign: "center",
                     editable: false,
                   },
                   {
                     field: "leader",
                     headerName: "Leader / Atasan",
-                    minWidth: 150,
+                    minWidth: 250,
                     headerAlign: "center",
                     editable: false,
                   },
@@ -671,7 +670,7 @@ export default function Home() {
                     field: "roles",
                     headerName: "Roles",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                     renderCell: (params) => {
                       return (
@@ -711,14 +710,14 @@ export default function Home() {
                     field: "createdBy",
                     headerName: "Created By",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                   },
                   {
                     field: "createdAt",
                     headerName: "Created At",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                     valueFormatter: (params) =>
                       moment(params?.value).format("DD/MM/YYYY hh:mm"),
@@ -727,14 +726,14 @@ export default function Home() {
                     field: "modifiedBy",
                     headerName: "Modified By",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                   },
                   {
                     field: "modifedAt",
                     headerName: "Modifed At",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                     valueFormatter: (params) =>
                       moment(params?.value).format("DD/MM/YYYY hh:mm"),
@@ -967,7 +966,7 @@ export default function Home() {
                   {
                     field: "value",
                     headerName: "Roles",
-                    minWidth: 150,
+                    minWidth: 250,
                     width: 500,
                     align: "left",
                     headerAlign: "center",

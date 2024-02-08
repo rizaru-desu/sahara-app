@@ -1,17 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { addProduct } from "@/app/utils/db/controllerDB";
-import z from "zod";
+import { pageAllLabeling } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
+import z from "zod";
 
 const Schema = z
   .object({
-    productName: z.string(),
-    productCode: z.string(),
-    weight: z.number().multipleOf(0.01),
-    unit: z.string(),
-    expiredPeriod: z.number(),
-    createdBy: z.string().optional(),
+    skip: z.number(),
+    take: z.number(),
   })
   .strict();
 
@@ -57,18 +53,51 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addProduct({
-        productName: resultValid.productName,
-        productCode: resultValid.productCode,
-        weight: resultValid.weight,
-        unit: resultValid.unit,
-        expiredPeriod: resultValid.expiredPeriod,
-        createdBy: resultValid.createdBy,
+      const { userId } = tokenValidated;
+      const { detail, allProduct, allLabel, totalLabel } =
+        await pageAllLabeling({
+          skip: resultValid.skip,
+          take: resultValid.take,
+          userId: userId,
+        });
+
+      const finalResult = _.map(allProduct, (item) => {
+        return Object.assign(
+          {
+            productName: `[${item.productCode}] ${item.productName}`,
+            productCode: item.productCode,
+            expiredPeriod: item.expiredPeriod,
+            productId: item.productId,
+          },
+          _.omit(
+            item,
+            "productId",
+            "productName",
+            "weight",
+            "unit",
+            "createdAt",
+            "modifedAt",
+            "modifiedBy",
+            "createdBy"
+          )
+        );
+      });
+
+      const labelResult = _.map(allLabel, (item) => {
+        return Object.assign(
+          {
+            id: item.labelId,
+          },
+          _.omit(item, "labelId")
+        );
       });
 
       return NextResponse.json(
         {
-          message: `Product ${resultValid.productName} has been successfully add.`,
+          allProduct: finalResult,
+          userDetail: detail,
+          allLabel: labelResult,
+          countLabel: totalLabel,
         },
         {
           status: 200,

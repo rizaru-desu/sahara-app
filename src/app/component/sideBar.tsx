@@ -9,6 +9,7 @@ import {
   FaCog,
   FaQrcode,
   FaWarehouse,
+  FaBoxOpen,
 } from "react-icons/fa";
 import { FaBoxesPacking } from "react-icons/fa6";
 import { RiMoneyEuroCircleFill, RiMoneyDollarCircleFill } from "react-icons/ri";
@@ -64,26 +65,34 @@ function SideBar({
       },
       {
         title: "Setting",
-        href: "/setting",
+        href: "/page/setting",
         header: false,
         icon: <FaCog size={25} color={"#fff"} />,
         roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
       },
       { title: "Inventory", href: "#", header: true, roles: [0] },
       {
-        title: "Stock",
-        href: "/stock",
-        header: false,
-        icon: <FaWarehouse size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
-      },
-      {
         title: "Labeling",
-        href: "/labeling",
+        href: "/page/labeling-product",
         header: false,
         icon: <FaQrcode size={25} color={"#fff"} />,
         roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
       },
+      {
+        title: "Labeling Box",
+        href: "/page/labeling-box",
+        header: false,
+        icon: <FaBoxOpen size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+      {
+        title: "Stock",
+        href: "/page/stock-product",
+        header: false,
+        icon: <FaWarehouse size={25} color={"#fff"} />,
+        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+      },
+
       {
         title: "Distribution",
         href: "#",
@@ -93,30 +102,23 @@ function SideBar({
       },
       {
         title: "Delivery Order",
-        href: "/delivery-order",
+        href: "/page/delivery-order",
         header: false,
         icon: <FaBoxesPacking size={25} color={"#fff"} />,
         roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
       },
       {
-        title: "Reports",
+        title: "Loyalty",
         href: "#",
         header: true,
         icon: undefined,
         roles: [0],
       },
       {
-        title: "Point By",
-        href: "/pointby-report",
+        title: "Point",
+        href: "/page/point-loyalty",
         header: false,
         icon: <RiMoneyEuroCircleFill size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
-      },
-      {
-        title: "Agent",
-        href: "/customer-report",
-        header: false,
-        icon: <RiMoneyDollarCircleFill size={25} color={"#fff"} />,
         roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
       },
     ],

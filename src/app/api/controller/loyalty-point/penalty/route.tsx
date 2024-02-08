@@ -1,16 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { addProduct } from "@/app/utils/db/controllerDB";
-import z from "zod";
+import {
+  loyaltyPenaltyPoint,
+  loyaltySearch,
+} from "@/app/utils/db/controllerDB";
 import _ from "lodash";
+import z from "zod";
 
 const Schema = z
   .object({
-    productName: z.string(),
-    productCode: z.string(),
-    weight: z.number().multipleOf(0.01),
-    unit: z.string(),
-    expiredPeriod: z.number(),
+    pointId: z.string(),
+    userId: z.string(),
+    point: z.number(),
+    loyaltyPoint: z.string(),
+    remarks: z.string(),
     createdBy: z.string().optional(),
   })
   .strict();
@@ -57,18 +60,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addProduct({
-        productName: resultValid.productName,
-        productCode: resultValid.productCode,
-        weight: resultValid.weight,
-        unit: resultValid.unit,
-        expiredPeriod: resultValid.expiredPeriod,
+      const { result, resultLog } = await loyaltyPenaltyPoint({
+        pointId: resultValid.pointId,
+        userId: resultValid.userId,
+        point: resultValid.point,
+        loyaltyPoint: resultValid.loyaltyPoint,
+        remark: resultValid.remarks,
         createdBy: resultValid.createdBy,
       });
 
       return NextResponse.json(
         {
-          message: `Product ${resultValid.productName} has been successfully add.`,
+          message: `The user ${result.userIdData?.fullname} received a penalty of ${resultLog.loyaltyPoint}.`,
         },
         {
           status: 200,

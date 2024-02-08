@@ -8,6 +8,7 @@ const Schema = z
   .object({
     skip: z.number(),
     take: z.number(),
+    boothOwnerId: z.string(),
   })
   .strict();
 
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
       const { result, count } = await boothMemberPagination({
         skip: resultValid.skip,
         take: resultValid.take,
+        boothOwnerId: resultValid.boothOwnerId,
       });
 
       const finalResult = _.map(result, (item) => {

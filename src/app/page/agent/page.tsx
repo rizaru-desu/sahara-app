@@ -540,7 +540,7 @@ export default function Home() {
                   {
                     field: "customerName",
                     headerName: "Customer Name",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -570,7 +570,7 @@ export default function Home() {
                   {
                     field: "noNpwp",
                     headerName: "NPWP",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -578,7 +578,7 @@ export default function Home() {
                   {
                     field: "picName",
                     headerName: "PIC Name",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -586,7 +586,7 @@ export default function Home() {
                   {
                     field: "picPhone",
                     headerName: "PIC Phone",
-                    minWidth: 150,
+                    minWidth: 250,
                     align: "left",
                     headerAlign: "center",
                     editable: false,
@@ -594,7 +594,7 @@ export default function Home() {
                   {
                     field: "email",
                     headerName: "Email",
-                    minWidth: 150,
+                    minWidth: 250,
                     headerAlign: "center",
                     editable: false,
                   },
@@ -602,14 +602,14 @@ export default function Home() {
                     field: "createdBy",
                     headerName: "Created By",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                   },
                   {
                     field: "createdAt",
                     headerName: "Created At",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                     valueFormatter: (params: any) =>
                       moment(params?.value).format("DD/MM/YYYY hh:mm"),
@@ -618,14 +618,14 @@ export default function Home() {
                     field: "modifiedBy",
                     headerName: "Modified By",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                   },
                   {
                     field: "modifedAt",
                     headerName: "Modifed At",
                     headerAlign: "center",
-                    minWidth: 150,
+                    minWidth: 250,
                     editable: false,
                     valueFormatter: (params: any) =>
                       moment(params?.value).format("DD/MM/YYYY hh:mm"),

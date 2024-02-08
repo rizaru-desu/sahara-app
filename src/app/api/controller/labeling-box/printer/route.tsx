@@ -1,17 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { addProduct } from "@/app/utils/db/controllerDB";
-import z from "zod";
+import { labelBoxPrinter } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
+import z from "zod";
 
 const Schema = z
   .object({
-    productName: z.string(),
-    productCode: z.string(),
-    weight: z.number().multipleOf(0.01),
-    unit: z.string(),
-    expiredPeriod: z.number(),
-    createdBy: z.string().optional(),
+    labelIds: z.array(z.string()),
+    modifiedBy: z.string().optional(),
   })
   .strict();
 
@@ -57,18 +53,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addProduct({
-        productName: resultValid.productName,
-        productCode: resultValid.productCode,
-        weight: resultValid.weight,
-        unit: resultValid.unit,
-        expiredPeriod: resultValid.expiredPeriod,
-        createdBy: resultValid.createdBy,
+      const { result, labelExport } = await labelBoxPrinter({
+        labelId: resultValid.labelIds,
+        modifiedBy: resultValid.modifiedBy,
       });
 
       return NextResponse.json(
         {
-          message: `Product ${resultValid.productName} has been successfully add.`,
+          message: `Label ${result.count} has been successfully export & printed.`,
+          data: labelExport,
         },
         {
           status: 200,

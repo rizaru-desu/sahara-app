@@ -218,6 +218,20 @@ export default function Home() {
                 <TextField
                   name="customerName"
                   id="customerName"
+                  label="Descripton"
+                  inputProps={{ max: 255 }}
+                  maxRows={4}
+                  type={"text"}
+                  size="small"
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                />
+
+                <TextField
+                  name="customerName"
+                  id="customerName"
                   label="add Image"
                   type={"file"}
                   size="small"
@@ -248,24 +262,26 @@ export default function Home() {
               disableRowSelectionOnClick
               columns={[
                 {
-                  field: "productCode",
-                  headerName: "Product Code",
+                  field: "campaignName",
+                  headerName: "CampaignName",
                   minWidth: 250,
                   align: "left",
                   headerAlign: "center",
                   editable: false,
                 },
                 {
-                  field: "labelCode",
-                  headerName: "Label Product Code",
+                  field: "startDate",
+                  headerName: "Start Date",
                   minWidth: 250,
                   align: "left",
                   headerAlign: "center",
                   editable: false,
+                  valueFormatter: (params: any) =>
+                    moment(params?.value).format("DD/MM/YYYY"),
                 },
                 {
-                  field: "bestBefore",
-                  headerName: "Best Before",
+                  field: "endDate",
+                  headerName: "End Date",
                   minWidth: 250,
                   align: "center",
                   headerAlign: "center",
@@ -274,19 +290,21 @@ export default function Home() {
                     moment(params?.value).format("DD/MM/YYYY"),
                 },
                 {
-                  field: "printed",
-                  headerName: "Printed",
+                  field: "loyaltyPoint",
+                  headerName: "Point",
                   minWidth: 250,
                   align: "center",
                   headerAlign: "center",
                   editable: false,
-                  renderCell: (params) => {
-                    return params.value === 0 ? (
-                      <MdPrintDisabled />
-                    ) : (
-                      <MdPrint />
-                    );
-                  },
+                },
+
+                {
+                  field: "photo",
+                  headerName: "Image",
+                  minWidth: 250,
+                  align: "center",
+                  headerAlign: "center",
+                  editable: false,
                 },
                 {
                   field: "createdBy",

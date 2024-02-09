@@ -64,8 +64,8 @@ function SideBar({
         roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
       },
       {
-        title: "Setting",
-        href: "/page/setting",
+        title: "Point & Campaign",
+        href: "/page/point-campaign",
         header: false,
         icon: <FaCog size={25} color={"#fff"} />,
         roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],

@@ -229,6 +229,50 @@ model LoyaltyPointLog {
   @@index([pointId])
 }
 
+model BaseLoyalty {
+  baseLoyaltyId String    @id @default(uuid()) @db.VarChar(255)
+  basePoint Int
+  @@index([baseLoyaltyId])
+}
+
+model Campaign {
+  campaignId String    @id @default(uuid()) @db.VarChar(255)
+  campaignName  String   @db.VarChar(255)
+  startDate DateTime
+  endDate DateTime
+  productId String   @db.VarChar(255)
+  loyaltyPoint Int
+  description String   @db.VarChar(255)
+  photo Bytes
+  createdAt     DateTime  @default(now())
+  modifedAt     DateTime  @updatedAt
+  modifiedBy    String?   @db.VarChar(255)
+  createdBy     String    @default("bySystem") @db.VarChar(255)
+
+  @@index([campaignId])
+}
+
+model SuratJalan {
+  suratJalanId String    @id @default(uuid()) @db.VarChar(255)
+  noSurat  String   @db.VarChar(255)
+  OrderNo String   @db.VarChar(255)
+  ShippingDate DateTime
+  agentId String   @db.VarChar(255)
+  deliveryAddress String   @db.VarChar(500)
+  totalWeight Int   
+  deliveryNote String   @db.VarChar(255)
+  status Int
+  recaiveDate DateTime
+  recaiveBy String   @db.VarChar(255)
+  recaiveNote String   @db.VarChar(255)
+  createdAt     DateTime  @default(now())
+  modifedAt     DateTime  @updatedAt
+  modifiedBy    String?   @db.VarChar(255)
+  createdBy     String    @default("bySystem") @db.VarChar(255)
+
+  @@index([suratJalanId])
+}
+
 model StringMap {
   stringId   String   @id @default(uuid()) @db.VarChar(255)
   objectName String?  @db.VarChar(255)

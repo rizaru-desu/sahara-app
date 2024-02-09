@@ -24,6 +24,7 @@ export default function Home() {
   const [loading, setLoading] = React.useState(false);
   const [menuOpen, isMenuOpen] = React.useState(false);
   const [detailUsers, setDetailUsers] = React.useState<any>(undefined);
+  const [selectProduct, setSelectProduct] = React.useState<any[]>([]);
 
   const [totalPage, setTotalPage] = React.useState<number>(0);
   const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -184,7 +185,9 @@ export default function Home() {
                 />
 
                 <Select
-                  options={[]}
+                  options={[
+                    { productId: "123-123-123", productName: "Kebab 1KG" },
+                  ]}
                   valueField="productId"
                   labelField="productName"
                   color="#b91c1c"
@@ -194,6 +197,10 @@ export default function Home() {
                   clearable
                   placeholder="Select Product"
                   className="text-black"
+                  onChange={(values) => {
+                    setSelectProduct(values);
+                  }}
+                  values={selectProduct}
                 />
 
                 <TextField

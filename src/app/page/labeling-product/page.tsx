@@ -4,7 +4,7 @@ import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { toastMessage } from "@/app/component/toasttify";
 import { Services } from "@/app/utils/services/service";
-import { Pagination } from "@mui/material";
+import { Pagination, TextField } from "@mui/material";
 import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { customTheme } from "@/app/component/theme";
 import { DataGrid } from "@mui/x-data-grid";
@@ -33,6 +33,7 @@ export default function Home() {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const [selectProduct, setSelectProduct] = React.useState<any[]>([]);
+  const [manualLabeling, setManualLabeling] = React.useState<string>("");
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -145,9 +146,7 @@ export default function Home() {
       const responseApi = await authService.addLabelProduct({
         productId: selectProduct[0].productId,
         productCode: selectProduct[0].productCode,
-        labelCode: `SBI${serialNumber}${selectProduct[0].productCode}${
-          Math.floor(Math.random() * (9999 - 100 + 1)) + 100
-        }`,
+        labelCode: manualLabeling,
         bestBefore: moment(new Date())
           .add(selectProduct[0].expiredPeriod, "days")
           .toDate(),
@@ -176,7 +175,13 @@ export default function Home() {
         toastMessage({ message: e.message, type: "error" });
       }
     }
-  }, [detailUsers?.fullname, getAllLabelProduct, logoutUser, selectProduct]);
+  }, [
+    detailUsers?.fullname,
+    getAllLabelProduct,
+    logoutUser,
+    manualLabeling,
+    selectProduct,
+  ]);
 
   const searchLabelProduct = React.useCallback(
     async ({ value }: { value: any }) => {
@@ -280,21 +285,38 @@ export default function Home() {
                 <strong>Create label product</strong>
               </h6>
 
-              <Select
-                options={listProduct}
-                valueField="productId"
-                labelField="productName"
-                color="#b91c1c"
-                searchBy="productName"
-                searchable
-                required
-                clearable
-                className="text-black"
-                onChange={(values) => {
-                  setSelectProduct(values);
-                }}
-                values={selectProduct}
-              />
+              <div className="grid grid-cols-2 gap-5">
+                <Select
+                  options={listProduct}
+                  valueField="productId"
+                  labelField="productName"
+                  color="#b91c1c"
+                  searchBy="productName"
+                  searchable
+                  required
+                  clearable
+                  className="text-black"
+                  onChange={(values) => {
+                    setSelectProduct(values);
+                  }}
+                  values={selectProduct}
+                />
+                <TextField
+                  name="labelCode"
+                  id="labelCode"
+                  label="Manual Label Code"
+                  type={"text"}
+                  size="small"
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    setManualLabeling(value);
+                  }}
+                />
+              </div>
 
               <button
                 type="submit"

@@ -304,6 +304,14 @@ export default function Home() {
                   },
                 },
                 {
+                  field: "location",
+                  headerName: "Location",
+                  minWidth: 250,
+                  align: "left",
+                  headerAlign: "center",
+                  editable: false,
+                },
+                {
                   field: "productName",
                   headerName: "Product Name",
                   minWidth: 250,
@@ -313,7 +321,7 @@ export default function Home() {
                 },
                 {
                   field: "productCode",
-                  headerName: "",
+                  headerName: "Product Code",
                   minWidth: 250,
                   align: "center",
                   headerAlign: "center",

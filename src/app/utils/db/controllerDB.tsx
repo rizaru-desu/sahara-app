@@ -1632,10 +1632,11 @@ const pageAllPoCam = async ({ userId, skip, take }: pageAll) => {
         prisma.campaign.findMany({
           skip,
           take,
+          include: { product: true },
           orderBy: { campaignName: "desc" },
         }),
         prisma.campaign.count(),
-        prisma.product.findMany({ where: { NOT: { campaignId: undefined } } }),
+        prisma.product.findMany({ where: { campaignId: null } }),
       ]);
 
     return { detail, basePoint, allCampaign, totalCampaign, allProduct };
@@ -1680,12 +1681,144 @@ const addCampaign = async ({
       if (insertCampaign) {
         const updateProduct = await tx.product.updateMany({
           where: { productId: { in: productId } },
-          data: { campaignId: insertCampaign.campaignId },
+          data: {
+            campaignId: insertCampaign.campaignId,
+            modifiedBy: createdBy,
+          },
         });
 
         return { updateProduct };
       }
     });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const editCampaign = async ({
+  campaignId,
+  campaignName,
+  startDate,
+  endDate,
+  removeProductId,
+  productId,
+  loyaltyPoint,
+  photo,
+  description,
+  createdBy,
+}: {
+  campaignId: string;
+  campaignName: string;
+  startDate: Date;
+  endDate: Date;
+  removeProductId?: string[];
+  productId: string[];
+  loyaltyPoint: number;
+  photo?: any;
+  description: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const insertCampaign = await tx.campaign.update({
+        where: { campaignId },
+        data: {
+          campaignName,
+          startDate,
+          endDate,
+          loyaltyPoint,
+          photo,
+          description,
+          modifiedBy: createdBy,
+        },
+      });
+
+      if (insertCampaign) {
+        const updateProduct = await tx.product.updateMany({
+          where: { productId: { in: productId } },
+          data: {
+            campaignId: insertCampaign.campaignId,
+            modifiedBy: createdBy,
+          },
+        });
+
+        if (removeProductId) {
+          const removeProduct = await tx.product.updateMany({
+            where: { productId: { in: removeProductId } },
+            data: {
+              campaignId: null,
+              modifiedBy: createdBy,
+            },
+          });
+
+          return { removeProduct };
+        }
+
+        return { updateProduct };
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const campaignPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count, allProduct] = await prisma.$transaction([
+      prisma.campaign.findMany({
+        skip,
+        take,
+        include: { product: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.campaign.count(),
+      prisma.product.findMany({ where: { campaignId: null } }),
+    ]);
+
+    return { result, count, allProduct };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const campaignSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.campaign.findMany({
+        where: {
+          OR: [{ campaignName: { contains: value } }],
+        },
+        include: { product: true },
+        orderBy: { startDate: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const inActiveCampaign = async ({
+  campaignId,
+  value,
+  createdBy,
+}: {
+  campaignId: string;
+  value: boolean;
+  createdBy: string;
+}) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.campaign.update({
+        where: {
+          campaignId,
+        },
+        data: { inActive: value, modifiedBy: createdBy },
+      }),
+    ]);
+
+    return result;
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1707,6 +1840,21 @@ const changeDefaultPoint = async ({
           baseLoyaltyId,
         },
         data: { basePoint: value, modifiedBy: createdBy },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const campaignImage = async ({ campaignId }: { campaignId: string }) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.campaign.findUnique({
+        where: { campaignId },
+        select: { photo: true },
       }),
     ]);
 
@@ -1798,4 +1946,9 @@ export {
   pageAllPoCam,
   changeDefaultPoint,
   addCampaign,
+  campaignPagination,
+  editCampaign,
+  campaignSearch,
+  inActiveCampaign,
+  campaignImage,
 };

@@ -842,6 +842,59 @@ export class Services {
 
     return response;
   };
+
+  getCampaign = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/campaign-point/all-campaign",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  addCampaign = async ({ formData }: { formData: any }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/campaign-point/add-campaign",
+      formData
+    );
+
+    return response;
+  };
+
+  editCampaign = async ({ formData }: { formData: any }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/campaign-point/edit-campaign",
+      formData
+    );
+
+    return response;
+  };
+
+  searchCampaign = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/campaign-point/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  activeCampaign = async ({
+    campaignId,
+    value,
+    createdBy,
+  }: {
+    campaignId: string;
+    value: boolean;
+    createdBy: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/campaign-point/update-active",
+      { campaignId, value, createdBy }
+    );
+
+    return response;
+  };
   /** END SECTION  LOYALTY POINT*/
 }
 

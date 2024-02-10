@@ -1865,6 +1865,32 @@ const campaignImage = async ({ campaignId }: { campaignId: string }) => {
 };
 /** END SECTION POINT & CAMPAING */
 
+/** SECTION DASHBOARD */
+const pageDashboard = async ({ userId }: { userId: string }) => {
+  try {
+    const [detail, topTenPoint, activeCampaign] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        include: { roles: { select: { stringId: true } } },
+      }),
+      prisma.loyaltyPoint.findMany({
+        orderBy: { loyaltyPoint: "desc" },
+        take: 10,
+        include: { userIdData: { select: { fullname: true } } },
+      }),
+      prisma.campaign.findMany({
+        where: { inActive: false },
+        orderBy: { startDate: "desc" },
+      }),
+    ]);
+
+    return { detail, topTenPoint, activeCampaign };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+/** END SECTION DASHBOARD*/
+
 export {
   //** USER */
   generateToken,
@@ -1951,4 +1977,5 @@ export {
   campaignSearch,
   inActiveCampaign,
   campaignImage,
+  pageDashboard,
 };

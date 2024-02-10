@@ -896,6 +896,17 @@ export class Services {
     return response;
   };
   /** END SECTION  LOYALTY POINT*/
+
+  /** SECTION  DASHBOARD*/
+  getPageDashboardData = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/dashboard/",
+      {}
+    );
+
+    return response;
+  };
+  /** END SECTION DASHBOARD*/
 }
 
 interface AgentInput {

@@ -9,21 +9,21 @@ datasource db {
 }
 
 model User {
-  userId      String      @id @default(uuid()) @db.VarChar(255)
-  fullname    String?     @db.VarChar(255)
-  phone       String?     @db.VarChar(50)
-  dateOfBirth String?     @db.VarChar(50)
-  email       String      @unique @db.VarChar(255)
-  password    String      @db.VarChar(255)
-  inActive    Boolean     @default(false)
-  modifiedBy  String?     @db.VarChar(255)
-  createdAt   DateTime    @default(now())
-  modifedAt   DateTime    @updatedAt
-  createdBy   String      @default("bySystem") @db.VarChar(255)
-  leader      String?     @db.VarChar(255)
-  token       AuthToken[]
-  roles       Roles[]
-  loyaltyPoint  LoyaltyPoint[]
+  userId       String         @id @default(uuid()) @db.VarChar(255)
+  fullname     String?        @db.VarChar(255)
+  phone        String?        @db.VarChar(50)
+  dateOfBirth  String?        @db.VarChar(50)
+  email        String         @unique @db.VarChar(255)
+  password     String         @db.VarChar(255)
+  inActive     Boolean        @default(false)
+  modifiedBy   String?        @db.VarChar(255)
+  createdAt    DateTime       @default(now())
+  modifedAt    DateTime       @updatedAt
+  createdBy    String         @default("bySystem") @db.VarChar(255)
+  leader       String?        @db.VarChar(255)
+  token        AuthToken[]
+  roles        Roles[]
+  loyaltyPoint LoyaltyPoint[]
 
   @@index([userId])
 }
@@ -112,18 +112,18 @@ model Booth {
 }
 
 model Product {
-  productId     String   @id @default(uuid()) @db.VarChar(255)
-  productName   String   @db.VarChar(255)
+  productId     String        @id @default(uuid()) @db.VarChar(255)
+  productName   String        @db.VarChar(255)
   weight        Decimal
-  unit          String   @db.VarChar(255)
-  productCode   String   @unique(map: "productCode_UNIQUE") @db.VarChar(255)
+  unit          String        @db.VarChar(255)
+  productCode   String        @unique(map: "productCode_UNIQUE") @db.VarChar(255)
   expiredPeriod Int
-  createdAt     DateTime @default(now())
-  modifedAt     DateTime @updatedAt
-  campaignId    String?   @db.VarChar(255)
-  modifiedBy    String?  @db.VarChar(255)
-  createdBy     String   @default("bySystem") @db.VarChar(255)
-  campaign      Campaign? @relation(fields: [campaignId], references: [campaignId], onDelete: Cascade )
+  campaignId    String?       @db.VarChar(255)
+  createdAt     DateTime      @default(now())
+  modifedAt     DateTime      @updatedAt
+  modifiedBy    String?       @db.VarChar(255)
+  createdBy     String        @default("bySystem") @db.VarChar(255)
+  campaign      Campaign?     @relation(fields: [campaignId], references: [campaignId], onDelete: Cascade)
   stockProduct  StokPorudct[]
 
   @@index([productId])
@@ -131,23 +131,22 @@ model Product {
 }
 
 model LabelProduct {
-  labelId     String    @id @default(uuid()) @db.VarChar(255)
-  productId   String    @db.VarChar(255)
-  productCode String    @db.VarChar(255)
-  labelCode   String    @db.VarChar(255)
-  shift       Int       
-  batch       String    @db.VarChar(255)
-  bestBefore  DateTime
-  createdAt   DateTime  @default(now())
-  modifedAt   DateTime  @updatedAt
-  modifiedBy  String?   @db.VarChar(255)
-  createdBy   String    @default("bySystem") @db.VarChar(255)
-  printed     Int       @default(0)
-  labelBoxId  String?   @db.VarChar(255)
+  labelId      String        @id @default(uuid()) @db.VarChar(255)
+  productId    String        @db.VarChar(255)
+  productCode  String        @db.VarChar(255)
+  labelCode    String        @db.VarChar(255)
+  bestBefore   DateTime
+  shift        Int
+  batch        String        @db.VarChar(255)
+  createdAt    DateTime      @default(now())
+  modifedAt    DateTime      @updatedAt
+  modifiedBy   String?       @db.VarChar(255)
+  createdBy    String        @default("bySystem") @db.VarChar(255)
+  printed      Int           @default(0)
+  labelBoxId   String?       @db.VarChar(255)
   stockProduct StokPorudct[]
-  labelBox    LabelBox? @relation(fields: [labelBoxId], references: [labelBoxId], onDelete: Restrict)
-  
-  
+  labelBox     LabelBox?     @relation(fields: [labelBoxId], references: [labelBoxId], onDelete: Restrict)
+
   @@index([labelId])
   @@index([labelBoxId])
 }
@@ -168,26 +167,26 @@ model LabelBox {
 }
 
 model StokPorudct {
-  stockId       String    @id @default(uuid()) @db.VarChar(255)
-  productId     String    @db.VarChar(255)
-  productName   String    @db.VarChar(255)
-  productCode   String    @db.VarChar(255)
+  stockId       String        @id @default(uuid()) @db.VarChar(255)
+  productId     String        @db.VarChar(255)
+  productName   String        @db.VarChar(255)
+  productCode   String        @db.VarChar(255)
   weight        Decimal
-  unit          String    @db.VarChar(255)  
+  unit          String        @db.VarChar(255)
   expiredDate   DateTime
-  labelProducts String    @db.VarChar(255)
-  labelId       String    @db.VarChar(255)
-  labelBoxs     String?   @db.VarChar(255)
-  labelBoxId    String?   @db.VarChar(255)
-  status        Int       @default(1)
-  location      String?    @db.VarChar(5)
-  createdAt     DateTime  @default(now())
-  modifedAt     DateTime  @updatedAt
-  modifiedBy    String?   @db.VarChar(255)
-  createdBy     String    @default("bySystem") @db.VarChar(255)
-  labelBox      LabelBox? @relation(fields: [labelBoxId], references: [labelBoxId], onDelete: Restrict)
+  labelProducts String        @db.VarChar(255)
+  labelBoxs     String?       @db.VarChar(255)
+  labelBoxId    String?       @db.VarChar(255)
+  labelId       String        @db.VarChar(255)
+  status        Int           @default(1)
+  location      String?       @db.VarChar(5)
+  createdAt     DateTime      @default(now())
+  modifedAt     DateTime      @updatedAt
+  modifiedBy    String?       @db.VarChar(255)
+  createdBy     String        @default("bySystem") @db.VarChar(255)
+  labelBox      LabelBox?     @relation(fields: [labelBoxId], references: [labelBoxId], onDelete: Restrict)
   labelProduct  LabelProduct? @relation(fields: [labelId], references: [labelId], onDelete: Restrict)
-  product       Product? @relation(fields: [productId], references: [productId], onDelete: Restrict)
+  product       Product?      @relation(fields: [productId], references: [productId], onDelete: Restrict)
 
   @@index([stockId])
   @@index([labelBoxId])
@@ -196,38 +195,37 @@ model StokPorudct {
 }
 
 model LoyaltyPoint {
-  pointId       String    @id @default(uuid()) @db.VarChar(255)
-  userId        String   @db.VarChar(255)
-  loyaltyPoint  Int @default(0)
-  createdAt     DateTime  @default(now())
-  modifedAt     DateTime  @updatedAt
-  modifiedBy    String?   @db.VarChar(255)
-  createdBy     String    @default("bySystem") @db.VarChar(255)
-  userIdData    User? @relation(fields: [userId], references: [userId], onDelete: Restrict)
-  log           LoyaltyPointLog[]
-
+  pointId      String            @id @default(uuid()) @db.VarChar(255)
+  userId       String            @db.VarChar(255)
+  loyaltyPoint Int               @default(0)
+  createdAt    DateTime          @default(now())
+  modifedAt    DateTime          @updatedAt
+  modifiedBy   String?           @db.VarChar(255)
+  createdBy    String            @default("bySystem") @db.VarChar(255)
+  userIdData   User?             @relation(fields: [userId], references: [userId], onDelete: Restrict)
+  log          LoyaltyPointLog[]
 
   @@index([userId])
   @@index([pointId])
 }
 
 model LoyaltyPointLog {
-  pointLogId String    @id @default(uuid()) @db.VarChar(255)
-  pointId String   @db.VarChar(255)
-  userId  String   @db.VarChar(255)
-  loyaltyPoint  String 
-  remark  String?   @db.VarChar(500)
-  productId String?   @db.VarChar(255)
-  productName String?   @db.VarChar(255)
-  productCode String?   @db.VarChar(255)
-  labelId String?   @db.VarChar(255)
-  labelProducts String?   @db.VarChar(255)
-  scanDate  DateTime?  
-  campaignId  String?   @db.VarChar(255)
-  createdAt     DateTime  @default(now())
-  modifedAt     DateTime  @updatedAt
-  modifiedBy    String?   @db.VarChar(255)
-  createdBy     String    @default("bySystem") @db.VarChar(255)
+  pointLogId    String        @id @default(uuid()) @db.VarChar(255)
+  pointId       String        @db.VarChar(255)
+  userId        String        @db.VarChar(255)
+  loyaltyPoint  String
+  remark        String?       @db.VarChar(500)
+  productId     String?       @db.VarChar(255)
+  productCode   String?       @db.VarChar(255)
+  productName   String?       @db.VarChar(255)
+  labelId       String?       @db.VarChar(255)
+  labelProducts String?       @db.VarChar(255)
+  scanDate      DateTime?
+  campaignId    String?       @db.VarChar(255)
+  createdAt     DateTime      @default(now())
+  modifedAt     DateTime      @updatedAt
+  modifiedBy    String?       @db.VarChar(255)
+  createdBy     String        @default("bySystem") @db.VarChar(255)
   loyalty       LoyaltyPoint? @relation(fields: [pointId], references: [pointId], onDelete: Restrict)
 
   @@index([pointLogId])
@@ -235,54 +233,68 @@ model LoyaltyPointLog {
 }
 
 model BaseLoyalty {
-  baseLoyaltyId String    @id @default(uuid()) @db.VarChar(255)
-  basePoint Int
-  createdAt     DateTime  @default(now())
-  modifedAt     DateTime  @updatedAt
-  modifiedBy    String?   @db.VarChar(255)
-  createdBy     String    @default("bySystem") @db.VarChar(255)
+  baseLoyaltyId String   @id @default(uuid()) @db.VarChar(255)
+  basePoint     Int
+  createdAt     DateTime @default(now())
+  modifedAt     DateTime @updatedAt
+  modifiedBy    String?  @db.VarChar(255)
+  createdBy     String   @default("bySystem") @db.VarChar(255)
 
   @@index([baseLoyaltyId])
 }
 
 model Campaign {
-  campaignId String    @id @default(uuid()) @db.VarChar(255)
-  campaignName  String   @db.VarChar(255)
-  startDate DateTime
-  endDate DateTime
+  campaignId   String    @id @default(uuid()) @db.VarChar(255)
+  campaignName String    @db.VarChar(255)
+  startDate    DateTime
+  endDate      DateTime
   loyaltyPoint Int
-  description String   @db.VarChar(255)
-  photo Bytes
-  inActive    Boolean @default(false)
-  createdAt     DateTime  @default(now())
-  modifedAt     DateTime  @updatedAt
-  modifiedBy    String?   @db.VarChar(255)
-  createdBy     String    @default("bySystem") @db.VarChar(255)
-  product       Product[]
-
+  photo        Bytes
+  createdAt    DateTime  @default(now())
+  modifedAt    DateTime  @updatedAt
+  modifiedBy   String?   @db.VarChar(255)
+  createdBy    String    @default("bySystem") @db.VarChar(255)
+  description  String    @db.VarChar(255)
+  inActive     Boolean   @default(false)
+  product      Product[]
 
   @@index([campaignId])
 }
 
 model SuratJalan {
-  suratJalanId String    @id @default(uuid()) @db.VarChar(255)
-  noSurat  String   @db.VarChar(255)
-  OrderNo String   @db.VarChar(255)
-  ShippingDate DateTime
-  agentId String   @db.VarChar(255)
-  deliveryAddress String   @db.VarChar(500)
-  totalWeight Int   
-  deliveryNote String   @db.VarChar(255)
-  status Int
-  recaiveDate DateTime
-  recaiveBy String   @db.VarChar(255)
-  recaiveNote String   @db.VarChar(255)
-  createdAt     DateTime  @default(now())
-  modifedAt     DateTime  @updatedAt
-  modifiedBy    String?   @db.VarChar(255)
-  createdBy     String    @default("bySystem") @db.VarChar(255)
+  suratJalanId    String    @id @default(uuid()) @db.VarChar(255)
+  noSurat         String    @db.VarChar(255)
+  OrderNo         Int
+  ShippingDate    DateTime
+  agentId         String    @db.VarChar(255)
+  deliveryAddress String    @db.VarChar(500)
+  totalWeight     Int
+  deliveryNote    String?   @db.VarChar(255)
+  status          Int
+  recaiveDate     DateTime?
+  recaiveBy       String?   @db.VarChar(255)
+  recaiveNote     String?   @db.VarChar(255)
+  createdAt       DateTime  @default(now())
+  modifedAt       DateTime  @updatedAt
+  modifiedBy      String?   @db.VarChar(255)
+  createdBy       String    @default("bySystem") @db.VarChar(255)
 
   @@index([suratJalanId])
+}
+
+model SuratJalanProduct {
+  suratJalanProductId    String    @id @default(uuid()) @db.VarChar(255)
+  suratJalanId     String    @db.VarChar(255)
+  shipQty         Int
+  labelBox    String    @db.VarChar(255)
+  labelBoxId    String    @db.VarChar(255)
+  recaivedQty  Int?
+  createdAt       DateTime  @default(now())
+  modifedAt       DateTime  @updatedAt
+  modifiedBy      String?   @db.VarChar(255)
+  createdBy       String    @default("bySystem") @db.VarChar(255)
+
+  @@index([suratJalanProductId])
 }
 
 model StringMap {

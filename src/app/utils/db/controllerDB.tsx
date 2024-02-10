@@ -936,6 +936,8 @@ interface addLabelsProduct {
   productCode: string;
   labelCode: string;
   bestBefore: string;
+  shift: number;
+  batch: string;
   createdBy?: string;
 }
 
@@ -944,6 +946,8 @@ const addLabelProduct = async ({
   productCode,
   labelCode,
   bestBefore,
+  shift,
+  batch,
   createdBy,
 }: addLabelsProduct) => {
   try {
@@ -953,6 +957,8 @@ const addLabelProduct = async ({
           productCode,
           productId,
           labelCode,
+          shift,
+          batch,
           bestBefore,
           createdBy,
         },
@@ -1613,6 +1619,104 @@ const loyaltyPenaltyPoint = async ({
 };
 /** END SECTION LOYALTY */
 
+/** END SECTION POINT & CAMPAING */
+const pageAllPoCam = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, basePoint, allCampaign, totalCampaign, allProduct] =
+      await prisma.$transaction([
+        prisma.user.findUnique({
+          where: { userId },
+          include: { roles: { select: { stringId: true } } },
+        }),
+        prisma.baseLoyalty.findFirst(),
+        prisma.campaign.findMany({
+          skip,
+          take,
+          orderBy: { campaignName: "desc" },
+        }),
+        prisma.campaign.count(),
+        prisma.product.findMany({ where: { NOT: { campaignId: undefined } } }),
+      ]);
+
+    return { detail, basePoint, allCampaign, totalCampaign, allProduct };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const addCampaign = async ({
+  campaignName,
+  startDate,
+  endDate,
+  productId,
+  loyaltyPoint,
+  photo,
+  description,
+  createdBy,
+}: {
+  campaignName: string;
+  startDate: Date;
+  endDate: Date;
+  productId: string[];
+  loyaltyPoint: number;
+  photo: any;
+  description: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const insertCampaign = await tx.campaign.create({
+        data: {
+          campaignName,
+          startDate,
+          endDate,
+          loyaltyPoint,
+          photo,
+          description,
+          createdBy,
+        },
+      });
+
+      if (insertCampaign) {
+        const updateProduct = await tx.product.updateMany({
+          where: { productId: { in: productId } },
+          data: { campaignId: insertCampaign.campaignId },
+        });
+
+        return { updateProduct };
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const changeDefaultPoint = async ({
+  baseLoyaltyId,
+  value,
+  createdBy,
+}: {
+  baseLoyaltyId: string;
+  value: number;
+  createdBy?: string;
+}) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.baseLoyalty.update({
+        where: {
+          baseLoyaltyId,
+        },
+        data: { basePoint: value, modifiedBy: createdBy },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+/** END SECTION POINT & CAMPAING */
+
 export {
   //** USER */
   generateToken,
@@ -1689,4 +1793,9 @@ export {
   loyaltySearch,
   loyaltyLogSearch,
   loyaltyPenaltyPoint,
+
+  //** CAMPAING POINT */
+  pageAllPoCam,
+  changeDefaultPoint,
+  addCampaign,
 };

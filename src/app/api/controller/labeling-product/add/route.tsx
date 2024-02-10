@@ -10,6 +10,8 @@ const Schema = z
     productCode: z.string(),
     labelCode: z.string(),
     bestBefore: z.string(),
+    shift: z.number(),
+    batch: z.string(),
     createdBy: z.string().optional(),
   })
   .strict();
@@ -61,6 +63,8 @@ export async function POST(request: NextRequest) {
         productCode: resultValid.productCode,
         labelCode: resultValid.labelCode,
         bestBefore: resultValid.bestBefore,
+        batch: resultValid.batch,
+        shift: resultValid.shift,
         createdBy: resultValid.createdBy,
       });
 

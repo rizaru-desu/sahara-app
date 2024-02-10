@@ -450,11 +450,15 @@ export class Services {
     productCode,
     labelCode,
     bestBefore,
+    shift,
+    batch,
     createdBy,
   }: {
     productId: string;
     productCode: string;
     labelCode: string;
+    shift: number;
+    batch: string;
     bestBefore: Date;
     createdBy?: string;
   }) => {
@@ -464,6 +468,8 @@ export class Services {
         productId,
         productCode,
         labelCode,
+        shift,
+        batch,
         bestBefore,
         createdBy,
       }
@@ -798,6 +804,40 @@ export class Services {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/loyalty-point/penalty",
       { pointId, userId, point, loyaltyPoint, remarks, createdBy }
+    );
+
+    return response;
+  };
+  /** END SECTION  LOYALTY POINT*/
+
+  /**  SECTION  CAMPAIGN POINT*/
+  getPageCampaignPointData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/campaign-point/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  changePointLoyalty = async ({
+    baseLoyaltyId,
+    value,
+    createdBy,
+  }: {
+    baseLoyaltyId: string;
+    value: number;
+    createdBy?: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/campaign-point/default",
+      { baseLoyaltyId, value, createdBy }
     );
 
     return response;

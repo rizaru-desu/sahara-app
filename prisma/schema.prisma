@@ -120,11 +120,14 @@ model Product {
   expiredPeriod Int
   createdAt     DateTime @default(now())
   modifedAt     DateTime @updatedAt
+  campaignId    String?   @db.VarChar(255)
   modifiedBy    String?  @db.VarChar(255)
   createdBy     String   @default("bySystem") @db.VarChar(255)
-  stockProduct StokPorudct[]
+  campaign      Campaign? @relation(fields: [campaignId], references: [campaignId], onDelete: Cascade)
+  stockProduct  StokPorudct[]
 
   @@index([productId])
+  @@index([campaignId])
 }
 
 model LabelProduct {
@@ -132,6 +135,8 @@ model LabelProduct {
   productId   String    @db.VarChar(255)
   productCode String    @db.VarChar(255)
   labelCode   String    @db.VarChar(255)
+  shift       Int       
+  batch       String    @db.VarChar(255)
   bestBefore  DateTime
   createdAt   DateTime  @default(now())
   modifedAt   DateTime  @updatedAt
@@ -232,6 +237,11 @@ model LoyaltyPointLog {
 model BaseLoyalty {
   baseLoyaltyId String    @id @default(uuid()) @db.VarChar(255)
   basePoint Int
+  createdAt     DateTime  @default(now())
+  modifedAt     DateTime  @updatedAt
+  modifiedBy    String?   @db.VarChar(255)
+  createdBy     String    @default("bySystem") @db.VarChar(255)
+
   @@index([baseLoyaltyId])
 }
 
@@ -240,14 +250,16 @@ model Campaign {
   campaignName  String   @db.VarChar(255)
   startDate DateTime
   endDate DateTime
-  productId String   @db.VarChar(255)
   loyaltyPoint Int
   description String   @db.VarChar(255)
   photo Bytes
+  inActive    Boolean @default(false)
   createdAt     DateTime  @default(now())
   modifedAt     DateTime  @updatedAt
   modifiedBy    String?   @db.VarChar(255)
   createdBy     String    @default("bySystem") @db.VarChar(255)
+  product       Product[]
+
 
   @@index([campaignId])
 }

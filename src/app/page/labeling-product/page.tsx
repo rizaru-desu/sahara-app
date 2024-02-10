@@ -33,7 +33,10 @@ export default function Home() {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const [selectProduct, setSelectProduct] = React.useState<any[]>([]);
-  const [manualLabeling, setManualLabeling] = React.useState<string>("");
+  const [manualInput, setManualInput] = React.useState<{
+    shift: number;
+    batch: string;
+  }>({ shift: 0, batch: "" });
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -146,7 +149,11 @@ export default function Home() {
       const responseApi = await authService.addLabelProduct({
         productId: selectProduct[0].productId,
         productCode: selectProduct[0].productCode,
-        labelCode: manualLabeling,
+        labelCode: `SBI${selectProduct[0].productCode}${serialNumber}${
+          Math.floor(Math.random() * (9999 - 100 + 1)) + 100
+        }${manualInput.shift}${manualInput.batch}`,
+        shift: Number(manualInput.shift),
+        batch: manualInput.batch,
         bestBefore: moment(new Date())
           .add(selectProduct[0].expiredPeriod, "days")
           .toDate(),
@@ -179,7 +186,8 @@ export default function Home() {
     detailUsers?.fullname,
     getAllLabelProduct,
     logoutUser,
-    manualLabeling,
+    manualInput.batch,
+    manualInput.shift,
     selectProduct,
   ]);
 
@@ -261,6 +269,15 @@ export default function Home() {
     getPageData({ skip: 0, take: 100 });
   }, [getPageData]);
 
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target;
+
+    setManualInput((prevData: any) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   return (
     <ThemeProvider theme={customTheme(outerTheme)}>
       <main className="dark:bg-white bg-white min-h-screen">
@@ -301,20 +318,31 @@ export default function Home() {
                   }}
                   values={selectProduct}
                 />
+
                 <TextField
-                  name="labelCode"
-                  id="labelCode"
-                  label="Manual Label Code"
-                  type={"text"}
+                  name="shift"
+                  id="shift"
+                  label="Shift"
+                  type={"number"}
+                  size="small"
+                  required
+                  inputProps={{ min: 0 }}
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                  onChange={handleInputChange}
+                />
+
+                <TextField
+                  name="batch"
+                  id="batch"
+                  label="Batch"
                   size="small"
                   required
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    setManualLabeling(value);
-                  }}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -376,6 +404,22 @@ export default function Home() {
                     field: "labelCode",
                     headerName: "Label Product Code",
                     minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "shift",
+                    headerName: "Shift",
+                    minWidth: 50,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "batch",
+                    headerName: "Batch",
+                    minWidth: 150,
                     align: "left",
                     headerAlign: "center",
                     editable: false,

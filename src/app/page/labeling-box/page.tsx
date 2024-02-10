@@ -191,7 +191,11 @@ export default function Home() {
         leader: leader,
         labelIds: labelId,
         location: location,
-        labelCodeBox: `PSBI${serialNumber}${
+        labelCodeBox: `PSBI${serialNumber}${_.chain(leader)
+          .split(" ")
+          .map((part) => _.upperCase(_.first(part)))
+          .join("")
+          .value()}${moment().format("MM")}${
           Math.floor(Math.random() * (9999 - 100 + 1)) + 100
         }`,
         createdBy: detailUsers.fullname,
@@ -382,11 +386,18 @@ export default function Home() {
                 rows={listLabel}
                 checkboxSelection
                 disableRowSelectionOnClick
+                sx={{
+                  "& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-columnHeaderTitleContainer":
+                    {
+                      display: "none",
+                    },
+                }}
                 onRowSelectionModelChange={(ids: any) => {
                   const arrayId = _.split(ids, ",");
                   const filteredData = _.filter(listLabel, (item: any) =>
                     arrayId.includes(item.id)
                   );
+
                   setLabelId(arrayId);
                   setSelectLabel(filteredData);
                 }}

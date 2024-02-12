@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       const resultTop = _.map(topTenPoint, (item) => {
         return Object.assign(
           {
-            id: item.userIdData,
+            id: item.userId,
             fullName: item.userIdData?.fullname,
             loyaltyPoint: item.loyaltyPoint,
           },

@@ -3,6 +3,7 @@ import { env } from "process";
 const prisma = new PrismaClient();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import _ from "lodash";
 
 interface paginations {
   skip: number;
@@ -934,6 +935,7 @@ const pageAllLabeling = async ({ userId, skip, take }: pageAll) => {
 interface addLabelsProduct {
   productId: string;
   productCode: string;
+  productName: string;
   labelCode: string;
   bestBefore: string;
   shift: number;
@@ -944,6 +946,7 @@ interface addLabelsProduct {
 const addLabelProduct = async ({
   productId,
   productCode,
+  productName,
   labelCode,
   bestBefore,
   shift,
@@ -955,6 +958,7 @@ const addLabelProduct = async ({
       const insertLabelProduct = await tx.labelProduct.create({
         data: {
           productCode,
+          productName,
           productId,
           labelCode,
           shift,
@@ -1880,6 +1884,7 @@ const pageDashboard = async ({ userId }: { userId: string }) => {
       }),
       prisma.campaign.findMany({
         where: { inActive: false },
+        take: 10,
         orderBy: { startDate: "desc" },
       }),
     ]);
@@ -1890,6 +1895,242 @@ const pageDashboard = async ({ userId }: { userId: string }) => {
   }
 };
 /** END SECTION DASHBOARD*/
+
+/** SECTION DELIVERY ORDER */
+const pageAllDeliveryOrder = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, allSurat, totalSurat] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        include: { roles: { select: { stringId: true } } },
+      }),
+      prisma.suratJalan.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.suratJalan.count(),
+    ]);
+
+    return { detail, allSurat, totalSurat };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const pageAllDeliveryOrderProduct = async ({
+  userId,
+  skip,
+  take,
+  suratJalanId,
+}: {
+  userId: string;
+  skip: number;
+  take: number;
+  suratJalanId: string;
+}) => {
+  try {
+    const [detail, allSurat, totalSurat] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        include: { roles: { select: { stringId: true } } },
+      }),
+      prisma.suratJalanProduct.findMany({
+        where: { suratJalanId },
+        skip,
+        take,
+        include: { box: { include: { labelProduct: true } } },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.suratJalanProduct.count(),
+    ]);
+
+    return { detail, allSurat, totalSurat };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const deliveryOrderPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.suratJalan.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.suratJalan.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const deliveryOrderProductPagination = async ({
+  skip,
+  take,
+  suratJalanId,
+}: {
+  skip: number;
+  take: number;
+  suratJalanId: string;
+}) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.suratJalanProduct.findMany({
+        skip,
+        take,
+        where: { suratJalanId },
+        include: {
+          box: {
+            include: {
+              labelProduct: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.suratJalanProduct.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const deliveryOrderSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.suratJalan.findMany({
+        where: {
+          OR: [{ noSurat: { contains: value } }],
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const deliveryOrderFind = async ({
+  suratJalanId,
+  createdBy,
+}: {
+  suratJalanId: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const insertSuratJalan = await tx.suratJalan.update({
+        where: { suratJalanId },
+        data: { status: 2, modifiedBy: createdBy },
+      });
+
+      if (insertSuratJalan) {
+        if (insertSuratJalan.status === 2) {
+          const findSuratJalan = await tx.suratJalan.findUnique({
+            where: { suratJalanId: insertSuratJalan.suratJalanId },
+          });
+
+          const findProduct = await tx.suratJalanProduct.findMany({
+            where: { suratJalanId: insertSuratJalan.suratJalanId },
+            include: {
+              box: {
+                include: {
+                  labelProduct: true,
+                },
+              },
+            },
+            orderBy: { createdAt: "desc" },
+          });
+
+          const stockIds = _.map(findProduct, "stockId");
+
+          const statusStock = await tx.stokPorudct.updateMany({
+            where: { stockId: { in: stockIds } },
+            data: { status: 3 },
+          });
+
+          return { findProduct, statusStock, findSuratJalan };
+        }
+      }
+
+      return { insertSuratJalan };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const orderDeiveryCancel = async ({
+  suratJalanId,
+  createdBy,
+}: {
+  suratJalanId: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const insertSuratJalan = await tx.suratJalan.update({
+        where: { suratJalanId },
+        data: { status: 4, modifiedBy: createdBy },
+      });
+
+      return { insertSuratJalan };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const orderDeiveryRecaive = async ({
+  suratJalanId,
+  status,
+  createdBy,
+}: {
+  suratJalanId: string;
+  status: any[];
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const insertSuratJalan = await tx.suratJalan.update({
+        where: { suratJalanId },
+        data: { status: 3, modifiedBy: createdBy },
+      });
+
+      if (insertSuratJalan) {
+        for (const item of status) {
+          await tx.stokPorudct.updateMany({
+            where: { stockId: item.stockId },
+            data: { status: item.status },
+          });
+        }
+
+        for (const item of status) {
+          await tx.suratJalanProduct.updateMany({
+            where: { stockId: item.stockId },
+            data: { statusProduct: item.status },
+          });
+        }
+
+        return null;
+      }
+
+      return insertSuratJalan;
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+/** END SECTION DELIVERY ORDER */
 
 export {
   //** USER */
@@ -1977,5 +2218,15 @@ export {
   campaignSearch,
   inActiveCampaign,
   campaignImage,
+
+  /** DASHBOARD */
   pageDashboard,
+
+  /** DELIVERY ORDER */
+  pageAllDeliveryOrder,
+  deliveryOrderPagination,
+  deliveryOrderSearch,
+  deliveryOrderProductPagination,
+  pageAllDeliveryOrderProduct,
+  deliveryOrderFind,
 };

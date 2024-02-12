@@ -448,6 +448,7 @@ export class Services {
   addLabelProduct = async ({
     productId,
     productCode,
+    productName,
     labelCode,
     bestBefore,
     shift,
@@ -456,6 +457,7 @@ export class Services {
   }: {
     productId: string;
     productCode: string;
+    productName: string;
     labelCode: string;
     shift: number;
     batch: string;
@@ -466,6 +468,7 @@ export class Services {
       "api/controller/labeling-product/add",
       {
         productId,
+        productName,
         productCode,
         labelCode,
         shift,
@@ -907,6 +910,91 @@ export class Services {
     return response;
   };
   /** END SECTION DASHBOARD*/
+
+  /** SECTION DELIVERY ORDER*/
+  getPageDeliveryData = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getPageDeliveryProductData = async ({
+    skip,
+    take,
+    suratJalanId,
+  }: {
+    skip: number;
+    take: number;
+    suratJalanId: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/product",
+      { skip, take, suratJalanId }
+    );
+
+    return response;
+  };
+
+  getDeliveryOrder = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/all-delivery",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getDeliveryOrderProduct = async ({
+    skip,
+    take,
+    suratJalanId,
+  }: {
+    skip: number;
+    take: number;
+    suratJalanId: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/product/all-product",
+      { skip, take, suratJalanId }
+    );
+
+    return response;
+  };
+
+  getDeliveryOrderPdf = async ({
+    suratJalanId,
+    createdBy,
+  }: {
+    suratJalanId: string;
+    createdBy: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/generate-pdf",
+      { suratJalanId, createdBy }
+    );
+
+    return response;
+  };
+
+  searchDeliveryOrder = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  /** END SECTION DELIVERY ORDER*/
 }
 
 interface AgentInput {

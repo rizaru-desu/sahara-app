@@ -134,6 +134,7 @@ model LabelProduct {
   labelId      String        @id @default(uuid()) @db.VarChar(255)
   productId    String        @db.VarChar(255)
   productCode  String        @db.VarChar(255)
+  productName  String        @db.VarChar(255)
   labelCode    String        @db.VarChar(255)
   bestBefore   DateTime
   shift        Int
@@ -149,19 +150,21 @@ model LabelProduct {
 
   @@index([labelId])
   @@index([labelBoxId])
+  @@index([productId])
 }
 
 model LabelBox {
-  labelBoxId   String         @id @default(uuid()) @db.VarChar(255)
-  labelCodeBox String         @db.VarChar(255)
-  leader       String         @db.VarChar(255)
-  createdAt    DateTime       @default(now())
-  modifedAt    DateTime       @updatedAt
-  modifiedBy   String?        @db.VarChar(255)
-  createdBy    String         @default("bySystem") @db.VarChar(255)
-  statusBox    Int            @default(0)
+  labelBoxId   String              @id @default(uuid()) @db.VarChar(255)
+  labelCodeBox String              @db.VarChar(255)
+  leader       String              @db.VarChar(255)
+  createdAt    DateTime            @default(now())
+  modifedAt    DateTime            @updatedAt
+  modifiedBy   String?             @db.VarChar(255)
+  createdBy    String              @default("bySystem") @db.VarChar(255)
+  statusBox    Int                 @default(0)
   labelProduct LabelProduct[]
   stockProduct StokPorudct[]
+  suratProduct SuratJalanProduct[]
 
   @@index([labelBoxId])
 }
@@ -262,39 +265,47 @@ model Campaign {
 }
 
 model SuratJalan {
-  suratJalanId    String    @id @default(uuid()) @db.VarChar(255)
-  noSurat         String    @db.VarChar(255)
-  OrderNo         Int
-  ShippingDate    DateTime
-  agentId         String    @db.VarChar(255)
-  deliveryAddress String    @db.VarChar(500)
-  totalWeight     Int
-  deliveryNote    String?   @db.VarChar(255)
-  status          Int
-  recaiveDate     DateTime?
-  recaiveBy       String?   @db.VarChar(255)
-  recaiveNote     String?   @db.VarChar(255)
-  createdAt       DateTime  @default(now())
-  modifedAt       DateTime  @updatedAt
-  modifiedBy      String?   @db.VarChar(255)
-  createdBy       String    @default("bySystem") @db.VarChar(255)
+  suratJalanId      String              @id @default(uuid()) @db.VarChar(255)
+  noSurat           String              @db.VarChar(255)
+  orderNo           String              @db.VarChar(255)
+  shippingDate      DateTime
+  agentId           String              @db.VarChar(255)
+  customerName      String              @db.VarChar(255)
+  deliveryAddress   String              @db.VarChar(500)
+  totalWeight       Int
+  deliveryNote      String?             @db.VarChar(255)
+  status            Int
+  recaiveDate       DateTime?
+  recaiveBy         String?             @db.VarChar(255)
+  recaiveNote       String?             @db.VarChar(255)
+  createdAt         DateTime            @default(now())
+  modifedAt         DateTime            @updatedAt
+  modifiedBy        String?             @db.VarChar(255)
+  createdBy         String              @default("bySystem") @db.VarChar(255)
+  suratJalanProduct SuratJalanProduct[]
 
   @@index([suratJalanId])
 }
 
 model SuratJalanProduct {
-  suratJalanProductId    String    @id @default(uuid()) @db.VarChar(255)
-  suratJalanId     String    @db.VarChar(255)
-  shipQty         Int
-  labelBox    String    @db.VarChar(255)
-  labelBoxId    String    @db.VarChar(255)
-  recaivedQty  Int?
-  createdAt       DateTime  @default(now())
-  modifedAt       DateTime  @updatedAt
-  modifiedBy      String?   @db.VarChar(255)
-  createdBy       String    @default("bySystem") @db.VarChar(255)
+  suratJalanProductId String      @id @default(uuid()) @db.VarChar(255)
+  suratJalanId        String      @db.VarChar(255)
+  shipQty             Int
+  labelBox            String      @db.VarChar(255)
+  labelBoxId          String      @db.VarChar(255)
+  stockId             String      @db.VarChar(255)
+  recaivedQty         Int?
+  statusProduct       Int?
+  createdAt           DateTime    @default(now())
+  modifedAt           DateTime    @updatedAt
+  modifiedBy          String?     @db.VarChar(255)
+  createdBy           String      @default("bySystem") @db.VarChar(255)
+  suratJalan          SuratJalan? @relation(fields: [suratJalanId], references: [suratJalanId], onDelete: Restrict)
+  box                 LabelBox?   @relation(fields: [labelBoxId], references: [labelBoxId], onDelete: Restrict)
 
   @@index([suratJalanProductId])
+  @@index([suratJalanId])
+  @@index([labelBoxId])
 }
 
 model StringMap {

@@ -149,6 +149,7 @@ export default function Home() {
       const responseApi = await authService.addLabelProduct({
         productId: selectProduct[0].productId,
         productCode: selectProduct[0].productCode,
+        productName: selectProduct[0].productName,
         labelCode: `SBI${selectProduct[0].productCode}${serialNumber}${
           Math.floor(Math.random() * (9999 - 100 + 1)) + 100
         }${manualInput.shift}${manualInput.batch}`,
@@ -395,6 +396,14 @@ export default function Home() {
                   {
                     field: "productCode",
                     headerName: "Product Code",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "productName",
+                    headerName: "Product Name",
                     minWidth: 250,
                     align: "left",
                     headerAlign: "center",

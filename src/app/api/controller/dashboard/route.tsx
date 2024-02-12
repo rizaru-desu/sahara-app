@@ -36,12 +36,9 @@ export async function POST(request: NextRequest) {
       const resultTop = _.map(topTenPoint, (item) => {
         return Object.assign(
           {
-            label: item.userIdData?.fullname,
-            data: [item.loyaltyPoint],
-            backgroundColor: randomColor({
-              format: "rgba",
-              luminosity: "bright",
-            }),
+            id: userId,
+            fullName: item.userIdData?.fullname,
+            loyaltyPoint: item.loyaltyPoint,
           },
           _.omit(
             item,

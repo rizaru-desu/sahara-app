@@ -6,32 +6,14 @@ import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { toastMessage } from "@/app/component/toasttify";
 import { Services } from "@/app/utils/services/service";
+import { Carousel } from "react-responsive-carousel";
+import { DataGrid } from "@mui/x-data-grid";
 import _ from "lodash";
 import SideBar from "@/app/component/sideBar";
 import NavBar from "@/app/component/navBar";
 import Loader from "@/app/component/loader";
 import Loading from "@/app/loading";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from "react-responsive-carousel";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 export default function Home() {
   const router = useRouter();
@@ -119,25 +101,31 @@ export default function Home() {
 
       <Suspense fallback={<Loading />}>
         <div className="p-4 xl:ml-80 gap-12">
-          <div className="grid grid-cols-2 place-content-center place-items-center">
+          <div className="grid lg:grid-cols-2 grid-cols-1 place-content-center place-items-center gap-5">
             <div className="bg-white gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex ">
-              <Bar
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      position: "top" as const,
-                    },
-                    title: {
-                      display: true,
-                      text: "Top 10 Loyalty",
-                    },
+              <DataGrid
+                autoHeight
+                getRowHeight={() => "auto"}
+                rows={listPoint}
+                disableRowSelectionOnClick
+                columns={[
+                  {
+                    field: "fullName",
+                    headerName: "Fullname",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
                   },
-                }}
-                data={{
-                  labels: ["TOP 10"],
-                  datasets: listPoint,
-                }}
+                  {
+                    field: "loyaltyPoint",
+                    headerName: "Loyalty Point",
+                    minWidth: 250,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                ]}
               />
             </div>
 

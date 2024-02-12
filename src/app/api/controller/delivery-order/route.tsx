@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { pageAllLabeling } from "@/app/utils/db/controllerDB";
+import { pageAllDeliveryOrder } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
 
@@ -54,50 +54,17 @@ export async function POST(request: NextRequest) {
 
     if (tokenValidated) {
       const { userId } = tokenValidated;
-      const { detail, allProduct, allLabel, totalLabel } =
-        await pageAllLabeling({
-          skip: resultValid.skip,
-          take: resultValid.take,
-          userId: userId,
-        });
-
-      const finalResult = _.map(allProduct, (item) => {
-        return Object.assign(
-          {
-            productName: `${item.productName} ${item.unit}`,
-            productCode: item.productCode,
-            expiredPeriod: item.expiredPeriod,
-            productId: item.productId,
-          },
-          _.omit(
-            item,
-            "productId",
-            "productName",
-            "weight",
-            "unit",
-            "createdAt",
-            "modifedAt",
-            "modifiedBy",
-            "createdBy"
-          )
-        );
-      });
-
-      const labelResult = _.map(allLabel, (item) => {
-        return Object.assign(
-          {
-            id: item.labelId,
-          },
-          _.omit(item, "labelId")
-        );
+      const { detail, allSurat, totalSurat } = await pageAllDeliveryOrder({
+        skip: resultValid.skip,
+        take: resultValid.take,
+        userId: userId,
       });
 
       return NextResponse.json(
         {
-          allProduct: finalResult,
+          allSurat,
+          totalSurat,
           userDetail: detail,
-          allLabel: labelResult,
-          countLabel: totalLabel,
         },
         {
           status: 200,

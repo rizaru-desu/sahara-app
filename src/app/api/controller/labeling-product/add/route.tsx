@@ -8,6 +8,7 @@ const Schema = z
   .object({
     productId: z.string(),
     productCode: z.string(),
+    productName: z.string(),
     labelCode: z.string(),
     bestBefore: z.string(),
     shift: z.number(),
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest) {
       await addLabelProduct({
         productId: resultValid.productId,
         productCode: resultValid.productCode,
+        productName: resultValid.productName,
         labelCode: resultValid.labelCode,
         bestBefore: resultValid.bestBefore,
         batch: resultValid.batch,

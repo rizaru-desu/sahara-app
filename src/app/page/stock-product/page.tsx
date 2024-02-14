@@ -206,7 +206,7 @@ export default function Home() {
   );
 
   React.useEffect(() => {
-    getPageData({ skip: 0, take: 1000 });
+    getPageData({ skip: 0, take: 100 });
   }, [getPageData]);
 
   return (
@@ -414,8 +414,8 @@ export default function Home() {
                 ) => {
                   setCurrentPage(value);
                   getAllStockProduct({
-                    skip: Math.max(0, (value - 1) * 1000),
-                    take: 1000,
+                    skip: Math.max(0, (value - 1) * 100),
+                    take: 100,
                   });
                 }}
                 shape="rounded"

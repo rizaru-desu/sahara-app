@@ -6,14 +6,7 @@ import _ from "lodash";
 
 const Schema = z
   .object({
-    productId: z.string(),
-    productCode: z.string(),
-    productName: z.string(),
-    labelCode: z.string(),
-    bestBefore: z.string(),
-    shift: z.number(),
-    batch: z.string(),
-    createdBy: z.string().optional(),
+    data: z.array(z.unknown()),
   })
   .strict();
 
@@ -59,20 +52,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addLabelProduct({
-        productId: resultValid.productId,
-        productCode: resultValid.productCode,
-        productName: resultValid.productName,
-        labelCode: resultValid.labelCode,
-        bestBefore: resultValid.bestBefore,
-        batch: resultValid.batch,
-        shift: resultValid.shift,
-        createdBy: resultValid.createdBy,
-      });
+      await addLabelProduct({ data: resultValid.data });
 
       return NextResponse.json(
         {
-          message: `Label ${resultValid.labelCode} has been successfully add.`,
+          message: `Label ${_.size(
+            resultValid.data
+          )} has been successfully add.`,
         },
         {
           status: 200,

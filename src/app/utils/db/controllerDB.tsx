@@ -618,6 +618,7 @@ interface addProducts {
   productName: string;
   productCode: string;
   weight: number;
+  basePoint: number;
   unit: string;
   expiredPeriod: number;
   createdBy?: string;
@@ -627,6 +628,7 @@ const addProduct = async ({
   productName,
   productCode,
   weight,
+  basePoint,
   unit,
   expiredPeriod,
   createdBy,
@@ -640,6 +642,7 @@ const addProduct = async ({
           weight,
           expiredPeriod,
           unit,
+          basePoint,
           createdBy,
         },
       }),
@@ -933,29 +936,76 @@ const pageAllLabeling = async ({ userId, skip, take }: pageAll) => {
 };
 
 interface addLabelsProduct {
-  productId: string;
-  productCode: string;
-  productName: string;
-  labelCode: string;
-  bestBefore: string;
-  shift: number;
-  batch: string;
-  createdBy?: string;
+  data: any[];
 }
 
-const addLabelProduct = async ({
-  productId,
-  productCode,
-  productName,
-  labelCode,
-  bestBefore,
-  shift,
-  batch,
-  createdBy,
-}: addLabelsProduct) => {
+const addLabelProduct = async ({ data }: addLabelsProduct) => {
   try {
     return prisma.$transaction(async (tx) => {
-      const insertLabelProduct = await tx.labelProduct.create({
+      const manyProduct = await tx.labelProduct.createMany({ data: data });
+
+      if (manyProduct) {
+        const productids = _.map(data, "productId");
+        const labelCodeIds = _.map(data, "labelCode");
+
+        const findProduct = await tx.product.findMany({
+          where: { productId: { in: productids } },
+        });
+
+        const findLabelProduct = await tx.labelProduct.findMany({
+          where: { labelCode: { in: labelCodeIds } },
+        });
+
+        if (findProduct && findLabelProduct) {
+          const addStock = _.map(findLabelProduct, (dataItem: any) => {
+            const matchedProduct = findProduct.find(
+              (product) => product.productId === dataItem.productId
+            );
+            return matchedProduct
+              ? _.assign(
+                  {},
+                  dataItem,
+                  _.pick(matchedProduct, ["unit", "weight"])
+                )
+              : dataItem;
+          });
+
+          const finalResult = _.map(addStock, (item) => {
+            return Object.assign(
+              {
+                labelProducts: item.labelCode,
+                expiredDate: item.bestBefore,
+              },
+              _.omit(
+                item,
+                "bestBefore",
+                "labelCode",
+                "shift",
+                "batch",
+                "createdAt",
+                "modifedAt",
+                "modifiedBy",
+                "printed",
+                "labelBoxId"
+              )
+            );
+          }) as any;
+
+          console.log(finalResult[0]);
+
+          const insertStock = await tx.stokPorudct.createMany({
+            data: finalResult,
+          });
+
+          return insertStock;
+        } else {
+          throw new Error("Failed add label stock");
+        }
+      } else {
+        throw new Error("Failed add label product");
+      }
+
+      /* const insertLabelProduct = await tx.labelProduct.create({
         data: {
           productCode,
           productName,
@@ -987,10 +1037,10 @@ const addLabelProduct = async ({
           },
         });
 
-        return insertStock;
+        return insertStock; 
       } else {
         throw new Error("Failed add label product");
-      }
+      }*/
     });
   } catch (error: any) {
     throw new Error(error.message);
@@ -1365,7 +1415,7 @@ const pageAllStockProdut = async ({ userId, skip, take }: pageAll) => {
       prisma.stokPorudct.findMany({
         skip,
         take,
-        orderBy: { productName: "asc" },
+        orderBy: { status: "desc" },
       }),
       prisma.stokPorudct.count(),
     ]);
@@ -1382,7 +1432,7 @@ const stockProdutPagination = async ({ skip, take }: paginations) => {
       prisma.stokPorudct.findMany({
         skip,
         take,
-        orderBy: { productName: "asc" },
+        orderBy: { status: "desc" },
       }),
       prisma.stokPorudct.count(),
     ]);
@@ -1405,7 +1455,7 @@ const stockProdutSearch = async ({ value }: valueSearch) => {
             { labelProducts: { contains: value } },
           ],
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { status: "desc" },
       }),
     ]);
 
@@ -1431,7 +1481,7 @@ const stockProdutRangeSearch = async ({
             },
           ],
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { status: "desc" },
       }),
     ]);
 
@@ -1626,13 +1676,12 @@ const loyaltyPenaltyPoint = async ({
 /** END SECTION POINT & CAMPAING */
 const pageAllPoCam = async ({ userId, skip, take }: pageAll) => {
   try {
-    const [detail, basePoint, allCampaign, totalCampaign, allProduct] =
+    const [detail, allCampaign, totalCampaign, allProduct] =
       await prisma.$transaction([
         prisma.user.findUnique({
           where: { userId },
           include: { roles: { select: { stringId: true } } },
         }),
-        prisma.baseLoyalty.findFirst(),
         prisma.campaign.findMany({
           skip,
           take,
@@ -1643,7 +1692,7 @@ const pageAllPoCam = async ({ userId, skip, take }: pageAll) => {
         prisma.product.findMany({ where: { campaignId: null } }),
       ]);
 
-    return { detail, basePoint, allCampaign, totalCampaign, allProduct };
+    return { detail, allCampaign, totalCampaign, allProduct };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1819,31 +1868,6 @@ const inActiveCampaign = async ({
           campaignId,
         },
         data: { inActive: value, modifiedBy: createdBy },
-      }),
-    ]);
-
-    return result;
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
-};
-
-const changeDefaultPoint = async ({
-  baseLoyaltyId,
-  value,
-  createdBy,
-}: {
-  baseLoyaltyId: string;
-  value: number;
-  createdBy?: string;
-}) => {
-  try {
-    const [result] = await prisma.$transaction([
-      prisma.baseLoyalty.update({
-        where: {
-          baseLoyaltyId,
-        },
-        data: { basePoint: value, modifiedBy: createdBy },
       }),
     ]);
 
@@ -2211,7 +2235,6 @@ export {
 
   //** CAMPAING POINT */
   pageAllPoCam,
-  changeDefaultPoint,
   addCampaign,
   campaignPagination,
   editCampaign,

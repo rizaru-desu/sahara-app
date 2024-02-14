@@ -3,6 +3,7 @@ import { validateToken } from "@/app/utils/token/validate";
 import { labelProductPagination } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
+import moment from "moment";
 
 const Schema = z
   .object({
@@ -62,8 +63,9 @@ export async function POST(request: NextRequest) {
         return Object.assign(
           {
             id: item.labelId,
+            bestBefore: moment(item.bestBefore).format("DD/MM/YYYY"),
           },
-          _.omit(item, "labelId")
+          _.omit(item, "labelId", "bestBefore")
         );
       });
 

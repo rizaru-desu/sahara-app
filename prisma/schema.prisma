@@ -117,6 +117,7 @@ model Product {
   weight        Decimal
   unit          String        @db.VarChar(255)
   productCode   String        @unique(map: "productCode_UNIQUE") @db.VarChar(255)
+  basePoint     Int
   expiredPeriod Int
   campaignId    String?       @db.VarChar(255)
   createdAt     DateTime      @default(now())

@@ -30,13 +30,15 @@ export default function Home() {
   const [selectLabel, setSelectLabel] = React.useState<any[]>([]);
   const [labelId, setLabelId] = React.useState<string[]>([]);
   const [totalPage, setTotalPage] = React.useState<number>(0);
+  const [totalData, setTotalData] = React.useState<number>(0);
   const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const [selectProduct, setSelectProduct] = React.useState<any[]>([]);
   const [manualInput, setManualInput] = React.useState<{
     shift: number;
     batch: string;
-  }>({ shift: 0, batch: "" });
+    bulk: number;
+  }>({ shift: 0, batch: "", bulk: 0 });
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -81,6 +83,7 @@ export default function Home() {
           setLoading(false);
           setListProduct(allProduct);
           setTotalPage(Math.ceil(countLabel / 100));
+          setTotalData(countLabel);
           setDetailUsers(userDetail);
           setListLabel(allLabel);
         }
@@ -116,6 +119,7 @@ export default function Home() {
           setLoading(false);
           setListLabel(allLabel);
           setTotalPage(Math.ceil(countLabel / 100));
+          setTotalData(countLabel);
         }
       } catch (e: any) {
         setLoading(false);
@@ -134,63 +138,41 @@ export default function Home() {
     [logoutUser]
   );
 
-  const addLabel = React.useCallback(async () => {
-    try {
-      setLoading(true);
+  const addLabel = React.useCallback(
+    async ({ data }: { data: any[] }) => {
+      try {
+        setLoading(true);
 
-      const dateString = new Date();
+        const authService = new Services();
+        const responseApi = await authService.addLabelProduct({
+          data,
+        });
 
-      const date = moment("20" + dateString, "YYMMDD");
-
-      const excelBaseDate = moment("1900-01-02");
-      const serialNumber = date.diff(excelBaseDate, "days");
-
-      const authService = new Services();
-      const responseApi = await authService.addLabelProduct({
-        productId: selectProduct[0].productId,
-        productCode: selectProduct[0].productCode,
-        productName: selectProduct[0].productName,
-        labelCode: `SBI${selectProduct[0].productCode}${serialNumber}${
-          Math.floor(Math.random() * (9999 - 100 + 1)) + 100
-        }${manualInput.shift}${manualInput.batch}`,
-        shift: Number(manualInput.shift),
-        batch: manualInput.batch,
-        bestBefore: moment(new Date())
-          .add(selectProduct[0].expiredPeriod, "days")
-          .toDate(),
-        createdBy: detailUsers.fullname,
-      });
-
-      if (responseApi.status === 200) {
-        const { message } = responseApi.data;
+        if (responseApi.status === 200) {
+          const { message } = responseApi.data;
+          setLoading(false);
+          toastMessage({
+            message: message,
+            type: "success",
+          });
+          getAllLabelProduct({ skip: 0, take: 100 });
+        }
+      } catch (e: any) {
         setLoading(false);
-        toastMessage({
-          message: message,
-          type: "success",
-        });
-        getAllLabelProduct({ skip: 0, take: 100 });
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
       }
-    } catch (e: any) {
-      setLoading(false);
-      if (e.response && e.response.status === 500) {
-        toastMessage({
-          message: e.response.data.message,
-          type: "error",
-        });
-      } else if (e.response && e.response.status === 401) {
-        logoutUser();
-      } else {
-        toastMessage({ message: e.message, type: "error" });
-      }
-    }
-  }, [
-    detailUsers?.fullname,
-    getAllLabelProduct,
-    logoutUser,
-    manualInput.batch,
-    manualInput.shift,
-    selectProduct,
-  ]);
+    },
+    [getAllLabelProduct, logoutUser]
+  );
 
   const searchLabelProduct = React.useCallback(
     async ({ value }: { value: any }) => {
@@ -296,7 +278,41 @@ export default function Home() {
               className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col"
               onSubmit={(e: any) => {
                 e.preventDefault();
-                addLabel();
+
+                let totalDatas = totalData;
+                const data = _.times(manualInput.bulk, () => {
+                  const dateString = moment(
+                    new Date(),
+                    "YYYY-MM-DD HH:mm:ss"
+                  ).diff(moment("1899-12-30", "YYYY-MM-DD"), "days");
+
+                  const productId = selectProduct[0].productId;
+                  const productCode = selectProduct[0].productCode;
+                  const productName = selectProduct[0].productName;
+                  const labelCode = `SBI${selectProduct[0].productCode}${String(
+                    dateString
+                  )}${manualInput.shift}${
+                    manualInput.batch
+                  }${(totalDatas += 1)}`;
+                  const shift = Number(manualInput.shift);
+                  const batch = manualInput.batch;
+                  const bestBefore = moment(new Date())
+                    .add(selectProduct[0].expiredPeriod, "days")
+                    .toDate();
+                  const createdBy = detailUsers.fullname;
+                  return {
+                    productId,
+                    productCode,
+                    productName,
+                    labelCode,
+                    shift,
+                    batch,
+                    bestBefore,
+                    createdBy,
+                  };
+                });
+
+                addLabel({ data });
               }}
             >
               <h6 className="text-black text-bold">
@@ -339,6 +355,19 @@ export default function Home() {
                   id="batch"
                   label="Batch"
                   size="small"
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                  onChange={handleInputChange}
+                />
+
+                <TextField
+                  name="bulk"
+                  id="bulk"
+                  label="Bulk Geenerate"
+                  size="small"
+                  inputProps={{ min: 1 }}
                   required
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
@@ -440,8 +469,6 @@ export default function Home() {
                     align: "center",
                     headerAlign: "center",
                     editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY"),
                   },
                   {
                     field: "printed",

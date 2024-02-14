@@ -9,6 +9,7 @@ const Schema = z
     productName: z.string(),
     productCode: z.string(),
     weight: z.number().multipleOf(0.01),
+    basePoint: z.number(),
     unit: z.string(),
     expiredPeriod: z.number(),
     createdBy: z.string().optional(),
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
         productCode: resultValid.productCode,
         weight: resultValid.weight,
         unit: resultValid.unit,
+        basePoint: resultValid.basePoint,
         expiredPeriod: resultValid.expiredPeriod,
         createdBy: resultValid.createdBy,
       });

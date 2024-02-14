@@ -39,6 +39,7 @@ export default function Home() {
   const [labelIdBox, setLabelIdBox] = React.useState<string[]>([]);
   const [totalBoxPage, setTotalBoxPage] = React.useState<number>(0);
   const [currentBoxPage, setCurrentBoxPage] = React.useState<number>(1);
+  const [totalBoxData, setTotalBoxData] = React.useState<number>(0);
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -91,6 +92,7 @@ export default function Home() {
           setDetailUsers(userDetail);
           setListLabel(allLabel);
           setListLabelBox(allLabelBox);
+          setTotalBoxData(countLabelBox);
         }
       } catch (e: any) {
         setLoading(false);
@@ -124,6 +126,7 @@ export default function Home() {
           setLoading(false);
           setListLabelBox(allLabelBox);
           setTotalBoxPage(Math.ceil(countLabelBox / 100));
+          setTotalBoxData(countLabelBox);
         }
       } catch (e: any) {
         setLoading(false);
@@ -179,25 +182,21 @@ export default function Home() {
     try {
       setLoading(true);
 
-      const dateString = new Date();
+      const dateString = moment(new Date(), "YYYY-MM-DD HH:mm:ss").diff(
+        moment("1899-12-30", "YYYY-MM-DD"),
+        "days"
+      );
 
-      const date = moment("20" + dateString, "YYMMDD");
-
-      const excelBaseDate = moment("1900-01-02");
-      const serialNumber = date.diff(excelBaseDate, "days");
+      let totalDatas = totalBoxData;
 
       const authService = new Services();
       const responseApi = await authService.addLabelBox({
         leader: leader,
         labelIds: labelId,
         location: location,
-        labelCodeBox: `PSBI${serialNumber}${_.chain(leader)
-          .split(" ")
-          .map((part) => _.upperCase(_.first(part)))
-          .join("")
-          .value()}${moment().format("MM")}${
-          Math.floor(Math.random() * (9999 - 100 + 1)) + 100
-        }`,
+        labelCodeBox: `PSBI${dateString}${_.toUpper(
+          _.map(leader.split(" "), (word) => word[0]).join("")
+        )}${moment().format("MM")}${(totalDatas += 1)}`,
         createdBy: detailUsers.fullname,
       });
 
@@ -238,6 +237,7 @@ export default function Home() {
     leader,
     location,
     logoutUser,
+    totalBoxData,
   ]);
 
   const searchLabelBox = React.useCallback(
@@ -363,21 +363,73 @@ export default function Home() {
 
         <Suspense fallback={<Loading />}>
           <div className="p-4 xl:ml-80 gap-12">
-            <div
-              className="bg-white w-full gap-5 max-w-3xl max-h-[700px] mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col"
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-            >
+            <div className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col">
               <h6 className="text-black text-bold">
                 <strong>Create label box</strong>
               </h6>
 
-              <Search
-                onSearch={({ value }) => {
-                  searchLabelBoxProducts({ value });
-                }}
-              />
+              <div className="gap-5 flex flex-row justify-between">
+                <Search
+                  onSearch={({ value }) => {
+                    searchLabelBoxProducts({ value });
+                  }}
+                />
+
+                <form
+                  className="gap-3 flex-col flex"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    addLabel();
+                  }}
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    <TextField
+                      name="leader"
+                      id="leader"
+                      label="Leader"
+                      type={"text"}
+                      size="small"
+                      required
+                      value={leader}
+                      placeholder="Input Atasan/Leader"
+                      InputLabelProps={{ shrink: true }}
+                      variant="outlined"
+                      fullWidth
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        setLeader(value);
+                      }}
+                    />
+                    <TextField
+                      name="location"
+                      id="location"
+                      label="location"
+                      type={"text"}
+                      size="small"
+                      required
+                      value={location}
+                      placeholder="Disimpan di Locaksi?"
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ maxLength: 5 }}
+                      variant="outlined"
+                      fullWidth
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        setLocation(value);
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={!_.isEmpty(selectLabel) ? false : true}
+                    className="
+                 flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:bg-red-400"
+                  >
+                    Generate
+                  </button>
+                </form>
+              </div>
 
               <DataGrid
                 pagination={true}
@@ -386,12 +438,12 @@ export default function Home() {
                 rows={listLabel}
                 checkboxSelection
                 disableRowSelectionOnClick
-                sx={{
+                /* sx={{
                   "& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-columnHeaderTitleContainer":
                     {
                       display: "none",
                     },
-                }}
+                }} */
                 onRowSelectionModelChange={(ids: any) => {
                   const arrayId = _.split(ids, ",");
                   const filteredData = _.filter(listLabel, (item: any) =>
@@ -495,61 +547,6 @@ export default function Home() {
                   shape="rounded"
                 />
               </div>
-
-              <form
-                className="gap-3 flex-col flex"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  addLabel();
-                }}
-              >
-                <div className="grid grid-cols-2 gap-2">
-                  <TextField
-                    name="leader"
-                    id="leader"
-                    label="Leader"
-                    type={"text"}
-                    size="small"
-                    required
-                    value={leader}
-                    placeholder="Input Atasan/Leader"
-                    InputLabelProps={{ shrink: true }}
-                    variant="outlined"
-                    fullWidth
-                    onChange={(e) => {
-                      const { value } = e.target;
-                      setLeader(value);
-                    }}
-                  />
-                  <TextField
-                    name="location"
-                    id="location"
-                    label="location"
-                    type={"text"}
-                    size="small"
-                    required
-                    value={location}
-                    placeholder="Disimpan di Locaksi?"
-                    InputLabelProps={{ shrink: true }}
-                    inputProps={{ maxLength: 5 }}
-                    variant="outlined"
-                    fullWidth
-                    onChange={(e) => {
-                      const { value } = e.target;
-                      setLocation(value);
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={!_.isEmpty(selectLabel) ? false : true}
-                  className="
-                 flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:bg-red-400"
-                >
-                  Generate
-                </button>
-              </form>
             </div>
 
             <div className="m-10 flex flex-col">

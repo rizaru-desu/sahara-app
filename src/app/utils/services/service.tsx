@@ -276,10 +276,19 @@ export class Services {
     productName,
     productCode,
     weight,
+    basePoint,
     unit,
     expiredPeriod,
     createdBy,
-  }: addProducts) => {
+  }: {
+    productName: string;
+    productCode: string;
+    weight: number;
+    basePoint: number;
+    unit: string;
+    expiredPeriod: number;
+    createdBy?: string;
+  }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/product/add",
       {
@@ -287,6 +296,7 @@ export class Services {
         productCode,
         weight,
         unit,
+        basePoint,
         expiredPeriod,
         createdBy,
       }
@@ -445,36 +455,11 @@ export class Services {
     return response;
   };
 
-  addLabelProduct = async ({
-    productId,
-    productCode,
-    productName,
-    labelCode,
-    bestBefore,
-    shift,
-    batch,
-    createdBy,
-  }: {
-    productId: string;
-    productCode: string;
-    productName: string;
-    labelCode: string;
-    shift: number;
-    batch: string;
-    bestBefore: Date;
-    createdBy?: string;
-  }) => {
+  addLabelProduct = async ({ data }: { data: any[] }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/labeling-product/add",
       {
-        productId,
-        productName,
-        productCode,
-        labelCode,
-        shift,
-        batch,
-        bestBefore,
-        createdBy,
+        data,
       }
     );
 
@@ -829,23 +814,6 @@ export class Services {
     return response;
   };
 
-  changePointLoyalty = async ({
-    baseLoyaltyId,
-    value,
-    createdBy,
-  }: {
-    baseLoyaltyId: string;
-    value: number;
-    createdBy?: string;
-  }) => {
-    const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/campaign-point/default",
-      { baseLoyaltyId, value, createdBy }
-    );
-
-    return response;
-  };
-
   getCampaign = async ({ skip, take }: { skip: number; take: number }) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/campaign-point/all-campaign",
@@ -1007,13 +975,4 @@ interface AgentInput {
   noNpwp?: string;
   createdBy?: string;
   modifiedBy?: string;
-}
-
-interface addProducts {
-  productName: string;
-  productCode: string;
-  weight: number;
-  unit: string;
-  expiredPeriod: number;
-  createdBy?: string;
 }

@@ -11,6 +11,7 @@ import {
   TextField,
   Dialog,
   DialogContent,
+  IconButton,
 } from "@mui/material";
 import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { customTheme } from "@/app/component/theme";
@@ -24,6 +25,7 @@ import Loader from "@/app/component/loader";
 import Loading from "@/app/loading";
 import Search from "@/app/component/search";
 import moment from "moment";
+import styled from "@emotion/styled";
 
 export default function Home() {
   const router = useRouter();
@@ -137,45 +139,6 @@ export default function Home() {
     },
     [logoutUser]
   );
-
-  const changeDefaultPoint = React.useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const authService = new Services();
-      const responseApi = await authService.changePointLoyalty({
-        baseLoyaltyId: currentPoint.baseLoyaltyId,
-        value: Number(currentPoint.basePoint),
-        createdBy: detailUsers.fullname,
-      });
-
-      if (responseApi.status === 200) {
-        const { message } = responseApi.data;
-        setLoading(false);
-        toastMessage({
-          message: message,
-          type: "success",
-        });
-      }
-    } catch (e: any) {
-      setLoading(false);
-      if (e.response && e.response.status === 500) {
-        toastMessage({
-          message: e.response.data.message,
-          type: "error",
-        });
-      } else if (e.response && e.response.status === 401) {
-        logoutUser();
-      } else {
-        toastMessage({ message: e.message, type: "error" });
-      }
-    }
-  }, [
-    currentPoint?.baseLoyaltyId,
-    currentPoint?.basePoint,
-    detailUsers?.fullname,
-    logoutUser,
-  ]);
 
   const getAllCampaign = React.useCallback(
     async ({ skip, take }: { skip: number; take: number }) => {
@@ -376,46 +339,6 @@ export default function Home() {
 
         <Suspense fallback={<Loading />}>
           <div className="p-4 xl:ml-80 gap-12">
-            <form
-              className="flex flex-col gap-5 "
-              onSubmit={(e: any) => {
-                e.preventDefault();
-                changeDefaultPoint();
-              }}
-            >
-              <h6 className="text-black font-bold">Default Point</h6>
-
-              <div className="flex flex-row item-center gap-5">
-                <TextField
-                  name="basePoint"
-                  id="basePoint"
-                  label="Point"
-                  type={"number"}
-                  size="small"
-                  inputProps={{ min: 0 }}
-                  required
-                  InputLabelProps={{ shrink: true }}
-                  variant="outlined"
-                  value={currentPoint?.basePoint || 0}
-                  onChange={(e) => {
-                    const { name, value } = e.target;
-
-                    setCurrentPoint((prevData: any) => ({
-                      ...prevData,
-                      [name]: value,
-                    }));
-                  }}
-                />
-
-                <button
-                  type="submit"
-                  className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                >
-                  Simpan
-                </button>
-              </div>
-            </form>
-
             <div className="m-10 flex flex-col">
               <form
                 className="bg-white w-full gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col"
@@ -499,6 +422,95 @@ export default function Home() {
                       setSelectProduct(values);
                     }}
                     values={selectProduct}
+                    contentRenderer={({ props, state }) => (
+                      <div style={{ cursor: "pointer" }}>
+                        {state.values.length} of {props.options.length} selected
+                      </div>
+                    )}
+                    dropdownRenderer={({
+                      props,
+                      state,
+                      methods,
+                    }: {
+                      props: any;
+                      state: any;
+                      methods: any;
+                    }) => {
+                      const regexp = new RegExp(state.search, "i");
+
+                      return (
+                        <div>
+                          <SearchAndToggle color={props.color}>
+                            <Buttons>
+                              <div>Search and select:</div>
+                              {methods.areAllSelected() ? (
+                                <Button
+                                  className="clear"
+                                  onClick={methods.clearAll}
+                                >
+                                  Clear all
+                                </Button>
+                              ) : (
+                                <React.Fragment>
+                                  <Button onClick={methods.selectAll}>
+                                    Select all
+                                  </Button>
+                                </React.Fragment>
+                              )}
+                            </Buttons>
+                            <input
+                              type="text"
+                              value={state.search}
+                              onChange={methods.setSearch}
+                              placeholder="Type anything"
+                            />
+                          </SearchAndToggle>
+                          <Items>
+                            {props.options
+                              .filter((item: any) =>
+                                regexp.test(
+                                  item[props.searchBy] || item[props.labelField]
+                                )
+                              )
+                              .map((option: any) => {
+                                if (
+                                  !props.keepSelectedInList &&
+                                  methods.isSelected(option)
+                                ) {
+                                  return null;
+                                }
+
+                                return (
+                                  <Item
+                                    disabled={option.disabled}
+                                    key={option[props.valueField]}
+                                    onClick={
+                                      option.disabled
+                                        ? undefined
+                                        : () => methods.addItem(option)
+                                    }
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      onChange={() =>
+                                        option.disabled
+                                          ? undefined
+                                          : methods.addItem(option)
+                                      }
+                                      checked={
+                                        state.values.indexOf(option) !== -1
+                                      }
+                                    />
+                                    <ItemLabel>
+                                      {option[props.labelField]}
+                                    </ItemLabel>
+                                  </Item>
+                                );
+                              })}
+                          </Items>
+                        </div>
+                      );
+                    }}
                   />
 
                   <TextField
@@ -988,3 +1000,71 @@ export default function Home() {
     </ThemeProvider>
   );
 }
+
+const SearchAndToggle = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  input {
+    margin: 10px 10px 0;
+    line-height: 30px;
+    padding: 0px 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    :focus {
+      outline: none;
+      border: 1px solid deepskyblue;
+    }
+  }
+`;
+
+const Items = styled.div`
+  overflow: auto;
+  min-height: 10px;
+  max-height: 200px;
+`;
+
+const Item = styled.div`
+  display: flex;
+  margin: 10px;
+  align-items: baseline;
+  ${({ disabled }: { disabled: any }) =>
+    disabled && "text-decoration: line-through;"}
+`;
+
+const ItemLabel = styled.div`
+  margin: 5px 10px;
+`;
+
+const Buttons = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  & div {
+    margin: 10px 0 0 10px;
+    font-weight: 600;
+  }
+`;
+
+const Button = styled.button`
+  background: none;
+  border: 1px solid #555;
+  color: #555;
+  border-radius: 3px;
+  margin: 10px 10px 0;
+  padding: 3px 5px;
+  font-size: 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+
+  &.clear {
+    color: tomato;
+    border: 1px solid tomato;
+  }
+
+  :hover {
+    border: 1px solid deepskyblue;
+    color: deepskyblue;
+  }
+`;

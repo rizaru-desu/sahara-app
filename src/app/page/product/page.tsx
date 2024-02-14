@@ -21,6 +21,7 @@ interface addProducts {
   productName: string;
   productCode: string;
   weight: number;
+  basePoint: number;
   unit: string;
   expiredPeriod: number;
   createdBy?: string;
@@ -40,6 +41,7 @@ export default function Home() {
   const [productInput, setProductInput] = React.useState<addProducts>({
     productName: "",
     productCode: "",
+    basePoint: 0,
     weight: 0,
     unit: "",
     expiredPeriod: 0,
@@ -145,6 +147,7 @@ export default function Home() {
       productName,
       productCode,
       weight,
+      basePoint,
       unit,
       expiredPeriod,
     }: addProducts) => {
@@ -155,6 +158,7 @@ export default function Home() {
           productName: productName,
           productCode: productCode,
           weight: Number(weight),
+          basePoint: Number(basePoint),
           unit: unit,
           expiredPeriod: Number(expiredPeriod),
           createdBy: detailUsers.fullname,
@@ -333,7 +337,7 @@ export default function Home() {
                 addProduct({
                   productName: productInput.productName,
                   productCode: productInput.productCode,
-
+                  basePoint: productInput.basePoint,
                   weight: productInput.weight,
                   unit: productInput.unit,
                   expiredPeriod: productInput.expiredPeriod,
@@ -378,8 +382,8 @@ export default function Home() {
                   required
                   InputLabelProps={{ shrink: true }}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">kg</InputAdornment>
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
                     ),
                   }}
                   inputProps={{ step: 0.1 }}
@@ -408,6 +412,20 @@ export default function Home() {
                   type={"number"}
                   size="small"
                   required
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                  onChange={handleInputChangeAddProduct}
+                />
+
+                <TextField
+                  name="basePoint"
+                  id="basePoint"
+                  label="Base Point"
+                  type={"number"}
+                  size="small"
+                  required
+                  inputProps={{ min: 0 }}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
@@ -498,6 +516,14 @@ export default function Home() {
                 rows={listProduct}
                 columns={[
                   {
+                    field: "basePoint",
+                    headerName: "Base Point",
+                    minWidth: 100,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
                     field: "productCode",
                     headerName: "Product Code",
                     minWidth: 250,
@@ -505,7 +531,6 @@ export default function Home() {
                     headerAlign: "center",
                     editable: false,
                   },
-
                   {
                     field: "productName",
                     headerName: "Product Name",
@@ -516,9 +541,9 @@ export default function Home() {
                   },
                   {
                     field: "weight",
-                    headerName: "Weight",
+                    headerName: "Weight (Kg)",
                     minWidth: 250,
-                    align: "left",
+                    align: "right",
                     headerAlign: "center",
                     editable: false,
                   },

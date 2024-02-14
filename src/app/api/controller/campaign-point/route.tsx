@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     if (tokenValidated) {
       const baseURL = `${request.nextUrl.origin}`;
       const { userId } = tokenValidated;
-      const { detail, allCampaign, totalCampaign, allProduct, basePoint } =
+      const { detail, allCampaign, totalCampaign, allProduct } =
         await pageAllPoCam({
           skip: resultValid.skip,
           take: resultValid.take,
@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
           userDetail: detail,
           totalCampaign,
           allProduct,
-          basePoint,
         },
         {
           status: 200,

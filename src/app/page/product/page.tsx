@@ -16,6 +16,7 @@ import Loading from "@/app/loading";
 import Search from "@/app/component/search";
 import moment from "moment";
 import * as XLSX from "xlsx";
+import Select from "react-dropdown-select";
 
 interface addProducts {
   productName: string;
@@ -47,6 +48,7 @@ export default function Home() {
     expiredPeriod: 0,
     createdBy: "",
   });
+  const [selectUnit, setSelectUnit] = React.useState<any[]>([]);
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -339,7 +341,7 @@ export default function Home() {
                   productCode: productInput.productCode,
                   basePoint: productInput.basePoint,
                   weight: productInput.weight,
-                  unit: productInput.unit,
+                  unit: selectUnit[0].value,
                   expiredPeriod: productInput.expiredPeriod,
                 });
               }}
@@ -392,17 +394,24 @@ export default function Home() {
                   onChange={handleInputChangeAddProduct}
                 />
 
-                <TextField
-                  name="unit"
-                  id="unit"
-                  label="Unit"
-                  type={"text"}
-                  size="small"
+                <Select
+                  options={[
+                    { label: "Pack", value: "Pack" },
+                    { label: "Tiang", value: "Tiang" },
+                    { label: "Pcs", value: "Pcs" },
+                  ]}
+                  valueField="value"
+                  labelField="label"
+                  color="#b91c1c"
+                  searchBy="label"
+                  searchable
                   required
-                  InputLabelProps={{ shrink: true }}
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleInputChangeAddProduct}
+                  clearable
+                  className="text-black"
+                  onChange={(values) => {
+                    setSelectUnit(values);
+                  }}
+                  values={selectUnit}
                 />
 
                 <TextField
@@ -487,7 +496,7 @@ export default function Home() {
                         {
                           productName: "Daging Burger Sapi1",
                           weight: Number("2.5"),
-                          unit: "pack",
+                          unit: "Pack / Tiang / Pcs",
                           productCode: "SB1",
                           expiredPeriod: 100,
                         },

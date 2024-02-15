@@ -12,7 +12,7 @@ import {
   FaBoxOpen,
 } from "react-icons/fa";
 import { FaBoxesPacking } from "react-icons/fa6";
-import { RiMoneyEuroCircleFill, RiMoneyDollarCircleFill } from "react-icons/ri";
+import { RiMoneyEuroCircleFill } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 
 function SideBar({
@@ -33,14 +33,17 @@ function SideBar({
         href: "#",
         header: true,
         icon: undefined,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
       },
       {
         title: "Product",
         href: "/page/product",
         header: false,
         icon: <FaBox size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "024e2013-6bda-44bb-9557-c6838996d24a", //Admin PPIC
+          "548c0702-cc0e-11ee-8e87-38f9d362e2c9", //Admin Marketing
+        ],
       },
       {
         title: "Agent",
@@ -68,7 +71,10 @@ function SideBar({
         href: "/page/point-campaign",
         header: false,
         icon: <FaCog size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "548c0702-cc0e-11ee-8e87-38f9d362e2c9", //Admin Marketing
+        ],
       },
       { title: "Inventory", href: "#", header: true, roles: [0] },
       {
@@ -76,21 +82,33 @@ function SideBar({
         href: "/page/labeling-product",
         header: false,
         icon: <FaQrcode size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "024e2013-6bda-44bb-9557-c6838996d24a", //Admin PPIC
+          "81c44b38-0fc4-446f-a68b-a66a26035a3a", //Admin Product
+        ],
       },
       {
         title: "Labeling Box",
         href: "/page/labeling-box",
         header: false,
         icon: <FaBoxOpen size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "024e2013-6bda-44bb-9557-c6838996d24a", //Admin PPIC
+          "c03a5d0b-f3de-4ab1-8501-165ce79b0e74", //Admin Gudang
+        ],
       },
       {
         title: "Stock",
         href: "/page/stock-product",
         header: false,
         icon: <FaWarehouse size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "aaf7daac-cb1f-11ee-b237-38f9d362e2c9",
+          "024e2013-6bda-44bb-9557-c6838996d24a", //Admin PPIC
+        ],
       },
 
       {
@@ -105,7 +123,11 @@ function SideBar({
         href: "/page/delivery-order",
         header: false,
         icon: <FaBoxesPacking size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "024e2013-6bda-44bb-9557-c6838996d24a", //Admin PPIC
+          "8f595a1e-cb1f-11ee-b237-38f9d362e2c9", //Admin Delivery
+        ],
       },
       {
         title: "Loyalty",
@@ -119,7 +141,10 @@ function SideBar({
         href: "/page/point-loyalty",
         header: false,
         icon: <RiMoneyEuroCircleFill size={25} color={"#fff"} />,
-        roles: ["d4ead12a-564e-4f32-b5bb-84ccd253f904"],
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "548c0702-cc0e-11ee-8e87-38f9d362e2c9", //Admin Marketing
+        ],
       },
     ],
     []

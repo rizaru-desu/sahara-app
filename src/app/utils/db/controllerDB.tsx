@@ -33,6 +33,7 @@ const pageAllUser = async ({ userId, skip, take }: pageAll) => {
         select: { stringId: true, value: true },
       }),
       prisma.user.findMany({
+        where: { NOT: { email: "developer@sahara.com" } },
         skip,
         take,
         select: {
@@ -109,6 +110,7 @@ const userPagination = async ({ skip, take }: paginations) => {
   try {
     const [result, count] = await prisma.$transaction([
       prisma.user.findMany({
+        where: { NOT: { email: "developer@sahara.com" } },
         skip,
         take,
         select: {
@@ -154,6 +156,7 @@ const userSearch = async ({ value }: valueSearch) => {
             { fullname: { contains: value } },
             { phone: { contains: value } },
           ],
+          NOT: { email: "developer@sahara.com" },
         },
         select: {
           userId: true,
@@ -1285,14 +1288,12 @@ interface addLabelsBox {
   labelId: string[];
   labelCodeBox: string;
   leader: string;
-  location: string;
   createdBy?: string;
 }
 
 const addLabelBox = async ({
   labelId,
   labelCodeBox,
-  location,
   leader,
   createdBy,
 }: addLabelsBox) => {
@@ -1316,8 +1317,7 @@ const addLabelBox = async ({
           data: {
             labelBoxId: insertLabelBox.labelBoxId,
             labelBoxs: insertLabelBox.labelCodeBox,
-            location,
-            status: 2,
+            status: 1,
             modifiedBy: createdBy,
           },
         });
@@ -1460,6 +1460,60 @@ const stockProdutSearch = async ({ value }: valueSearch) => {
     ]);
 
     return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const stockBox = async () => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.stokPorudct.findMany({
+        where: {
+          labelBoxs: {
+            // Search for labelBoxs not null
+            not: null,
+          },
+          location: null, // Search for location being null
+        },
+        distinct: ["labelBoxs"],
+        orderBy: { status: "desc" },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const addStockLocation = async ({
+  location,
+  labelBoxId,
+  createdBy,
+}: {
+  location: string;
+  labelBoxId: string;
+  createdBy?: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findBox = await tx.stokPorudct.findMany({
+        where: {
+          labelBoxId,
+        },
+      });
+
+      if (findBox) {
+        const stockIds = findBox.map((stock) => stock.stockId);
+        const findPoint = await tx.stokPorudct.updateMany({
+          where: { stockId: { in: stockIds } },
+          data: { location, status: 2, modifiedBy: createdBy },
+        });
+
+        return findPoint;
+      }
+    });
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -2223,6 +2277,8 @@ export {
   stockProdutPagination,
   stockProdutRangeSearch,
   stockProdutSearch,
+  stockBox,
+  addStockLocation,
 
   //** POINT LOYALTY */
   pageAllLoyalty,

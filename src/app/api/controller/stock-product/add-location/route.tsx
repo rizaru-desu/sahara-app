@@ -1,14 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { addLabelBox } from "@/app/utils/db/controllerDB";
-import z from "zod";
+import { addStockLocation } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
+import z from "zod";
 
 const Schema = z
   .object({
-    labelIds: z.array(z.string()),
-    labelCodeBox: z.string(),
-    leader: z.string(),
+    location: z.string(),
+    labelBoxId: z.string(),
     createdBy: z.string().optional(),
   })
   .strict();
@@ -55,16 +54,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addLabelBox({
-        labelCodeBox: resultValid.labelCodeBox,
-        labelId: resultValid.labelIds,
-        leader: resultValid.leader,
+      await addStockLocation({
+        location: resultValid.location,
+        labelBoxId: resultValid.labelBoxId,
         createdBy: resultValid.createdBy,
       });
 
       return NextResponse.json(
         {
-          message: `Label Box ${resultValid.labelCodeBox} has been successfully add.`,
+          message: "add Location successfuly",
         },
         {
           status: 200,

@@ -579,12 +579,11 @@ export class Services {
     labelIds,
     labelCodeBox,
     leader,
-    location,
+
     createdBy,
   }: {
     labelIds: string[];
     labelCodeBox: string;
-    location: string;
     leader: string;
     createdBy?: string;
   }) => {
@@ -594,7 +593,6 @@ export class Services {
         labelCodeBox,
         labelIds,
         leader,
-        location,
         createdBy,
       }
     );
@@ -677,6 +675,32 @@ export class Services {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/stock-product/all-stock/",
       { skip, take }
+    );
+
+    return response;
+  };
+
+  getAllBox = async () => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/stock-product/all-box/",
+      {}
+    );
+
+    return response;
+  };
+
+  addLocationStock = async ({
+    location,
+    labelBoxId,
+    createdBy,
+  }: {
+    location: string;
+    labelBoxId: string;
+    createdBy: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/stock-product/add-location/",
+      { location, labelBoxId, createdBy }
     );
 
     return response;

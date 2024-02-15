@@ -4,7 +4,14 @@ import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { toastMessage } from "@/app/component/toasttify";
 import { Services } from "@/app/utils/services/service";
-import { Pagination, TextField } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Pagination,
+  Switch,
+  TextField,
+} from "@mui/material";
 import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { customTheme } from "@/app/component/theme";
 import { DataGrid } from "@mui/x-data-grid";
@@ -17,6 +24,7 @@ import Loading from "@/app/loading";
 import Search from "@/app/component/search";
 import moment from "moment";
 import * as XLSX from "xlsx";
+import ScanLabel from "@/app/component/scanLabel";
 
 export default function Home() {
   const router = useRouter();
@@ -40,6 +48,10 @@ export default function Home() {
   const [totalBoxPage, setTotalBoxPage] = React.useState<number>(0);
   const [currentBoxPage, setCurrentBoxPage] = React.useState<number>(1);
   const [totalBoxData, setTotalBoxData] = React.useState<number>(0);
+
+  const [scanOpen, setScanOpen] = React.useState<boolean>(false);
+  const [scanData, setScanData] = React.useState<any[]>([]);
+  const [scanValue, setScanValue] = React.useState<string>("");
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -193,7 +205,6 @@ export default function Home() {
       const responseApi = await authService.addLabelBox({
         leader: leader,
         labelIds: labelId,
-        location: location,
         labelCodeBox: `PSBI${dateString}${_.toUpper(
           _.map(leader.split(" "), (word) => word[0]).join("")
         )}${moment().format("MM")}${(totalDatas += 1)}`,
@@ -235,7 +246,6 @@ export default function Home() {
     getAllLabelBoxProducts,
     labelId,
     leader,
-    location,
     logoutUser,
     totalBoxData,
   ]);
@@ -304,6 +314,42 @@ export default function Home() {
     [logoutUser]
   );
 
+  const scanProducts = React.useCallback(
+    async ({ value }: { value: any }) => {
+      try {
+        setLoading(true);
+        const authService = new Services();
+        const responseApi = await authService.searchLabelBoxProducts({
+          value,
+        });
+
+        if (responseApi.status === 200) {
+          const { data } = responseApi.data;
+          setLoading(false);
+          setScanValue("");
+          let valuesToAdd = _.differenceBy(data, scanData, "labelCode");
+
+          const cloneData = _.clone(scanData);
+          cloneData.push(...valuesToAdd);
+          setScanData(cloneData);
+        }
+      } catch (e: any) {
+        setLoading(false);
+        if (e.response && e.response.status === 500) {
+          toastMessage({
+            message: e.response.data.message,
+            type: "error",
+          });
+        } else if (e.response && e.response.status === 401) {
+          logoutUser();
+        } else {
+          toastMessage({ message: e.message, type: "error" });
+        }
+      }
+    },
+    [logoutUser, scanData]
+  );
+
   const exportLabel = React.useCallback(async () => {
     try {
       setLoading(true);
@@ -369,11 +415,40 @@ export default function Home() {
               </h6>
 
               <div className="gap-5 flex flex-row justify-between">
-                <Search
-                  onSearch={({ value }) => {
-                    searchLabelBoxProducts({ value });
-                  }}
-                />
+                <div className="flex flex-col gap-5">
+                  <div className="flex flex-row gap-1 items-center">
+                    <Checkbox
+                      value={scanOpen}
+                      color="default"
+                      onChange={(event) => {
+                        const isChecked = event.target.checked;
+                        setScanOpen(isChecked);
+                        if (!isChecked) {
+                          setLabelId([]);
+                          setSelectLabel([]);
+                          setScanData([]);
+                        }
+                      }}
+                    />
+                    <label className="text-black">Mode Scan</label>
+                  </div>
+
+                  {scanOpen ? (
+                    <ScanLabel
+                      value={scanValue}
+                      onSearch={({ value }) => {
+                        setScanValue(value);
+                        scanProducts({ value });
+                      }}
+                    />
+                  ) : (
+                    <Search
+                      onSearch={({ value }) => {
+                        searchLabelBoxProducts({ value });
+                      }}
+                    />
+                  )}
+                </div>
 
                 <form
                   className="gap-3 flex-col flex"
@@ -382,43 +457,23 @@ export default function Home() {
                     addLabel();
                   }}
                 >
-                  <div className="grid grid-cols-2 gap-2">
-                    <TextField
-                      name="leader"
-                      id="leader"
-                      label="Leader"
-                      type={"text"}
-                      size="small"
-                      required
-                      value={leader}
-                      placeholder="Input Atasan/Leader"
-                      InputLabelProps={{ shrink: true }}
-                      variant="outlined"
-                      fullWidth
-                      onChange={(e) => {
-                        const { value } = e.target;
-                        setLeader(value);
-                      }}
-                    />
-                    <TextField
-                      name="location"
-                      id="location"
-                      label="location"
-                      type={"text"}
-                      size="small"
-                      required
-                      value={location}
-                      placeholder="Disimpan di Locaksi?"
-                      InputLabelProps={{ shrink: true }}
-                      inputProps={{ maxLength: 5 }}
-                      variant="outlined"
-                      fullWidth
-                      onChange={(e) => {
-                        const { value } = e.target;
-                        setLocation(value);
-                      }}
-                    />
-                  </div>
+                  <TextField
+                    name="leader"
+                    id="leader"
+                    label="Leader"
+                    type={"text"}
+                    size="small"
+                    required
+                    value={leader}
+                    placeholder="Input Atasan/Leader"
+                    InputLabelProps={{ shrink: true }}
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      setLeader(value);
+                    }}
+                  />
 
                   <button
                     type="submit"
@@ -435,7 +490,7 @@ export default function Home() {
                 pagination={true}
                 autoHeight
                 getRowHeight={() => "auto"}
-                rows={listLabel}
+                rows={scanOpen ? scanData : listLabel}
                 checkboxSelection
                 disableRowSelectionOnClick
                 /* sx={{
@@ -530,23 +585,25 @@ export default function Home() {
                 ]}
               />
 
-              <div className="flex justify-center py-4">
-                <Pagination
-                  count={totalPage}
-                  page={currentPage}
-                  onChange={async (
-                    event: React.ChangeEvent<unknown>,
-                    value: number
-                  ) => {
-                    setCurrentPage(value);
-                    getAllLabelBoxProducts({
-                      skip: Math.max(0, (value - 1) * 100),
-                      take: 100,
-                    });
-                  }}
-                  shape="rounded"
-                />
-              </div>
+              {scanOpen ? null : (
+                <div className="flex justify-center py-4">
+                  <Pagination
+                    count={totalPage}
+                    page={currentPage}
+                    onChange={async (
+                      event: React.ChangeEvent<unknown>,
+                      value: number
+                    ) => {
+                      setCurrentPage(value);
+                      getAllLabelBoxProducts({
+                        skip: Math.max(0, (value - 1) * 100),
+                        take: 100,
+                      });
+                    }}
+                    shape="rounded"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="m-10 flex flex-col">

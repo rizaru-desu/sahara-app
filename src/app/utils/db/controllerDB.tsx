@@ -994,8 +994,6 @@ const addLabelProduct = async ({ data }: addLabelsProduct) => {
             );
           }) as any;
 
-          console.log(finalResult[0]);
-
           const insertStock = await tx.stokPorudct.createMany({
             data: finalResult,
           });
@@ -1007,43 +1005,6 @@ const addLabelProduct = async ({ data }: addLabelsProduct) => {
       } else {
         throw new Error("Failed add label product");
       }
-
-      /* const insertLabelProduct = await tx.labelProduct.create({
-        data: {
-          productCode,
-          productName,
-          productId,
-          labelCode,
-          shift,
-          batch,
-          bestBefore,
-          createdBy,
-        },
-      });
-
-      if (insertLabelProduct) {
-        const findProduct = await tx.product.findUnique({
-          where: { productId: insertLabelProduct.productId },
-        });
-
-        const insertStock = await tx.stokPorudct.create({
-          data: {
-            productId: findProduct?.productId ?? "",
-            productName: findProduct?.productName ?? "",
-            productCode: findProduct?.productCode ?? "",
-            weight: findProduct?.weight ?? 0,
-            unit: findProduct?.unit ?? "",
-            expiredDate: insertLabelProduct.bestBefore,
-            labelProducts: insertLabelProduct.labelCode,
-            labelId: insertLabelProduct.labelId,
-            createdBy,
-          },
-        });
-
-        return insertStock; 
-      } else {
-        throw new Error("Failed add label product");
-      }*/
     });
   } catch (error: any) {
     throw new Error(error.message);

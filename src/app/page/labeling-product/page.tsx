@@ -36,9 +36,9 @@ export default function Home() {
   const [selectProduct, setSelectProduct] = React.useState<any[]>([]);
   const [manualInput, setManualInput] = React.useState<{
     shift: number;
-    batch: string;
+    batch: number;
     bulk: number;
-  }>({ shift: 0, batch: "", bulk: 0 });
+  }>({ shift: 0, batch: 0, bulk: 0 });
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -255,10 +255,26 @@ export default function Home() {
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
 
-    setManualInput((prevData: any) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    if (name === "batch") {
+      const newValue = Math.max(1, Math.min(10, parseInt(value, 10)))
+        .toString()
+        .padStart(2, "0");
+      setManualInput((prevData: any) => ({
+        ...prevData,
+        [name]: newValue,
+      }));
+    } else if (name === "bulk") {
+      const newValue = value.slice(0, 3);
+      setManualInput((prevData: any) => ({
+        ...prevData,
+        [name]: newValue,
+      }));
+    } else {
+      setManualInput((prevData: any) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   return (
@@ -279,21 +295,38 @@ export default function Home() {
               onSubmit={(e: any) => {
                 e.preventDefault();
 
-                let totalDatas = totalData;
+                let idx = 0;
                 const data = _.times(manualInput.bulk, () => {
                   const dateString = moment(
                     new Date(),
                     "YYYY-MM-DD HH:mm:ss"
                   ).diff(moment("1899-12-30", "YYYY-MM-DD"), "days");
 
+                  idx += 1;
+
+                  const formattedIdx = String(idx).padStart(3, "0");
+
+                  const dataString = dateString.toString();
+
+                  // Convert string to array of characters
+                  const chars = dataString.split("");
+
+                  // Shuffle the array of characters
+                  for (let i = chars.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [chars[i], chars[j]] = [chars[j], chars[i]];
+                  }
+
+                  // Convert array of characters back to string
+                  const shuffledString = chars.join("");
+
+                  // Convert shuffled string back to number
+                  const shuffledNumber = parseInt(shuffledString);
+
                   const productId = selectProduct[0].productId;
                   const productCode = selectProduct[0].productCode;
                   const productName = selectProduct[0].productName;
-                  const labelCode = `SBI${selectProduct[0].productCode}${String(
-                    dateString
-                  )}${manualInput.shift}${
-                    manualInput.batch
-                  }${(totalDatas += 1)}`;
+                  const labelCode = `SBI${shuffledNumber}${selectProduct[0].productCode}${manualInput.shift}${manualInput.batch}${formattedIdx}`;
                   const shift = Number(manualInput.shift);
                   const batch = manualInput.batch;
                   const bestBefore = moment(new Date())
@@ -312,7 +345,8 @@ export default function Home() {
                   };
                 });
 
-                addLabel({ data });
+                console.log(data);
+                //addLabel({ data });
               }}
             >
               <h6 className="text-black text-bold">
@@ -347,6 +381,7 @@ export default function Home() {
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
+                  value={manualInput.shift}
                   onChange={handleInputChange}
                 />
 
@@ -356,22 +391,27 @@ export default function Home() {
                   label="Batch"
                   size="small"
                   required
+                  type="number"
+                  inputProps={{ min: 1, max: 10 }}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
+                  value={manualInput.batch}
                   onChange={handleInputChange}
                 />
 
                 <TextField
                   name="bulk"
                   id="bulk"
-                  label="Bulk Geenerate"
+                  label="Qyt Generate"
                   size="small"
-                  inputProps={{ min: 1 }}
+                  type="number"
+                  inputProps={{ min: 1, max: 999 }}
                   required
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
+                  value={manualInput.bulk}
                   onChange={handleInputChange}
                 />
               </div>

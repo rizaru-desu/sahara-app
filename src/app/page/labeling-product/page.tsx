@@ -231,7 +231,7 @@ export default function Home() {
             Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
           }.xlsx`
         );
-        getAllLabelProduct({ skip: 0, take: 100 });
+        getAllLabelProduct({ skip: 0, take: 500 });
       }
     } catch (e: any) {
       setLoading(false);
@@ -249,7 +249,7 @@ export default function Home() {
   }, [getAllLabelProduct, labelId, logoutUser]);
 
   React.useEffect(() => {
-    getPageData({ skip: 0, take: 100 });
+    getPageData({ skip: 0, take: 500 });
   }, [getPageData]);
 
   const handleInputChange = (e: any) => {
@@ -569,8 +569,8 @@ export default function Home() {
                   ) => {
                     setCurrentPage(value);
                     getAllLabelProduct({
-                      skip: Math.max(0, (value - 1) * 100),
-                      take: 100,
+                      skip: Math.max(0, (value - 1) * 500),
+                      take: 500,
                     });
                   }}
                   shape="rounded"

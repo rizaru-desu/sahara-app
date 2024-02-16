@@ -345,8 +345,7 @@ export default function Home() {
                   };
                 });
 
-                console.log(data);
-                //addLabel({ data });
+                addLabel({ data });
               }}
             >
               <h6 className="text-black text-bold">

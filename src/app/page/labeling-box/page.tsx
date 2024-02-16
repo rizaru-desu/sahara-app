@@ -510,6 +510,14 @@ export default function Home() {
                 }}
                 columns={[
                   {
+                    field: "PackageDate",
+                    headerName: "Package Date",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
                     field: "productCode",
                     headerName: "Product Code",
                     minWidth: 250,

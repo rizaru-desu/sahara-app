@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
           {
             id: item.labelBoxId,
             totalProduct: _.size(item.labelProduct),
+            PackageDate: item.createdAt,
           },
           _.omit(item, "labelBoxId", "labelProduct")
         );

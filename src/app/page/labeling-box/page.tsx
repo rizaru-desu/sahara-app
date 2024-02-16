@@ -137,7 +137,7 @@ export default function Home() {
           const { allLabelBox, countLabelBox } = responseApi.data;
           setLoading(false);
           setListLabelBox(allLabelBox);
-          setTotalBoxPage(Math.ceil(countLabelBox / 100));
+          setTotalBoxPage(Math.ceil(countLabelBox / 500));
           setTotalBoxData(countLabelBox);
         }
       } catch (e: any) {
@@ -220,7 +220,7 @@ export default function Home() {
         });
         getAllLabelBox({
           skip: 0,
-          take: 100,
+          take: 500,
         });
         getAllLabelBoxProducts({
           skip: 0,
@@ -510,14 +510,6 @@ export default function Home() {
                 }}
                 columns={[
                   {
-                    field: "PackageDate",
-                    headerName: "Package Date",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
                     field: "productCode",
                     headerName: "Product Code",
                     minWidth: 250,
@@ -652,6 +644,16 @@ export default function Home() {
                   ),
                 }}
                 columns={[
+                  {
+                    field: "PackageDate",
+                    headerName: "Package Date",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY"),
+                  },
                   {
                     field: "labelCodeBox",
                     headerName: "Label Box Code",

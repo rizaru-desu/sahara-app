@@ -3,6 +3,7 @@ import { validateToken } from "@/app/utils/token/validate";
 import { labelBoxPrinter } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
+import moment from "moment";
 
 const Schema = z
   .object({
@@ -58,10 +59,19 @@ export async function POST(request: NextRequest) {
         modifiedBy: resultValid.modifiedBy,
       });
 
+      const updated = _.map(labelExport, (item) => {
+        return Object.assign(
+          {
+            PackageDate: moment(item.createdAt).format("DD/MM/YYYY"),
+          },
+          _.omit(item)
+        );
+      });
+
       return NextResponse.json(
         {
           message: `Label ${result.count} has been successfully export & printed.`,
-          data: labelExport,
+          data: updated,
         },
         {
           status: 200,

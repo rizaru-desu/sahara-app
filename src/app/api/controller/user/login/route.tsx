@@ -79,10 +79,13 @@ export async function POST(request: NextRequest) {
           };
 
           const userCookie = serialize("userData", String(tokenData.token), {
-            httpOnly: process.env.NODE_ENV === "development" ? false : true,
-            secure: true,
+            httpOnly: false,
+            secure: false,
+            sameSite: false,
+            //httpOnly: process.env.NODE_ENV === "development" ? false : true,
+            //secure: true,
             maxAge: 60 * 60 * 24, //maxAge: 60 * 60 * 24,  // Cookie will expire in 1 day
-            sameSite: true,
+            //sameSite: true,
             path: "/",
           });
 

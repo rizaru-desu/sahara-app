@@ -302,40 +302,14 @@ export default function Home() {
                     "YYYY-MM-DD HH:mm:ss"
                   ).diff(moment("1899-12-30", "YYYY-MM-DD"), "days");
 
-                  // Convert days to milliseconds (1 day = 24 hours = 24 * 60 * 60 * 1000 milliseconds)
-                  const millisecondsDifference =
-                    dateString * 24 * 60 * 60 * 1000;
-
-                  // Convert milliseconds difference to UNIX timestamp
-                  const unixTimestamp =
-                    Math.floor(Date.now() / 1000) +
-                    Math.floor(millisecondsDifference / 1000);
-
                   idx += 1;
 
                   const formattedIdx = String(idx).padStart(3, "0");
 
-                  const dataString = dateString.toString();
-
-                  // Convert string to array of characters
-                  const chars = dataString.split("");
-
-                  // Shuffle the array of characters
-                  for (let i = chars.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [chars[i], chars[j]] = [chars[j], chars[i]];
-                  }
-
-                  // Convert array of characters back to string
-                  const shuffledString = chars.join("");
-
-                  // Convert shuffled string back to number
-                  const shuffledNumber = parseInt(shuffledString);
-
                   const productId = selectProduct[0].productId;
                   const productCode = selectProduct[0].productCode;
                   const productName = selectProduct[0].productName;
-                  const labelCode = `SBI${String(unixTimestamp).substring(5)}${
+                  const labelCode = `SBI${String(dateString)}${
                     selectProduct[0].productCode
                   }${manualInput.shift}${manualInput.batch}${formattedIdx}`;
                   const shift = Number(manualInput.shift);
@@ -356,8 +330,7 @@ export default function Home() {
                   };
                 });
 
-                console.log(data);
-                //addLabel({ data });
+                addLabel({ data });
               }}
             >
               <h6 className="text-black text-bold">

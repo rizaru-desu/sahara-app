@@ -52,13 +52,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addLabelProduct({ data: resultValid.data });
+      const { manyProduct, duplicateCount } = await addLabelProduct({
+        data: resultValid.data,
+      });
 
       return NextResponse.json(
         {
-          message: `Label ${_.size(
-            resultValid.data
-          )} has been successfully add.`,
+          message: `Label ${manyProduct.count} was successfully added, and Label ${duplicateCount} has been duplicated.`,
         },
         {
           status: 200,

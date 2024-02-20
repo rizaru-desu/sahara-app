@@ -945,9 +945,14 @@ interface addLabelsProduct {
 const addLabelProduct = async ({ data }: addLabelsProduct) => {
   try {
     return prisma.$transaction(async (tx) => {
-      const manyProduct = await tx.labelProduct.createMany({ data: data });
+      const manyProduct = await tx.labelProduct.createMany({
+        data: data,
+        skipDuplicates: true,
+      });
 
       if (manyProduct) {
+        const duplicateCount = data.length - manyProduct.count;
+
         const productids = _.map(data, "productId");
         const labelCodeIds = _.map(data, "labelCode");
 
@@ -998,7 +1003,7 @@ const addLabelProduct = async ({ data }: addLabelsProduct) => {
             data: finalResult,
           });
 
-          return insertStock;
+          return { insertStock, manyProduct, duplicateCount };
         } else {
           throw new Error("Failed add label stock");
         }

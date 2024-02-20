@@ -131,21 +131,33 @@ export default function Home() {
 
             <div className="bg-white gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex ">
               <Carousel autoPlay interval={5000} showThumbs={false}>
-                {_.map(listCampaign, (item: any) => {
-                  return (
-                    <div>
-                      <img
-                        className="h-[420px] w-auto bg-cover"
-                        src={item.photo}
-                      />
-                      <p className="legend">
-                        {item.campaignName}
-                        <br />
-                        {item.description}
-                      </p>
-                    </div>
-                  );
-                })}
+                {_.map(
+                  _.isEmpty(listCampaign)
+                    ? [
+                        {
+                          campaignName: "Campaign is Empty",
+                          description: "Please set Cammpaign",
+                          photo:
+                            "https://placehold.co/1080x1350/jpg?text=Empty\nCampaign",
+                        },
+                      ]
+                    : listCampaign,
+                  (item: any) => {
+                    return (
+                      <div>
+                        <img
+                          className="h-[675px] w-auto bg-cover"
+                          src={item.photo}
+                        />
+                        <p className="legend">
+                          {item.campaignName}
+                          <br />
+                          {item.description}
+                        </p>
+                      </div>
+                    );
+                  }
+                )}
               </Carousel>
             </div>
           </div>

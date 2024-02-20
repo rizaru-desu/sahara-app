@@ -302,6 +302,15 @@ export default function Home() {
                     "YYYY-MM-DD HH:mm:ss"
                   ).diff(moment("1899-12-30", "YYYY-MM-DD"), "days");
 
+                  // Convert days to milliseconds (1 day = 24 hours = 24 * 60 * 60 * 1000 milliseconds)
+                  const millisecondsDifference =
+                    dateString * 24 * 60 * 60 * 1000;
+
+                  // Convert milliseconds difference to UNIX timestamp
+                  const unixTimestamp =
+                    Math.floor(Date.now() / 1000) +
+                    Math.floor(millisecondsDifference / 1000);
+
                   idx += 1;
 
                   const formattedIdx = String(idx).padStart(3, "0");
@@ -326,7 +335,9 @@ export default function Home() {
                   const productId = selectProduct[0].productId;
                   const productCode = selectProduct[0].productCode;
                   const productName = selectProduct[0].productName;
-                  const labelCode = `SBI${shuffledNumber}${selectProduct[0].productCode}${manualInput.shift}${manualInput.batch}${formattedIdx}`;
+                  const labelCode = `SBI${String(unixTimestamp).substring(5)}${
+                    selectProduct[0].productCode
+                  }${manualInput.shift}${manualInput.batch}${formattedIdx}`;
                   const shift = Number(manualInput.shift);
                   const batch = manualInput.batch;
                   const bestBefore = moment(new Date())
@@ -345,7 +356,8 @@ export default function Home() {
                   };
                 });
 
-                addLabel({ data });
+                console.log(data);
+                //addLabel({ data });
               }}
             >
               <h6 className="text-black text-bold">

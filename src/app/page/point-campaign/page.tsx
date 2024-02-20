@@ -560,11 +560,11 @@ export default function Home() {
                           reader.onload = function (event) {
                             const img = new Image();
                             img.onload = function () {
-                              if (img.width <= 1080 && img.height <= 1350) {
+                              if (img.width === 1080 && img.height === 1350) {
                                 setSelectFile(selectedFile);
                               } else {
                                 alert(
-                                  "Please select an image with dimensions 500x200."
+                                  "Please select an image with dimensions 1080x1350."
                                 );
                                 e.target.value = ""; // Clear input value
                                 setSelectFile(null); // Reset selected file

@@ -256,7 +256,7 @@ export default function Home() {
     const { name, value } = e.target;
 
     if (name === "batch") {
-      const newValue = Math.max(1, Math.min(10, parseInt(value, 10)))
+      const newValue = Math.max(1, Math.min(99, parseInt(value, 99)))
         .toString()
         .padStart(2, "0");
       setManualInput((prevData: any) => ({

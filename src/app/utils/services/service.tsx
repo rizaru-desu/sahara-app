@@ -209,11 +209,21 @@ export class Services {
     picPhone,
     alamatToko,
     noNpwp,
+    phoneAgent,
     createdBy,
   }: AgentInput) => {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/agent/add",
-      { email, customerName, picName, picPhone, alamatToko, noNpwp, createdBy }
+      {
+        email,
+        customerName,
+        picName,
+        picPhone,
+        alamatToko,
+        noNpwp,
+        phoneAgent,
+        createdBy,
+      }
     );
 
     return response;
@@ -227,6 +237,7 @@ export class Services {
     picPhone,
     alamatToko,
     noNpwp,
+    phoneAgent,
     modifiedBy,
   }: AgentInput) => {
     const response: AxiosResponse<any> = await this.instance.post(
@@ -239,6 +250,7 @@ export class Services {
         picPhone,
         alamatToko,
         noNpwp,
+        phoneAgent,
         modifiedBy,
       }
     );
@@ -997,6 +1009,7 @@ interface AgentInput {
   picName: string;
   alamatToko: string;
   noNpwp?: string;
+  phoneAgent?: string;
   createdBy?: string;
   modifiedBy?: string;
 }

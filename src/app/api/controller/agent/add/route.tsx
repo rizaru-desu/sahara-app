@@ -17,6 +17,7 @@ const Schema = z
     ),
     alamatToko: z.string(),
     noNpwp: z.string(),
+    phoneAgent: z.string(),
     createdBy: z.string().optional(),
   })
   .strict();
@@ -80,6 +81,7 @@ export async function POST(request: NextRequest) {
         picPhone: resultValid.picPhone,
         alamatToko: resultValid.alamatToko,
         noNpwp: formattedNPWP,
+        phoneAgent: resultValid.phoneAgent,
         createdBy: resultValid.createdBy,
       });
 

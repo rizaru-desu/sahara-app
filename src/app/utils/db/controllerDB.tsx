@@ -496,6 +496,7 @@ interface AgentInput {
   picName: string;
   alamatToko: string;
   noNpwp?: string;
+  phoneAgent: string;
   createdBy?: string;
   modifiedBy?: string;
 }
@@ -506,6 +507,7 @@ const addAgent = async ({
   picPhone,
   alamatToko,
   noNpwp,
+  phoneAgent,
   createdBy,
 }: AgentInput) => {
   try {
@@ -518,6 +520,7 @@ const addAgent = async ({
           picPhone,
           alamatToko,
           noNpwp,
+          phone: phoneAgent,
           createdBy,
         },
       }),
@@ -537,6 +540,7 @@ const editAgent = async ({
   picPhone,
   alamatToko,
   noNpwp,
+  phoneAgent,
   modifiedBy,
 }: AgentInput) => {
   try {
@@ -550,6 +554,7 @@ const editAgent = async ({
           picPhone,
           alamatToko,
           noNpwp,
+          phone: phoneAgent,
           modifiedBy,
         },
       }),
@@ -1001,6 +1006,7 @@ const addLabelProduct = async ({ data }: addLabelsProduct) => {
 
           const insertStock = await tx.stokPorudct.createMany({
             data: finalResult,
+            skipDuplicates: true,
           });
 
           return { insertStock, manyProduct, duplicateCount };

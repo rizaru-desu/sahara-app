@@ -64,6 +64,7 @@ model Agent {
   customerName String   @unique(map: "customerName") @db.VarChar(255)
   email        String   @db.VarChar(255)
   noNpwp       String?  @db.VarChar(50)
+  phone     String   @db.VarChar(255)
   picName      String   @db.VarChar(255)
   picPhone     String   @db.VarChar(255)
 
@@ -156,7 +157,7 @@ model LabelProduct {
 
 model LabelBox {
   labelBoxId   String              @id @default(uuid()) @db.VarChar(255)
-  labelCodeBox String              @db.VarChar(255)
+  labelCodeBox String              @unique @db.VarChar(255)
   leader       String              @db.VarChar(255)
   createdAt    DateTime            @default(now())
   modifedAt    DateTime            @updatedAt
@@ -178,7 +179,7 @@ model StokPorudct {
   weight        Decimal
   unit          String        @db.VarChar(255)
   expiredDate   DateTime
-  labelProducts String        @db.VarChar(255)
+  labelProducts String        @unique @db.VarChar(255)
   labelBoxs     String?       @db.VarChar(255)
   labelBoxId    String?       @db.VarChar(255)
   labelId       String        @db.VarChar(255)

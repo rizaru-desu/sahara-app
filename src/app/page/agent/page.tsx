@@ -31,6 +31,8 @@ interface AgentInput {
   picName: string;
   alamatToko: string;
   noNpwp?: string;
+  phoneAgent?: string;
+  phone?: string;
   createdBy?: string;
   modifiedBy?: string;
 }
@@ -54,6 +56,7 @@ export default function Home() {
     picName: "",
     alamatToko: "",
     noNpwp: undefined,
+    phoneAgent: "",
     createdBy: "",
     modifiedBy: "",
   });
@@ -65,6 +68,7 @@ export default function Home() {
     picName: "",
     alamatToko: "",
     noNpwp: undefined,
+    phone: "",
     createdBy: "",
     modifiedBy: "",
   });
@@ -202,6 +206,7 @@ export default function Home() {
       picName,
       picPhone,
       alamatToko,
+      phoneAgent,
       noNpwp,
     }: AgentInput) => {
       try {
@@ -214,6 +219,7 @@ export default function Home() {
           picPhone,
           alamatToko,
           noNpwp,
+          phoneAgent,
           createdBy: detailUsers.fullname,
         });
 
@@ -251,6 +257,7 @@ export default function Home() {
       picName,
       picPhone,
       alamatToko,
+      phone,
       noNpwp,
     }: AgentInput) => {
       try {
@@ -263,6 +270,7 @@ export default function Home() {
           picName,
           picPhone,
           alamatToko,
+          phoneAgent: phone,
           noNpwp,
           modifiedBy: detailUsers.fullname,
         });
@@ -413,6 +421,20 @@ export default function Home() {
                   variant="outlined"
                   fullWidth
                   inputProps={{ maxLength: 15 }}
+                  onChange={handleInputChangeAddAgent}
+                />
+
+                <TextField
+                  name="phoneAgent"
+                  id="phoneAgent"
+                  label="Phone Agent"
+                  type={"text"}
+                  size="small"
+                  placeholder="+62xx"
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
                   onChange={handleInputChangeAddAgent}
                 />
 
@@ -568,6 +590,14 @@ export default function Home() {
                     },
                   },
                   {
+                    field: "phone",
+                    headerName: "Phone Agent",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
                     field: "noNpwp",
                     headerName: "NPWP",
                     minWidth: 250,
@@ -720,6 +750,21 @@ export default function Home() {
                   value={(agentEditInput?.noNpwp || "")
                     .toString()
                     .replace(/[^0-9]/g, "")}
+                  onChange={handleInputChangeEditAgent}
+                />
+
+                <TextField
+                  name="phone"
+                  id="phone"
+                  label="Phone Agent"
+                  type={"text"}
+                  size="small"
+                  placeholder="+62xx"
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                  value={agentEditInput.phone}
                   onChange={handleInputChangeEditAgent}
                 />
 

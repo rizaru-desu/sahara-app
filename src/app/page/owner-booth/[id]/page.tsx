@@ -259,14 +259,7 @@ export default function Home({ params }: { params: { id: string } }) {
                     headerAlign: "center",
                     editable: false,
                   },
-                  {
-                    field: "phone",
-                    headerName: "No. HP",
-                    minWidth: 350,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
+
                   {
                     field: "email",
                     headerName: "Email",

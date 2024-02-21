@@ -258,124 +258,125 @@ export default function Home() {
               }}
             />
 
-            <DataGrid
-              pagination={true}
-              autoHeight
-              getRowHeight={() => "auto"}
-              rows={listLoyalty}
-              getRowId={(rows) => rows.pointId}
-              disableRowSelectionOnClick
-              columns={[
-                {
-                  field: "actions",
-                  headerName: "Actions",
-                  hideSortIcons: true,
-                  disableColumnMenu: true,
-                  minWidth: 325,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                  renderCell: (params) => {
-                    return (
-                      <div className="grid grid-cols-2 my-2 place-content-center place-items-center">
-                        <button
-                          type="button"
-                          className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                          onClick={(e: any) => {
-                            e.preventDefault();
+            <div className="w-auto h-[700px]">
+              <DataGrid
+                pagination={true}
+                getRowHeight={() => "auto"}
+                rows={listLoyalty}
+                getRowId={(rows) => rows.pointId}
+                disableRowSelectionOnClick
+                columns={[
+                  {
+                    field: "actions",
+                    headerName: "Actions",
+                    hideSortIcons: true,
+                    disableColumnMenu: true,
+                    minWidth: 325,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                    renderCell: (params) => {
+                      return (
+                        <div className="grid grid-cols-2 my-2 place-content-center place-items-center">
+                          <button
+                            type="button"
+                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                            onClick={(e: any) => {
+                              e.preventDefault();
 
-                            router.push(`/page/point-loyalty/${params.id}`);
-                          }}
-                        >
-                          Log
-                        </button>
+                              router.push(`/page/point-loyalty/${params.id}`);
+                            }}
+                          >
+                            Log
+                          </button>
 
-                        <button
-                          type="button"
-                          className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                          onClick={(e: any) => {
-                            e.preventDefault();
+                          <button
+                            type="button"
+                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                            onClick={(e: any) => {
+                              e.preventDefault();
 
-                            const findPoint = _.find(listLoyalty, {
-                              pointId: params.id,
-                            });
-                            setUserCurrentPoint(findPoint);
-                            setPenaltyOpen(true);
-                          }}
-                        >
-                          Penalty
-                        </button>
-                      </div>
-                    );
+                              const findPoint = _.find(listLoyalty, {
+                                pointId: params.id,
+                              });
+                              setUserCurrentPoint(findPoint);
+                              setPenaltyOpen(true);
+                            }}
+                          >
+                            Penalty
+                          </button>
+                        </div>
+                      );
+                    },
                   },
-                },
-                {
-                  field: "fullname",
-                  headerName: "Fullname",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "email",
-                  headerName: "Email",
-                  minWidth: 250,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "phone",
-                  headerName: "Phone",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
+                  {
+                    field: "fullname",
+                    headerName: "Fullname",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "email",
+                    headerName: "Email",
+                    minWidth: 250,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "phone",
+                    headerName: "Phone",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
 
-                {
-                  field: "loyaltyPoint",
-                  headerName: "Loyalty Point",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "createdBy",
-                  headerName: "Created By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "createdAt",
-                  headerName: "Created At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-                {
-                  field: "modifiedBy",
-                  headerName: "Modified By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "modifedAt",
-                  headerName: "Modifed At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-              ]}
-            />
+                  {
+                    field: "loyaltyPoint",
+                    headerName: "Loyalty Point",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "createdBy",
+                    headerName: "Created By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "createdAt",
+                    headerName: "Created At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                  {
+                    field: "modifiedBy",
+                    headerName: "Modified By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "modifedAt",
+                    headerName: "Modifed At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                ]}
+              />
+            </div>
 
             <div className="flex justify-center py-4">
               <Pagination

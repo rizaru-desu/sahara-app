@@ -275,223 +275,224 @@ export default function Home() {
               }}
             />
 
-            <DataGrid
-              pagination={true}
-              autoHeight
-              getRowHeight={() => "auto"}
-              rows={listDeliveryOrder}
-              getRowId={(rows) => rows.suratJalanId}
-              disableRowSelectionOnClick
-              columns={[
-                {
-                  field: "actions",
-                  headerName: "Actions",
-                  hideSortIcons: true,
-                  disableColumnMenu: true,
-                  minWidth: 325,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                  renderCell: (params) => {
-                    const statusComplete =
-                      params.row.status === 3 ? true : false;
-                    return (
-                      <div className="grid grid-cols-4 gap-5 my-2 place-content-center place-items-center">
-                        <button
-                          type="button"
-                          disabled={statusComplete}
-                          className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                          onClick={(e: any) => {
-                            e.preventDefault();
+            <div className="w-auto h-[700px]">
+              <DataGrid
+                pagination={true}
+                getRowHeight={() => "auto"}
+                rows={listDeliveryOrder}
+                getRowId={(rows) => rows.suratJalanId}
+                disableRowSelectionOnClick
+                columns={[
+                  {
+                    field: "actions",
+                    headerName: "Actions",
+                    hideSortIcons: true,
+                    disableColumnMenu: true,
+                    minWidth: 325,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                    renderCell: (params) => {
+                      const statusComplete =
+                        params.row.status === 3 ? true : false;
+                      return (
+                        <div className="grid grid-cols-4 gap-5 my-2 place-content-center place-items-center">
+                          <button
+                            type="button"
+                            disabled={statusComplete}
+                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                            onClick={(e: any) => {
+                              e.preventDefault();
 
-                            router.push(`/page/delivery-order/${params.id}`);
-                          }}
-                        >
-                          List Product
-                        </button>
+                              router.push(`/page/delivery-order/${params.id}`);
+                            }}
+                          >
+                            List Product
+                          </button>
 
-                        <button
-                          type="button"
-                          className={`${
-                            params.row.status === 1 ? "block" : "hidden"
-                          } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
-                          onClick={async (e: any) => {
-                            e.preventDefault();
+                          <button
+                            type="button"
+                            className={`${
+                              params.row.status === 1 ? "block" : "hidden"
+                            } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
+                            onClick={async (e: any) => {
+                              e.preventDefault();
 
-                            getAllDeliveryOrderGenerate({
-                              suratJalanId: params.id.toString(),
-                            });
-                          }}
-                        >
-                          Submit DR
-                        </button>
+                              getAllDeliveryOrderGenerate({
+                                suratJalanId: params.id.toString(),
+                              });
+                            }}
+                          >
+                            Submit DR
+                          </button>
 
-                        <button
-                          type="button"
-                          className={`${
-                            params.row.status === 2 ? "block" : "hidden"
-                          } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
-                          onClick={async (e: any) => {
-                            e.preventDefault();
+                          <button
+                            type="button"
+                            className={`${
+                              params.row.status === 2 ? "block" : "hidden"
+                            } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
+                            onClick={async (e: any) => {
+                              e.preventDefault();
 
-                            getAllDataProduct({
-                              suratJalanId: params.id.toString(),
-                            });
-                            setOpenRecaive(true);
-                          }}
-                        >
-                          Recaive
-                        </button>
+                              getAllDataProduct({
+                                suratJalanId: params.id.toString(),
+                              });
+                              setOpenRecaive(true);
+                            }}
+                          >
+                            Recaive
+                          </button>
 
-                        <button
-                          type="button"
-                          className={`${
-                            params.row.status === 1 ? "block" : "hidden"
-                          } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
-                          onClick={(e: any) => {
-                            e.preventDefault();
-                          }}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    );
+                          <button
+                            type="button"
+                            className={`${
+                              params.row.status === 1 ? "block" : "hidden"
+                            } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
+                            onClick={(e: any) => {
+                              e.preventDefault();
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      );
+                    },
                   },
-                },
-                {
-                  field: "noSurat",
-                  headerName: "Nomer Surat",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "orderNo",
-                  headerName: "Order No",
-                  minWidth: 250,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "shippingDate",
-                  headerName: "Shipping Date",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-
-                {
-                  field: "deliveryAddress",
-                  headerName: "Delivery Address",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "totalWeight",
-                  headerName: "Total Weight",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "status",
-                  headerName: "Status",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                  renderCell: (params) => {
-                    const status = {
-                      1: "Create",
-                      2: "OnDelivery",
-                      3: "Recaive",
-                      4: "Cancel",
-                    } as any;
-
-                    const result = status[params.value];
-                    return <span className="text-black">{result}</span>;
+                  {
+                    field: "noSurat",
+                    headerName: "Nomer Surat",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
                   },
-                },
-                {
-                  field: "deliveryNote",
-                  headerName: "Delivery Note",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "recaiveDate",
-                  headerName: "Recaive Date",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                  valueFormatter: (params: any) => {
-                    return params?.value
-                      ? moment(params?.value).format("DD/MM/YYYY hh:mm")
-                      : null;
+                  {
+                    field: "orderNo",
+                    headerName: "Order No",
+                    minWidth: 250,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
                   },
-                },
-                {
-                  field: "recaiveBy",
-                  headerName: "Recaive By",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "recaiveNote",
-                  headerName: "Recaive Note",
-                  minWidth: 250,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "createdBy",
-                  headerName: "Created By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
+                  {
+                    field: "shippingDate",
+                    headerName: "Shipping Date",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
 
-                {
-                  field: "createdAt",
-                  headerName: "Created At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-                {
-                  field: "modifiedBy",
-                  headerName: "Modified By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "modifedAt",
-                  headerName: "Modifed At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-              ]}
-            />
+                  {
+                    field: "deliveryAddress",
+                    headerName: "Delivery Address",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "totalWeight",
+                    headerName: "Total Weight",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "status",
+                    headerName: "Status",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                    renderCell: (params) => {
+                      const status = {
+                        1: "Create",
+                        2: "OnDelivery",
+                        3: "Recaive",
+                        4: "Cancel",
+                      } as any;
+
+                      const result = status[params.value];
+                      return <span className="text-black">{result}</span>;
+                    },
+                  },
+                  {
+                    field: "deliveryNote",
+                    headerName: "Delivery Note",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "recaiveDate",
+                    headerName: "Recaive Date",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                    valueFormatter: (params: any) => {
+                      return params?.value
+                        ? moment(params?.value).format("DD/MM/YYYY hh:mm")
+                        : null;
+                    },
+                  },
+                  {
+                    field: "recaiveBy",
+                    headerName: "Recaive By",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "recaiveNote",
+                    headerName: "Recaive Note",
+                    minWidth: 250,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "createdBy",
+                    headerName: "Created By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+
+                  {
+                    field: "createdAt",
+                    headerName: "Created At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                  {
+                    field: "modifiedBy",
+                    headerName: "Modified By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "modifedAt",
+                    headerName: "Modifed At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                ]}
+              />
+            </div>
 
             <div className="flex justify-center py-4">
               <Pagination

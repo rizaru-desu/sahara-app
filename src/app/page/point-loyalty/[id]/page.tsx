@@ -186,104 +186,105 @@ export default function Home() {
               }}
             />
 
-            <DataGrid
-              pagination={true}
-              autoHeight
-              getRowHeight={() => "auto"}
-              rows={listLoyaltyLog}
-              getRowId={(rows) => rows.pointLogId}
-              disableRowSelectionOnClick
-              columns={[
-                {
-                  field: "productName",
-                  headerName: "ProductName",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "productCode",
-                  headerName: "Product Code",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "loyaltyPoint",
-                  headerName: "Point",
-                  minWidth: 150,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "remark",
-                  headerName: "Remarks",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "labelProducts",
-                  headerName: "Product Label",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "scanDate",
-                  headerName: "Scan Date",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) => {
-                    if (!_.isEmpty(params.value)) {
-                      return moment(params?.value ?? new Date()).format(
-                        "DD/MM/YYYY hh:mm"
-                      );
-                    } else {
-                      return null;
-                    }
+            <div className="w-auto h-[700px]">
+              <DataGrid
+                pagination={true}
+                getRowHeight={() => "auto"}
+                rows={listLoyaltyLog}
+                getRowId={(rows) => rows.pointLogId}
+                disableRowSelectionOnClick
+                columns={[
+                  {
+                    field: "productName",
+                    headerName: "ProductName",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
                   },
-                },
-                {
-                  field: "createdBy",
-                  headerName: "Created By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "createdAt",
-                  headerName: "Created At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-                {
-                  field: "modifiedBy",
-                  headerName: "Modified By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "modifedAt",
-                  headerName: "Modifed At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-              ]}
-            />
+                  {
+                    field: "productCode",
+                    headerName: "Product Code",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "loyaltyPoint",
+                    headerName: "Point",
+                    minWidth: 150,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "remark",
+                    headerName: "Remarks",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "labelProducts",
+                    headerName: "Product Label",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "scanDate",
+                    headerName: "Scan Date",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) => {
+                      if (!_.isEmpty(params.value)) {
+                        return moment(params?.value ?? new Date()).format(
+                          "DD/MM/YYYY hh:mm"
+                        );
+                      } else {
+                        return null;
+                      }
+                    },
+                  },
+                  {
+                    field: "createdBy",
+                    headerName: "Created By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "createdAt",
+                    headerName: "Created At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                  {
+                    field: "modifiedBy",
+                    headerName: "Modified By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "modifedAt",
+                    headerName: "Modifed At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                ]}
+              />
+            </div>
 
             <div className="flex justify-center py-4">
               <Pagination

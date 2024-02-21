@@ -561,185 +561,188 @@ export default function Home() {
                 }}
               />
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rowSelection={false}
-                rows={listUser}
-                columns={[
-                  {
-                    field: "actions",
-                    headerName: "Actions",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    minWidth: 325,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <div className="grid grid-cols-2 gap-2 my-2 place-content-center place-items-center">
-                          <button
-                            type="button"
-                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                            onClick={(e: any) => {
-                              e.preventDefault();
+              <div className="w-auto h-[700px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rowSelection={false}
+                  rows={listUser}
+                  columns={[
+                    {
+                      field: "actions",
+                      headerName: "Actions",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      minWidth: 325,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <div className="grid grid-cols-2 gap-2 my-2 place-content-center place-items-center">
+                            <button
+                              type="button"
+                              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                              onClick={(e: any) => {
+                                e.preventDefault();
 
-                              const findId = _.find(listUser, {
-                                id: params.id,
+                                const findId = _.find(listUser, {
+                                  id: params.id,
+                                });
+                                setInputEditUser(findId);
+
+                                setEditOpen(true);
+                                setUserId(params.id.toString());
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                              onClick={(e: any) => {
+                                e.preventDefault();
+
+                                const findId = _.find(listUser, {
+                                  id: params.id,
+                                });
+
+                                const finalResult = _.map(
+                                  findId.roles,
+                                  (item) => {
+                                    return Object.assign(
+                                      {
+                                        id: item.roleId,
+                                      },
+                                      _.omit(item, "roleId")
+                                    );
+                                  }
+                                );
+
+                                setAddRoleOpen(true);
+                                setUserId(params.id.toString());
+                                setUserRoles(finalResult);
+                              }}
+                            >
+                              Role
+                            </button>
+                          </div>
+                        );
+                      },
+                    },
+                    {
+                      field: "fullname",
+                      headerName: "Nama Lengkap",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "email",
+                      headerName: "Email",
+                      minWidth: 250,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "phone",
+                      headerName: "No. HP",
+                      minWidth: 250,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "dateOfBirth",
+                      headerName: "Tanggal Lahir",
+                      minWidth: 250,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "leader",
+                      headerName: "Leader / Atasan",
+                      minWidth: 250,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "roles",
+                      headerName: "Roles",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <span className="text-black">
+                            {_.map(params.value, (item) => item.value).join(
+                              ","
+                            )}
+                          </span>
+                        );
+                      },
+                    },
+                    {
+                      field: "inActive",
+                      headerName: "In Active",
+                      minWidth: 100,
+                      align: "center",
+                      headerAlign: "center",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      renderCell: (params) => {
+                        return (
+                          <Checkbox
+                            checked={params.value}
+                            onChange={(
+                              event: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                              event.stopPropagation();
+                              activeUser({
+                                userId: params.id.toString(),
+                                value: event.target.checked,
                               });
-                              setInputEditUser(findId);
-
-                              setEditOpen(true);
-                              setUserId(params.id.toString());
                             }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                            onClick={(e: any) => {
-                              e.preventDefault();
-
-                              const findId = _.find(listUser, {
-                                id: params.id,
-                              });
-
-                              const finalResult = _.map(
-                                findId.roles,
-                                (item) => {
-                                  return Object.assign(
-                                    {
-                                      id: item.roleId,
-                                    },
-                                    _.omit(item, "roleId")
-                                  );
-                                }
-                              );
-
-                              setAddRoleOpen(true);
-                              setUserId(params.id.toString());
-                              setUserRoles(finalResult);
-                            }}
-                          >
-                            Role
-                          </button>
-                        </div>
-                      );
+                            inputProps={{ "aria-label": "controlled" }}
+                          />
+                        );
+                      },
                     },
-                  },
-                  {
-                    field: "fullname",
-                    headerName: "Nama Lengkap",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "email",
-                    headerName: "Email",
-                    minWidth: 250,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "phone",
-                    headerName: "No. HP",
-                    minWidth: 250,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "dateOfBirth",
-                    headerName: "Tanggal Lahir",
-                    minWidth: 250,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "leader",
-                    headerName: "Leader / Atasan",
-                    minWidth: 250,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "roles",
-                    headerName: "Roles",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <span className="text-black">
-                          {_.map(params.value, (item) => item.value).join(",")}
-                        </span>
-                      );
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
                     },
-                  },
-                  {
-                    field: "inActive",
-                    headerName: "In Active",
-                    minWidth: 100,
-                    align: "center",
-                    headerAlign: "center",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    renderCell: (params) => {
-                      return (
-                        <Checkbox
-                          checked={params.value}
-                          onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                          ) => {
-                            event.stopPropagation();
-                            activeUser({
-                              userId: params.id.toString(),
-                              value: event.target.checked,
-                            });
-                          }}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      );
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
                     },
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex justify-center py-4">
                 <Pagination
@@ -931,49 +934,50 @@ export default function Home() {
                 </button>
               </div>
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rows={isUserRoles}
-                checkboxSelection
-                onRowSelectionModelChange={(ids: any) => {
-                  const arrayId = _.split(ids, ",");
-                  const filteredData = _.filter(isUserRoles, (item: any) =>
-                    arrayId.includes(item.id)
-                  );
+              <div className="w-auto h-[200px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rows={isUserRoles}
+                  checkboxSelection
+                  onRowSelectionModelChange={(ids: any) => {
+                    const arrayId = _.split(ids, ",");
+                    const filteredData = _.filter(isUserRoles, (item: any) =>
+                      arrayId.includes(item.id)
+                    );
 
-                  setSelectRoles(filteredData);
-                }}
-                slots={{
-                  toolbar: () => (
-                    <button
-                      onClick={(e: any) => {
-                        e.preventDefault();
-                        deletRoleUser({ userId, roles: isSelectRoles });
-                        setAddRoleOpen(false);
-                        setSelectRoles([]);
-                      }}
-                      className={`${
-                        !_.isEmpty(isSelectRoles) ? "block" : "hidden"
-                      } self-start m-2 justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
-                    >
-                      Delete Roles
-                    </button>
-                  ),
-                }}
-                columns={[
-                  {
-                    field: "value",
-                    headerName: "Roles",
-                    minWidth: 250,
-                    width: 500,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                ]}
-              />
+                    setSelectRoles(filteredData);
+                  }}
+                  slots={{
+                    toolbar: () => (
+                      <button
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          deletRoleUser({ userId, roles: isSelectRoles });
+                          setAddRoleOpen(false);
+                          setSelectRoles([]);
+                        }}
+                        className={`${
+                          !_.isEmpty(isSelectRoles) ? "block" : "hidden"
+                        } self-start m-2 justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
+                      >
+                        Delete Roles
+                      </button>
+                    ),
+                  }}
+                  columns={[
+                    {
+                      field: "value",
+                      headerName: "Roles",
+                      minWidth: 250,
+                      width: 500,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                  ]}
+                />
+              </div>
             </DialogContent>
           </Dialog>
         </Suspense>

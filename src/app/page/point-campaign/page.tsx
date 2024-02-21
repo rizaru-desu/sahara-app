@@ -601,184 +601,185 @@ export default function Home() {
                 }}
               />
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                getRowId={(row) => row.campaignId}
-                rows={listCampaign}
-                disableRowSelectionOnClick
-                columns={[
-                  {
-                    field: "actions",
-                    headerName: "Actions",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    minWidth: 150,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <div className="grid grid-cols-1 my-2 place-content-center place-items-center">
-                          <button
-                            type="button"
-                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                            onClick={(e: any) => {
-                              e.preventDefault();
-                              setEditOpen(true);
+              <div className="w-auto h-[700px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  getRowId={(row) => row.campaignId}
+                  rows={listCampaign}
+                  disableRowSelectionOnClick
+                  columns={[
+                    {
+                      field: "actions",
+                      headerName: "Actions",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      minWidth: 150,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <div className="grid grid-cols-1 my-2 place-content-center place-items-center">
+                            <button
+                              type="button"
+                              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                              onClick={(e: any) => {
+                                e.preventDefault();
+                                setEditOpen(true);
 
-                              const findCampaign = _.find(listCampaign, {
-                                campaignId: params.id,
+                                const findCampaign = _.find(listCampaign, {
+                                  campaignId: params.id,
+                                });
+
+                                const joinedArray = _.concat(
+                                  listProdut,
+                                  findCampaign.listProduct
+                                );
+
+                                setCurrentProduct(findCampaign.listProduct);
+                                setListEditProduct(joinedArray);
+                                setSelectEditProduct(findCampaign.listProduct);
+
+                                setCampaignInput(findCampaign);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        );
+                      },
+                    },
+                    {
+                      field: "inActive",
+                      headerName: "In Active",
+                      minWidth: 70,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <Checkbox
+                            checked={params.value}
+                            onChange={(
+                              event: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                              event.stopPropagation();
+                              activeCampaign({
+                                campaignId: params.id.toString(),
+                                value: event.target.checked,
                               });
-
-                              const joinedArray = _.concat(
-                                listProdut,
-                                findCampaign.listProduct
-                              );
-
-                              setCurrentProduct(findCampaign.listProduct);
-                              setListEditProduct(joinedArray);
-                              setSelectEditProduct(findCampaign.listProduct);
-
-                              setCampaignInput(findCampaign);
                             }}
-                          >
-                            Edit
-                          </button>
-                        </div>
-                      );
-                    },
-                  },
-                  {
-                    field: "inActive",
-                    headerName: "In Active",
-                    minWidth: 70,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <Checkbox
-                          checked={params.value}
-                          onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                          ) => {
-                            event.stopPropagation();
-                            activeCampaign({
-                              campaignId: params.id.toString(),
-                              value: event.target.checked,
-                            });
-                          }}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
-                      );
-                    },
-                  },
-                  {
-                    field: "campaignName",
-                    headerName: "CampaignName",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "startDate",
-                    headerName: "Start Date",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY"),
-                  },
-                  {
-                    field: "endDate",
-                    headerName: "End Date",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY"),
-                  },
-                  {
-                    field: "loyaltyPoint",
-                    headerName: "Point",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "photo",
-                    headerName: "Image",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      const onClick = (e: any) => {
-                        e.stopPropagation();
-
-                        new ImageViewer({
-                          images: [
-                            {
-                              mainUrl: params.value,
-                            },
-                          ],
-                          showThumbnails: false,
-                          isZoomable: false,
-                          stretchImages: false,
-                        });
-                      };
-
-                      return (
-                        <button className="m-4" onClick={onClick}>
-                          <img
-                            src={params.value}
-                            alt="Phoots"
-                            className="w-full max-w-[400px] h-auto"
+                            inputProps={{ "aria-label": "controlled" }}
                           />
-                        </button>
-                      );
+                        );
+                      },
                     },
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+                    {
+                      field: "campaignName",
+                      headerName: "CampaignName",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "startDate",
+                      headerName: "Start Date",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY"),
+                    },
+                    {
+                      field: "endDate",
+                      headerName: "End Date",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY"),
+                    },
+                    {
+                      field: "loyaltyPoint",
+                      headerName: "Point",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "photo",
+                      headerName: "Image",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        const onClick = (e: any) => {
+                          e.stopPropagation();
+
+                          new ImageViewer({
+                            images: [
+                              {
+                                mainUrl: params.value,
+                              },
+                            ],
+                            showThumbnails: false,
+                            isZoomable: false,
+                            stretchImages: false,
+                          });
+                        };
+
+                        return (
+                          <button className="m-4" onClick={onClick}>
+                            <img
+                              src={params.value}
+                              alt="Phoots"
+                              className="w-full max-w-[400px] h-auto"
+                            />
+                          </button>
+                        );
+                      },
+                    },
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex justify-center py-4">
                 <Pagination

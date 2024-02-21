@@ -509,159 +509,160 @@ export default function Home() {
                 </button>
               </div>
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rowSelection={false}
-                rows={listAgent}
-                columns={[
-                  {
-                    field: "actions",
-                    headerName: "Actions",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    minWidth: 325,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params: any) => {
-                      return (
-                        <div className="grid grid-cols-1 gap-2 my-2 place-content-center place-items-center">
-                          <Button
-                            className="bg-red-700 text-sm hover:bg-red-300"
-                            variant="contained"
-                            size="small"
-                            onClick={(e: any) => {
-                              e.preventDefault();
+              <div className="w-auto h-[700px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rowSelection={false}
+                  rows={listAgent}
+                  columns={[
+                    {
+                      field: "actions",
+                      headerName: "Actions",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      minWidth: 325,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params: any) => {
+                        return (
+                          <div className="grid grid-cols-1 gap-2 my-2 place-content-center place-items-center">
+                            <Button
+                              className="bg-red-700 text-sm hover:bg-red-300"
+                              variant="contained"
+                              size="small"
+                              onClick={(e: any) => {
+                                e.preventDefault();
 
-                              const findAgent = _.find(listAgent, {
-                                id: params.id,
-                              });
+                                const findAgent = _.find(listAgent, {
+                                  id: params.id,
+                                });
 
-                              const updatedAgent = _.mapKeys(
-                                findAgent,
-                                (value, key) => {
-                                  if (key === "id") {
-                                    return "agentId";
+                                const updatedAgent = _.mapKeys(
+                                  findAgent,
+                                  (value, key) => {
+                                    if (key === "id") {
+                                      return "agentId";
+                                    }
+                                    return key;
                                   }
-                                  return key;
-                                }
-                              ) as any;
+                                ) as any;
 
-                              setEditOpen(true);
-                              setAgentEditInput(updatedAgent);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                        </div>
-                      );
+                                setEditOpen(true);
+                                setAgentEditInput(updatedAgent);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </div>
+                        );
+                      },
                     },
-                  },
-                  {
-                    field: "customerName",
-                    headerName: "Customer Name",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "alamatToko",
-                    headerName: "Alamat",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    minWidth: 325,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <div className="grid grid-rows-1 gap-2 my-2 place-content-center place-items-center">
-                          <a
-                            href={`https://maps.google.com?q=${params.value}`}
-                            target="_blank"
-                          >
-                            <span>{params.value}</span>
-                          </a>
-                        </div>
-                      );
+                    {
+                      field: "customerName",
+                      headerName: "Customer Name",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
                     },
-                  },
-                  {
-                    field: "phone",
-                    headerName: "Phone Agent",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "noNpwp",
-                    headerName: "NPWP",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "picName",
-                    headerName: "PIC Name",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "picPhone",
-                    headerName: "PIC Phone",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "email",
-                    headerName: "Email",
-                    minWidth: 250,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+                    {
+                      field: "alamatToko",
+                      headerName: "Alamat",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      minWidth: 325,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <div className="grid grid-rows-1 gap-2 my-2 place-content-center place-items-center">
+                            <a
+                              href={`https://maps.google.com?q=${params.value}`}
+                              target="_blank"
+                            >
+                              <span>{params.value}</span>
+                            </a>
+                          </div>
+                        );
+                      },
+                    },
+                    {
+                      field: "phone",
+                      headerName: "Phone Agent",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "noNpwp",
+                      headerName: "NPWP",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "picName",
+                      headerName: "PIC Name",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "picPhone",
+                      headerName: "PIC Phone",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "email",
+                      headerName: "Email",
+                      minWidth: 250,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex justify-center py-4">
                 <Pagination

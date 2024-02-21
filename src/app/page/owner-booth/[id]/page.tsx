@@ -233,117 +233,118 @@ export default function Home({ params }: { params: { id: string } }) {
                 </button>
               </div>
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rowSelection={false}
-                rows={listBoothMember}
-                columns={[
-                  {
-                    field: "fullname",
-                    headerName: "Member Name",
-                    minWidth: 350,
-                    flex: 1,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "alamatBooth",
-                    headerName: "Alamat Member",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    minWidth: 350,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-
-                  {
-                    field: "email",
-                    headerName: "Email",
-                    minWidth: 350,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "phone",
-                    headerName: "No. Hp",
-                    minWidth: 350,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "photoBooth",
-                    headerName: "Photo Booth",
-                    minWidth: 350,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      const onClick = (e: any) => {
-                        e.stopPropagation();
-
-                        new ImageViewer({
-                          images: [
-                            {
-                              mainUrl: params.value,
-                            },
-                          ],
-                          showThumbnails: false,
-                          isZoomable: false,
-                          stretchImages: false,
-                        });
-                      };
-
-                      return (
-                        <button className="m-4" onClick={onClick}>
-                          <img
-                            src={params.value}
-                            alt="PhotoBooth"
-                            className="w-full max-w-[400px] h-auto"
-                          />
-                        </button>
-                      );
+              <div className="w-auto h-[700px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rowSelection={false}
+                  rows={listBoothMember}
+                  columns={[
+                    {
+                      field: "fullname",
+                      headerName: "Member Name",
+                      minWidth: 350,
+                      flex: 1,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
                     },
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+                    {
+                      field: "alamatBooth",
+                      headerName: "Alamat Member",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      minWidth: 350,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+
+                    {
+                      field: "email",
+                      headerName: "Email",
+                      minWidth: 350,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "phone",
+                      headerName: "No. Hp",
+                      minWidth: 350,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "photoBooth",
+                      headerName: "Photo Booth",
+                      minWidth: 350,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        const onClick = (e: any) => {
+                          e.stopPropagation();
+
+                          new ImageViewer({
+                            images: [
+                              {
+                                mainUrl: params.value,
+                              },
+                            ],
+                            showThumbnails: false,
+                            isZoomable: false,
+                            stretchImages: false,
+                          });
+                        };
+
+                        return (
+                          <button className="m-4" onClick={onClick}>
+                            <img
+                              src={params.value}
+                              alt="PhotoBooth"
+                              className="w-full max-w-[400px] h-auto"
+                            />
+                          </button>
+                        );
+                      },
+                    },
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                    },
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex justify-center py-4">
                 <Pagination

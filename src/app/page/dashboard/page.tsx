@@ -103,30 +103,31 @@ export default function Home() {
         <div className="p-4 xl:ml-80 gap-12">
           <div className="grid lg:grid-cols-2 grid-cols-1 place-content-center place-items-center gap-5">
             <div className="bg-white gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex ">
-              <DataGrid
-                autoHeight
-                getRowHeight={() => "auto"}
-                rows={listPoint}
-                disableRowSelectionOnClick
-                columns={[
-                  {
-                    field: "fullName",
-                    headerName: "Fullname",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "loyaltyPoint",
-                    headerName: "Loyalty Point",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                ]}
-              />
+              <div className="w-auto h-[300px]">
+                <DataGrid
+                  getRowHeight={() => "auto"}
+                  rows={listPoint}
+                  disableRowSelectionOnClick
+                  columns={[
+                    {
+                      field: "fullName",
+                      headerName: "Fullname",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "loyaltyPoint",
+                      headerName: "Loyalty Point",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                  ]}
+                />
+              </div>
             </div>
 
             <div className="bg-white gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex ">

@@ -332,169 +332,171 @@ export default function Home() {
               </div>
             </div>
 
-            <DataGrid
-              pagination={true}
-              autoHeight
-              getRowHeight={() => "auto"}
-              rows={listProduct}
-              getRowId={(rows) => rows.stockId}
-              checkboxSelection
-              disableRowSelectionOnClick
-              onRowSelectionModelChange={(ids: any) => {
-                const arrayId = _.split(ids, ",");
-                const filteredData = _.filter(listProduct, (item: any) =>
-                  arrayId.includes(item.stockId)
-                );
+            <div className="w-auto h-[700px]">
+              <DataGrid
+                pagination={true}
+                getRowHeight={() => "auto"}
+                rows={listProduct}
+                getRowId={(rows) => rows.stockId}
+                checkboxSelection
+                disableRowSelectionOnClick
+                onRowSelectionModelChange={(ids: any) => {
+                  const arrayId = _.split(ids, ",");
+                  const filteredData = _.filter(listProduct, (item: any) =>
+                    arrayId.includes(item.stockId)
+                  );
 
-                setSelectProduct(filteredData);
-              }}
-              slots={{
-                toolbar: () => (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const ws = XLSX.utils.json_to_sheet(selectProduct);
-                      const wb = XLSX.utils.book_new();
-                      XLSX.utils.book_append_sheet(wb, ws, "Stock Product");
-                      XLSX.writeFile(
-                        wb,
-                        `Stock Product ${moment().format("DD-MM-YYYY")}-${
-                          Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
-                        }.xlsx`
-                      );
-                    }}
-                    className={`${
-                      !_.isEmpty(selectProduct) ? "block" : "hidden"
-                    } self-start m-2 justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
-                  >
-                    Export
-                  </button>
-                ),
-              }}
-              columns={[
-                {
-                  field: "status",
-                  headerName: "Status",
-                  minWidth: 250,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                  renderCell: (params) => {
-                    const sampleNames: any = {
-                      1: "Created",
-                      2: "InStock",
-                      3: "OnDelivery",
-                      4: "Sold",
-                      5: "Expired",
-                      6: "Damage",
-                    };
+                  setSelectProduct(filteredData);
+                }}
+                slots={{
+                  toolbar: () => (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const ws = XLSX.utils.json_to_sheet(selectProduct);
+                        const wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, "Stock Product");
+                        XLSX.writeFile(
+                          wb,
+                          `Stock Product ${moment().format("DD-MM-YYYY")}-${
+                            Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000
+                          }.xlsx`
+                        );
+                      }}
+                      className={`${
+                        !_.isEmpty(selectProduct) ? "block" : "hidden"
+                      } self-start m-2 justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
+                    >
+                      Export
+                    </button>
+                  ),
+                }}
+                columns={[
+                  {
+                    field: "status",
+                    headerName: "Status",
+                    minWidth: 250,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                    renderCell: (params) => {
+                      const sampleNames: any = {
+                        1: "Created",
+                        2: "InStock",
+                        3: "OnDelivery",
+                        4: "Sold",
+                        5: "Expired",
+                        6: "Damage",
+                      };
 
-                    const statusText =
-                      (sampleNames[params.value] as any) || ("Unknown" as any);
+                      const statusText =
+                        (sampleNames[params.value] as any) ||
+                        ("Unknown" as any);
 
-                    return <span className="text-black">{statusText}</span>;
+                      return <span className="text-black">{statusText}</span>;
+                    },
                   },
-                },
-                {
-                  field: "location",
-                  headerName: "Location",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "productName",
-                  headerName: "Product Name",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "productCode",
-                  headerName: "Product Code",
-                  minWidth: 250,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "labelProducts",
-                  headerName: "Label Product",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
+                  {
+                    field: "location",
+                    headerName: "Location",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "productName",
+                    headerName: "Product Name",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "productCode",
+                    headerName: "Product Code",
+                    minWidth: 250,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "labelProducts",
+                    headerName: "Label Product",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
 
-                {
-                  field: "labelBoxs",
-                  headerName: "Label Box",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "weight",
-                  headerName: "wieght (kg)",
-                  minWidth: 50,
-                  align: "right",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "unit",
-                  headerName: "Unit",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "expiredDate",
-                  headerName: "Expired Date",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY"),
-                },
-                {
-                  field: "createdBy",
-                  headerName: "Created By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "createdAt",
-                  headerName: "Created At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-                {
-                  field: "modifiedBy",
-                  headerName: "Modified By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "modifedAt",
-                  headerName: "Modifed At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-              ]}
-            />
+                  {
+                    field: "labelBoxs",
+                    headerName: "Label Box",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "weight",
+                    headerName: "wieght (kg)",
+                    minWidth: 50,
+                    align: "right",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "unit",
+                    headerName: "Unit",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "expiredDate",
+                    headerName: "Expired Date",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY"),
+                  },
+                  {
+                    field: "createdBy",
+                    headerName: "Created By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "createdAt",
+                    headerName: "Created At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                  {
+                    field: "modifiedBy",
+                    headerName: "Modified By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "modifedAt",
+                    headerName: "Modifed At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                ]}
+              />
+            </div>
 
             <div className="flex justify-center py-4">
               <Pagination

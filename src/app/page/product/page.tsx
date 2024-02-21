@@ -517,93 +517,94 @@ export default function Home() {
                 </div>
               </div>
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rowSelection={false}
-                rows={listProduct}
-                columns={[
-                  {
-                    field: "basePoint",
-                    headerName: "Base Point",
-                    minWidth: 100,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "productCode",
-                    headerName: "Product Code",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "productName",
-                    headerName: "Product Name",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "weight",
-                    headerName: "Weight (Kg)",
-                    minWidth: 250,
-                    align: "right",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "unit",
-                    headerName: "Unit",
-                    minWidth: 250,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "expiredPeriod",
-                    headerName: "Expired Period",
-                    minWidth: 250,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+              <div className="w-auto h-[700px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rowSelection={false}
+                  rows={listProduct}
+                  columns={[
+                    {
+                      field: "basePoint",
+                      headerName: "Base Point",
+                      minWidth: 100,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "productCode",
+                      headerName: "Product Code",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "productName",
+                      headerName: "Product Name",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "weight",
+                      headerName: "Weight (Kg)",
+                      minWidth: 250,
+                      align: "right",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "unit",
+                      headerName: "Unit",
+                      minWidth: 250,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "expiredPeriod",
+                      headerName: "Expired Period",
+                      minWidth: 250,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex justify-center py-4">
                 <Pagination

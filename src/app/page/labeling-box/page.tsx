@@ -486,104 +486,105 @@ export default function Home() {
                 </form>
               </div>
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rows={scanOpen ? scanData : listLabel}
-                checkboxSelection
-                disableRowSelectionOnClick
-                /* sx={{
+              <div className="w-auto h-[300px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rows={scanOpen ? scanData : listLabel}
+                  checkboxSelection
+                  disableRowSelectionOnClick
+                  /* sx={{
                   "& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-columnHeaderTitleContainer":
                     {
                       display: "none",
                     },
                 }} */
-                onRowSelectionModelChange={(ids: any) => {
-                  const arrayId = _.split(ids, ",");
-                  const filteredData = _.filter(listLabel, (item: any) =>
-                    arrayId.includes(item.id)
-                  );
+                  onRowSelectionModelChange={(ids: any) => {
+                    const arrayId = _.split(ids, ",");
+                    const filteredData = _.filter(listLabel, (item: any) =>
+                      arrayId.includes(item.id)
+                    );
 
-                  setLabelId(arrayId);
-                  setSelectLabel(filteredData);
-                }}
-                columns={[
-                  {
-                    field: "productCode",
-                    headerName: "Product Code",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "labelCode",
-                    headerName: "Label Product Code",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "bestBefore",
-                    headerName: "Best Before",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY"),
-                  },
-                  {
-                    field: "printed",
-                    headerName: "Printed",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return params.value === 0 ? (
-                        <MdPrintDisabled />
-                      ) : (
-                        <MdPrint />
-                      );
+                    setLabelId(arrayId);
+                    setSelectLabel(filteredData);
+                  }}
+                  columns={[
+                    {
+                      field: "productCode",
+                      headerName: "Product Code",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
                     },
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+                    {
+                      field: "labelCode",
+                      headerName: "Label Product Code",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "bestBefore",
+                      headerName: "Best Before",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY"),
+                    },
+                    {
+                      field: "printed",
+                      headerName: "Printed",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return params.value === 0 ? (
+                          <MdPrintDisabled />
+                        ) : (
+                          <MdPrint />
+                        );
+                      },
+                    },
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               {scanOpen ? null : (
                 <div className="flex justify-center py-4">
@@ -613,124 +614,125 @@ export default function Home() {
                 }}
               />
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rows={listLabelBox}
-                checkboxSelection
-                disableRowSelectionOnClick
-                onRowSelectionModelChange={(ids: any) => {
-                  const arrayId = _.split(ids, ",");
-                  const filteredData = _.filter(listLabelBox, (item: any) =>
-                    arrayId.includes(item.id)
-                  );
-                  setLabelIdBox(arrayId);
-                  setSelectLabelBox(filteredData);
-                }}
-                slots={{
-                  toolbar: () => (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        exportLabel();
-                      }}
-                      className={`${
-                        !_.isEmpty(selectLabelBox) ? "block" : "hidden"
-                      } self-start m-2 justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
-                    >
-                      Export to printing
-                    </button>
-                  ),
-                }}
-                columns={[
-                  {
-                    field: "PackageDate",
-                    headerName: "Package Date",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY"),
-                  },
-                  {
-                    field: "labelCodeBox",
-                    headerName: "Label Box Code",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "totalProduct",
-                    headerName: "Total Product",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "leader",
-                    headerName: "Leader / Atasan",
-                    minWidth: 250,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "statusBox",
-                    headerName: "Status",
-                    minWidth: 250,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <span className="text-black">
-                          {params.value === 0
-                            ? "Generate"
-                            : params.value === 1
-                            ? "Printed"
-                            : "Canceled"}
-                        </span>
-                      );
+              <div className="w-auto h-[700px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rows={listLabelBox}
+                  checkboxSelection
+                  disableRowSelectionOnClick
+                  onRowSelectionModelChange={(ids: any) => {
+                    const arrayId = _.split(ids, ",");
+                    const filteredData = _.filter(listLabelBox, (item: any) =>
+                      arrayId.includes(item.id)
+                    );
+                    setLabelIdBox(arrayId);
+                    setSelectLabelBox(filteredData);
+                  }}
+                  slots={{
+                    toolbar: () => (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          exportLabel();
+                        }}
+                        className={`${
+                          !_.isEmpty(selectLabelBox) ? "block" : "hidden"
+                        } self-start m-2 justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
+                      >
+                        Export to printing
+                      </button>
+                    ),
+                  }}
+                  columns={[
+                    {
+                      field: "PackageDate",
+                      headerName: "Package Date",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY"),
                     },
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 250,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+                    {
+                      field: "labelCodeBox",
+                      headerName: "Label Box Code",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "totalProduct",
+                      headerName: "Total Product",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "leader",
+                      headerName: "Leader / Atasan",
+                      minWidth: 250,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "statusBox",
+                      headerName: "Status",
+                      minWidth: 250,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <span className="text-black">
+                            {params.value === 0
+                              ? "Generate"
+                              : params.value === 1
+                              ? "Printed"
+                              : "Canceled"}
+                          </span>
+                        );
+                      },
+                    },
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 250,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex justify-center py-4">
                 <Pagination

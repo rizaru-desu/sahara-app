@@ -144,94 +144,95 @@ export default function Home({ params }: { params: { id: string } }) {
 
         <Suspense fallback={<Loading />}>
           <div className="p-4 xl:ml-80 gap-12 min-h-screen">
-            <DataGrid
-              pagination={true}
-              autoHeight
-              getRowHeight={() => "auto"}
-              rows={listDeliveryOrder}
-              getRowId={(rows) => rows.suratJalanProductId}
-              disableRowSelectionOnClick
-              columns={[
-                {
-                  field: "labelBox",
-                  headerName: "Label Box",
-                  minWidth: 250,
-                  align: "left",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "box",
-                  headerName: "Product List",
-                  minWidth: 250,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                  renderCell: (params) => {
-                    return (
-                      <div className="flex flex-col gap-5">
-                        {_.map(params.value.labelProduct, (item: any) => {
-                          return (
-                            <span>
-                              [{item.productCode}] {item.productName}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    );
+            <div className="w-auto h-[700px]">
+              <DataGrid
+                pagination={true}
+                getRowHeight={() => "auto"}
+                rows={listDeliveryOrder}
+                getRowId={(rows) => rows.suratJalanProductId}
+                disableRowSelectionOnClick
+                columns={[
+                  {
+                    field: "labelBox",
+                    headerName: "Label Box",
+                    minWidth: 250,
+                    align: "left",
+                    headerAlign: "center",
+                    editable: false,
                   },
-                },
-                {
-                  field: "shipQty",
-                  headerName: "Ship Qty",
-                  minWidth: 50,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "recaivedQty",
-                  headerName: "Recaive Qty",
-                  minWidth: 50,
-                  align: "center",
-                  headerAlign: "center",
-                  editable: false,
-                },
-                {
-                  field: "createdBy",
-                  headerName: "Created By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
+                  {
+                    field: "box",
+                    headerName: "Product List",
+                    minWidth: 250,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                    renderCell: (params) => {
+                      return (
+                        <div className="flex flex-col gap-5">
+                          {_.map(params.value.labelProduct, (item: any) => {
+                            return (
+                              <span>
+                                [{item.productCode}] {item.productName}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    field: "shipQty",
+                    headerName: "Ship Qty",
+                    minWidth: 50,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "recaivedQty",
+                    headerName: "Recaive Qty",
+                    minWidth: 50,
+                    align: "center",
+                    headerAlign: "center",
+                    editable: false,
+                  },
+                  {
+                    field: "createdBy",
+                    headerName: "Created By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
 
-                {
-                  field: "createdAt",
-                  headerName: "Created At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-                {
-                  field: "modifiedBy",
-                  headerName: "Modified By",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                },
-                {
-                  field: "modifedAt",
-                  headerName: "Modifed At",
-                  headerAlign: "center",
-                  minWidth: 250,
-                  editable: false,
-                  valueFormatter: (params: any) =>
-                    moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                },
-              ]}
-            />
+                  {
+                    field: "createdAt",
+                    headerName: "Created At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                  {
+                    field: "modifiedBy",
+                    headerName: "Modified By",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                  },
+                  {
+                    field: "modifedAt",
+                    headerName: "Modifed At",
+                    headerAlign: "center",
+                    minWidth: 250,
+                    editable: false,
+                    valueFormatter: (params: any) =>
+                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                  },
+                ]}
+              />
+            </div>
 
             <div className="flex justify-center py-4">
               <Pagination

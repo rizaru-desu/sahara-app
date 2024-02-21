@@ -230,158 +230,159 @@ export default function Home() {
                 </button>
               </div>
 
-              <DataGrid
-                pagination={true}
-                autoHeight
-                getRowHeight={() => "auto"}
-                rowSelection={false}
-                rows={listBoothOwner}
-                columns={[
-                  {
-                    field: "actions",
-                    headerName: "Actions",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    minWidth: 325,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <div className="grid grid-cols-1 my-2 place-content-center place-items-center">
-                          <button
-                            type="button"
-                            className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-                            onClick={(e: any) => {
-                              e.preventDefault();
+              <div className="w-auto h-[700px]">
+                <DataGrid
+                  pagination={true}
+                  getRowHeight={() => "auto"}
+                  rowSelection={false}
+                  rows={listBoothOwner}
+                  columns={[
+                    {
+                      field: "actions",
+                      headerName: "Actions",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      minWidth: 325,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <div className="grid grid-cols-1 my-2 place-content-center place-items-center">
+                            <button
+                              type="button"
+                              className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                              onClick={(e: any) => {
+                                e.preventDefault();
 
-                              router.push(`/page/owner-booth/${params.id}`);
-                            }}
-                          >
-                            Booth Member
-                          </button>
-                        </div>
-                      );
+                                router.push(`/page/owner-booth/${params.id}`);
+                              }}
+                            >
+                              Booth Member
+                            </button>
+                          </div>
+                        );
+                      },
                     },
-                  },
-                  {
-                    field: "fullname",
-                    headerName: "Owner Name",
-                    minWidth: 350,
-                    flex: 1,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "alamatOwner",
-                    headerName: "Alamat Owner",
-                    hideSortIcons: true,
-                    disableColumnMenu: true,
-                    minWidth: 350,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                    renderCell: (params) => {
-                      return (
-                        <div className="grid grid-rows-1 gap-2 my-2 place-content-center place-items-center">
-                          <a
-                            href={`https://maps.google.com?q=${params.value}`}
-                            target="_blank"
-                          >
-                            <span>{params.value}</span>
-                          </a>
-                        </div>
-                      );
+                    {
+                      field: "fullname",
+                      headerName: "Owner Name",
+                      minWidth: 350,
+                      flex: 1,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
                     },
-                  },
-                  {
-                    field: "phone",
-                    headerName: "No. HP",
-                    minWidth: 350,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "email",
-                    headerName: "Email",
-                    minWidth: 350,
-                    align: "left",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "dateEstablishment",
-                    headerName: "Sejak Tahun",
-                    minWidth: 350,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "totalBooth",
-                    headerName: "Total Booth",
-                    minWidth: 350,
-                    align: "center",
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "Instagram",
-                    headerName: "Instagram",
-                    minWidth: 350,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "facebook",
-                    headerName: "Facebook",
-                    minWidth: 350,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "ecommerce",
-                    headerName: "E-Commerce",
-                    minWidth: 350,
-                    headerAlign: "center",
-                    editable: false,
-                  },
-                  {
-                    field: "createdBy",
-                    headerName: "Created By",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                  },
-                  {
-                    field: "createdAt",
-                    headerName: "Created At",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                  {
-                    field: "modifiedBy",
-                    headerName: "Modified By",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                  },
-                  {
-                    field: "modifedAt",
-                    headerName: "Modifed At",
-                    headerAlign: "center",
-                    minWidth: 350,
-                    editable: false,
-                    valueFormatter: (params: any) =>
-                      moment(params?.value).format("DD/MM/YYYY hh:mm"),
-                  },
-                ]}
-              />
+                    {
+                      field: "alamatOwner",
+                      headerName: "Alamat Owner",
+                      hideSortIcons: true,
+                      disableColumnMenu: true,
+                      minWidth: 350,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                      renderCell: (params) => {
+                        return (
+                          <div className="grid grid-rows-1 gap-2 my-2 place-content-center place-items-center">
+                            <a
+                              href={`https://maps.google.com?q=${params.value}`}
+                              target="_blank"
+                            >
+                              <span>{params.value}</span>
+                            </a>
+                          </div>
+                        );
+                      },
+                    },
+                    {
+                      field: "phone",
+                      headerName: "No. HP",
+                      minWidth: 350,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "email",
+                      headerName: "Email",
+                      minWidth: 350,
+                      align: "left",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "dateEstablishment",
+                      headerName: "Sejak Tahun",
+                      minWidth: 350,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "totalBooth",
+                      headerName: "Total Booth",
+                      minWidth: 350,
+                      align: "center",
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "Instagram",
+                      headerName: "Instagram",
+                      minWidth: 350,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "facebook",
+                      headerName: "Facebook",
+                      minWidth: 350,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "ecommerce",
+                      headerName: "E-Commerce",
+                      minWidth: 350,
+                      headerAlign: "center",
+                      editable: false,
+                    },
+                    {
+                      field: "createdBy",
+                      headerName: "Created By",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                    },
+                    {
+                      field: "createdAt",
+                      headerName: "Created At",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                    {
+                      field: "modifiedBy",
+                      headerName: "Modified By",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                    },
+                    {
+                      field: "modifedAt",
+                      headerName: "Modifed At",
+                      headerAlign: "center",
+                      minWidth: 350,
+                      editable: false,
+                      valueFormatter: (params: any) =>
+                        moment(params?.value).format("DD/MM/YYYY hh:mm"),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex justify-center py-4">
                 <Pagination

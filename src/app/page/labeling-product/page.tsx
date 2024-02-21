@@ -376,7 +376,7 @@ export default function Home() {
                   size="small"
                   required
                   type="number"
-                  inputProps={{ min: 1, max: 10 }}
+                  inputProps={{ min: 1, max: 99 }}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth

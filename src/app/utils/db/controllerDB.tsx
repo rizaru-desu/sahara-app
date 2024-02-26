@@ -207,6 +207,39 @@ const detailUser = async ({ userId }: detailUserInput) => {
   }
 };
 
+const forgotPasswordUser = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findEmail = await tx.user.findUnique({
+        where: { email: email },
+      });
+
+      if (!findEmail) {
+        const resultUser = await tx.user.update({
+          where: { email },
+          data: {
+            password,
+          },
+        });
+
+        return resultUser;
+      } else {
+        throw new Error(
+          "Sorry, the email provided isn't linked to any active account. Please check the email address or consider signing up."
+        );
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 interface AddUserInput {
   email: string;
   password: string;
@@ -2196,6 +2229,7 @@ export {
   roles,
   pageAllUser,
   userSearch,
+  forgotPasswordUser,
 
   //** AGENT */
   pageAllAgent,

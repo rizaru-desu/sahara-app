@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { validateToken } from "@/app/utils/token/validate";
 import { addUser } from "@/app/utils/db/controllerDB";
 import z from "zod";
 import bcrypt from "bcrypt";
@@ -18,7 +17,6 @@ const Schema = z
       { message: "Invalid phone number format" }
     ),
     bod: z.string(),
-    leader: z.string().optional(),
     createdBy: z.string().optional(),
   })
   .strict();
@@ -53,75 +51,52 @@ function toTitleCase(str: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get("Authorization") as any;
-
-    const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
-    const userData = request.cookies.get("userData");
-
-    const tokenValidated = (await validateToken({
-      token: _.isEmpty(tokenWithoutBearer)
-        ? userData?.value
-        : tokenWithoutBearer,
-    })) as any;
-
     const json = await request.json();
 
     const resultValid = validateSchema({
       data: json,
     });
 
-    if (tokenValidated) {
-      const startDate = moment("2022-01-01");
-      const endDate = moment();
+    const startDate = moment("2022-01-01");
+    const endDate = moment();
 
-      const daysDiff = endDate.diff(startDate, "days");
+    const daysDiff = endDate.diff(startDate, "days");
 
-      const randomDays = Math.floor(Math.random() * (daysDiff + 1));
+    const randomDays = Math.floor(Math.random() * (daysDiff + 1));
 
-      const randomDate = startDate.clone().add(randomDays, "days");
+    const randomDate = startDate.clone().add(randomDays, "days");
 
-      const dateString = `${randomDate.format("DDMMMMYYYY")}!`;
+    const dateString = `${randomDate.format("DDMMMMYYYY")}!`;
 
-      const hashedPassword = await bcrypt.hash(dateString, 10);
+    const hashedPassword = await bcrypt.hash(dateString, 10);
 
-      await addUser({
+    await addUser({
+      email: resultValid.email,
+      password: hashedPassword,
+      fullname: toTitleCase(resultValid.fullname),
+      dateOfBirth: moment(resultValid.bod).format("DD-MM-YYYY"),
+      phone: resultValid.phone,
+      createdBy: resultValid.createdBy,
+    });
+
+    await sendMailer({
+      send: resultValid.email,
+      subject: `${resultValid.fullname} account has been successfully created`,
+      html: html({
         email: resultValid.email,
-        password: hashedPassword,
-        fullname: toTitleCase(resultValid.fullname),
-        dateOfBirth: moment(resultValid.bod).format("DD-MM-YYYY"),
-        phone: resultValid.phone,
-        createdBy: resultValid.createdBy,
-        leader: resultValid.leader,
-      });
+        fullname: resultValid.fullname,
+        password: dateString,
+      }),
+    });
 
-      await sendMailer({
-        send: resultValid.email,
-        subject: `${resultValid.fullname} account has been successfully created,`,
-        html: html({
-          email: resultValid.email,
-          fullname: resultValid.fullname,
-          password: dateString,
-        }),
-      });
-
-      return NextResponse.json(
-        {
-          message: `User ${resultValid.email} has been successfully created. Password will be sent to email`,
-        },
-        {
-          status: 200,
-        }
-      );
-    } else {
-      return NextResponse.json(
-        {
-          message: "Invalid token. Authentication failed.",
-        },
-        {
-          status: 401,
-        }
-      );
-    }
+    return NextResponse.json(
+      {
+        message: `User ${resultValid.email} has been successfully created. Password will be sent to email`,
+      },
+      {
+        status: 200,
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       {

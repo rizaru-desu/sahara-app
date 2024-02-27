@@ -34,12 +34,6 @@ function validateSchema({ data }: { data: any }) {
   }
 }
 
-function toTitleCase(str: string): string {
-  return str.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-}
-
 export async function POST(request: NextRequest) {
   try {
     const json = await request.json();

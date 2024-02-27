@@ -24,7 +24,7 @@ export default async function sendMailer({
 }) {
   try {
     const info = await transporter.sendMail({
-      from: '"no-reply" <no-reply@meou.my.id>',
+      from: '"no-reply" <no-reply@saharabogatama.co.id>',
       to: send,
       subject: subject,
       html: html, // use the html parameter passed to the function

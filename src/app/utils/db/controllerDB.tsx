@@ -225,6 +225,7 @@ const forgotPasswordUser = async ({
           where: { email },
           data: {
             password,
+            modifiedBy: "bySystem",
           },
         });
 

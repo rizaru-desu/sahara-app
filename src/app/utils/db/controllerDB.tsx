@@ -220,7 +220,7 @@ const forgotPasswordUser = async ({
         where: { email: email },
       });
 
-      if (!findEmail) {
+      if (findEmail) {
         const resultUser = await tx.user.update({
           where: { email },
           data: {

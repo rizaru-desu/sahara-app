@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
         ![
           "503da001-3e56-414b-81c0-4329287ea6c7",
           "6467c855-165d-4dc8-88b5-68c54599e930",
-          "6d398686-6ec2-4df3-b3d6-607972d6375e",
           "8f595a1e-cb1f-11ee-b237-38f9d362e2c9",
         ].includes(item.stringId)
     );

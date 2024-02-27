@@ -2290,6 +2290,7 @@ const findUser = async ({ tx, userId }: any) => {
       dateOfBirth: true,
       email: true,
       roles: true,
+      leader: true,
     },
   });
 };

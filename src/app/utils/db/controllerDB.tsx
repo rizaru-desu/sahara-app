@@ -2284,7 +2284,13 @@ const addUserMobile = async ({
 const findUser = async ({ tx, userId }: any) => {
   return await tx.user.findUnique({
     where: { userId },
-    select: { fullname: true, phone: true, dateOfBirth: true, email: true },
+    select: {
+      fullname: true,
+      phone: true,
+      dateOfBirth: true,
+      email: true,
+      roles: true,
+    },
   });
 };
 

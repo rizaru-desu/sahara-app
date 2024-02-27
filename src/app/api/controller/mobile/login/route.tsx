@@ -41,53 +41,33 @@ export async function POST(request: NextRequest) {
       data: json,
     });
 
-    const { user, roles } = await loginUser({ email: resultValid.email });
-
-    const excBooth = _.filter(
-      roles,
-      (item: any) =>
-        ![
-          "503da001-3e56-414b-81c0-4329287ea6c7",
-          "6467c855-165d-4dc8-88b5-68c54599e930",
-          "8f595a1e-cb1f-11ee-b237-38f9d362e2c9",
-        ].includes(item.stringId)
-    );
-
-    const isEqualRole = _.intersectionBy(
-      excBooth,
-      user?.roles as any,
-      "stringId"
-    );
+    const { user } = await loginUser({ email: resultValid.email });
 
     if (user) {
       if (!user?.inActive) {
-        if (_.isEmpty(isEqualRole)) {
-          const generateTokens = await generateToken({
-            userId: user?.userId,
-            userPassword: resultValid.password,
-            dbPassword: user?.password,
-          });
+        const generateTokens = await generateToken({
+          userId: user?.userId,
+          userPassword: resultValid.password,
+          dbPassword: user?.password,
+        });
 
-          const tokenData: any = {
-            token: generateTokens.token,
-            userId: user.userId,
-            fullname: user.fullname,
-            phone: user.phone,
-            email: user.email,
-            createdAt: user.createdAt,
-          };
+        const tokenData: any = {
+          token: generateTokens.token,
+          userId: user.userId,
+          fullname: user.fullname,
+          phone: user.phone,
+          email: user.email,
+          createdAt: user.createdAt,
+        };
 
-          return NextResponse.json(
-            {
-              userData: tokenData,
-            },
-            {
-              status: 200,
-            }
-          );
-        } else {
-          throw new Error("Unfortunately, your account is not access.");
-        }
+        return NextResponse.json(
+          {
+            userData: tokenData,
+          },
+          {
+            status: 200,
+          }
+        );
       } else {
         throw new Error("Unfortunately, your account is no longer active.");
       }

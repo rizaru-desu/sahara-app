@@ -240,6 +240,68 @@ const forgotPasswordUser = async ({
   }
 };
 
+const addUserMobile = async ({
+  email,
+  password,
+  phone,
+  dateOfBirth,
+  fullname,
+  roles,
+  createdBy,
+}: AddUserInput) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findEmail = await tx.user.findUnique({
+        where: { email: email },
+      });
+
+      if (!findEmail) {
+        const resultUser = await tx.user.create({
+          data: {
+            email,
+            password,
+            phone,
+            fullname,
+            createdBy,
+            dateOfBirth,
+          },
+        });
+
+        if (resultUser) {
+          const stringMap = await tx.stringMap.findUnique({
+            where: { stringId: roles },
+          });
+
+          if (stringMap) {
+            const resultRoles = await tx.user.update({
+              where: { userId: resultUser.userId },
+              data: {
+                roles: {
+                  create: {
+                    createdBy,
+                    stringId: stringMap?.stringId,
+                    value: stringMap?.value,
+                  },
+                },
+              },
+            });
+
+            return resultRoles;
+          }
+        }
+
+        return resultUser;
+      } else {
+        throw new Error(
+          "Please provide a different email address because your current one has already been registered."
+        );
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 interface AddUserInput {
   email: string;
   password: string;
@@ -247,6 +309,7 @@ interface AddUserInput {
   dateOfBirth: string;
   fullname: string;
   leader?: string;
+  roles?: any;
   createdBy?: string;
 }
 
@@ -2221,6 +2284,7 @@ export {
   userPagination,
   loginUser,
   addUser,
+  addUserMobile,
   updateDataUser,
   activeUser,
   detailUser,

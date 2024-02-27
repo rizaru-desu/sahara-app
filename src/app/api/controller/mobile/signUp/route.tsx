@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { addUser } from "@/app/utils/db/controllerDB";
+import { addUserMobile } from "@/app/utils/db/controllerDB";
 import z from "zod";
 import bcrypt from "bcrypt";
 import sendMailer from "@/app/utils/services/node.mailer";
@@ -17,6 +17,7 @@ const Schema = z
       { message: "Invalid phone number format" }
     ),
     bod: z.string(),
+    roles: z.string(),
     createdBy: z.string().optional(),
   })
   .strict();
@@ -70,12 +71,13 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(dateString, 10);
 
-    await addUser({
+    await addUserMobile({
       email: resultValid.email,
       password: hashedPassword,
       fullname: toTitleCase(resultValid.fullname),
       dateOfBirth: moment(resultValid.bod).format("DD-MM-YYYY"),
       phone: resultValid.phone,
+      roles: resultValid.roles,
       createdBy: resultValid.createdBy,
     });
 

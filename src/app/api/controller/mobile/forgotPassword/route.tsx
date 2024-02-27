@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: ``,
+        message: `Please check your email.`,
       },
       {
         status: 200,

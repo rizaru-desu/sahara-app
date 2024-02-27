@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import _ from "lodash";
+import moment from "moment";
 
 interface paginations {
   skip: number;
@@ -202,102 +203,6 @@ const detailUser = async ({ userId }: detailUserInput) => {
     ]);
 
     return result;
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
-};
-
-const forgotPasswordUser = async ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) => {
-  try {
-    return prisma.$transaction(async (tx) => {
-      const findEmail = await tx.user.findUnique({
-        where: { email: email },
-      });
-
-      if (findEmail) {
-        const resultUser = await tx.user.update({
-          where: { email },
-          data: {
-            password,
-            modifiedBy: "bySystem",
-          },
-        });
-
-        return resultUser;
-      } else {
-        throw new Error(
-          "Sorry, the email provided isn't linked to any active account. Please check the email address or consider signing up."
-        );
-      }
-    });
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
-};
-
-const addUserMobile = async ({
-  email,
-  password,
-  phone,
-  dateOfBirth,
-  fullname,
-  roles,
-  createdBy,
-}: AddUserInput) => {
-  try {
-    return prisma.$transaction(async (tx) => {
-      const findEmail = await tx.user.findUnique({
-        where: { email: email },
-      });
-
-      if (!findEmail) {
-        const resultUser = await tx.user.create({
-          data: {
-            email,
-            password,
-            phone,
-            fullname,
-            createdBy,
-            dateOfBirth,
-          },
-        });
-
-        if (resultUser) {
-          const stringMap = await tx.stringMap.findUnique({
-            where: { stringId: roles },
-          });
-
-          if (stringMap) {
-            const resultRoles = await tx.user.update({
-              where: { userId: resultUser.userId },
-              data: {
-                roles: {
-                  create: {
-                    createdBy,
-                    stringId: stringMap?.stringId,
-                    value: stringMap?.value,
-                  },
-                },
-              },
-            });
-
-            return resultRoles;
-          }
-        }
-
-        return resultUser;
-      } else {
-        throw new Error(
-          "Please provide a different email address because your current one has already been registered."
-        );
-      }
-    });
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -2279,13 +2184,282 @@ const orderDeiveryRecaive = async ({
 
 /** END SECTION DELIVERY ORDER */
 
+/** SECTION MOBILE */
+const forgotPasswordUser = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findEmail = await tx.user.findUnique({
+        where: { email: email },
+      });
+
+      if (findEmail) {
+        const resultUser = await tx.user.update({
+          where: { email },
+          data: {
+            password,
+            modifiedBy: "bySystem",
+          },
+        });
+
+        return resultUser;
+      } else {
+        throw new Error(
+          "Sorry, the email provided isn't linked to any active account. Please check the email address or consider signing up."
+        );
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const addUserMobile = async ({
+  email,
+  password,
+  phone,
+  dateOfBirth,
+  fullname,
+  roles,
+  createdBy,
+}: AddUserInput) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findEmail = await tx.user.findUnique({
+        where: { email: email },
+      });
+
+      if (!findEmail) {
+        const resultUser = await tx.user.create({
+          data: {
+            email,
+            password,
+            phone,
+            fullname,
+            createdBy,
+            dateOfBirth,
+          },
+        });
+
+        if (resultUser) {
+          const stringMap = await tx.stringMap.findUnique({
+            where: { stringId: roles },
+          });
+
+          if (stringMap) {
+            const resultRoles = await tx.user.update({
+              where: { userId: resultUser.userId },
+              data: {
+                roles: {
+                  create: {
+                    createdBy,
+                    stringId: stringMap?.stringId,
+                    value: stringMap?.value,
+                  },
+                },
+              },
+            });
+
+            return resultRoles;
+          }
+        }
+
+        return resultUser;
+      } else {
+        throw new Error(
+          "Please provide a different email address because your current one has already been registered."
+        );
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const findUser = async ({ tx, userId }: any) => {
+  return await tx.user.findUnique({
+    where: { userId },
+    select: { fullname: true, phone: true, dateOfBirth: true, email: true },
+  });
+};
+
+const dashboardDRMob = async ({ userId }: { userId: string }) => {
+  try {
+    const thirtyDaysAgo = moment().subtract(30, "days").toDate();
+
+    return prisma.$transaction(async (tx) => {
+      const userDetail = await findUser({ tx, userId });
+
+      const deliveryList = await tx.suratJalan.findMany({
+        where: { createdAt: { gte: thirtyDaysAgo } },
+      });
+
+      return { userDetail, deliveryList };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const findProductDRMob = async ({ suratJalanId }: { suratJalanId: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const productList = await tx.suratJalanProduct.findMany({
+        where: { suratJalanId },
+      });
+
+      return { productList };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const settingMob = async ({ userId }: { userId: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const userDetail = await findUser({ tx, userId });
+
+      return { userDetail };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const findAgentId = async ({ value }: { value: string }) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.agent.findMany({
+        where: {
+          customerName: { contains: value },
+        },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const findStockBox = async ({ value }: { value?: string }) => {
+  try {
+    let whereCondition = {};
+    if (value) {
+      whereCondition = {
+        labelBox: value,
+      };
+    }
+
+    const [result] = await prisma.$transaction([
+      prisma.stokPorudct.findFirst({
+        where: whereCondition,
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const newDeliveyOrderMob = async ({
+  noSurat,
+  orderNo,
+  shippingDate,
+  agentId,
+  customerName,
+  deliveryAddress,
+  deliveryNote,
+  totalWeight,
+  createdBy,
+  status,
+  product,
+}: {
+  noSurat: string;
+  orderNo: string;
+  shippingDate: Date;
+  agentId: string;
+  customerName: string;
+  deliveryAddress: string;
+  totalWeight: number;
+  deliveryNote?: string;
+  createdBy: string;
+  status: number;
+  product: {
+    suratJalanId: string;
+    shipQty: number;
+    labelBox: string;
+    labelBoxId: string;
+    stockId: string;
+    createdBy: string;
+    statusProduct: number;
+  }[];
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const createDR = await tx.suratJalan.create({
+        data: {
+          noSurat,
+          orderNo,
+          shippingDate,
+          agentId,
+          customerName,
+          deliveryAddress,
+          deliveryNote,
+          totalWeight,
+          createdBy,
+          status,
+          suratJalanProduct: {
+            createMany: { data: product },
+          },
+        },
+      });
+
+      return { createDR };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const changePasswordMob = async ({
+  userId,
+  password,
+  createdBy,
+}: {
+  userId: string;
+  password: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const changePass = await tx.user.update({
+        where: { userId },
+        data: { password, modifiedBy: createdBy },
+      });
+
+      return { changePass };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+/** END SECTION MOBILE */
+
 export {
   //** USER */
   generateToken,
   userPagination,
   loginUser,
   addUser,
-  addUserMobile,
   updateDataUser,
   activeUser,
   detailUser,
@@ -2294,7 +2468,6 @@ export {
   roles,
   pageAllUser,
   userSearch,
-  forgotPasswordUser,
 
   //** AGENT */
   pageAllAgent,
@@ -2379,4 +2552,13 @@ export {
   deliveryOrderProductPagination,
   pageAllDeliveryOrderProduct,
   deliveryOrderFind,
+
+  /** Mobile */
+  forgotPasswordUser,
+  addUserMobile,
+  dashboardDRMob,
+  changePasswordMob,
+  settingMob,
+  findAgentId,
+  findStockBox,
 };

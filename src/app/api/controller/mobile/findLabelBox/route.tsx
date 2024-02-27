@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { generateToken, loginUser } from "@/app/utils/db/controllerDB";
+import { validateToken } from "@/app/utils/token/validate";
+import { findStockBox } from "@/app/utils/db/controllerDB";
 import z from "zod";
 import _ from "lodash";
 
 const Schema = z
   .object({
-    email: z.string().email(),
-    password: z.string(),
+    value: z.string(),
   })
   .strict();
 
@@ -34,45 +34,44 @@ function validateSchema({ data }: { data: any }) {
 
 export async function POST(request: NextRequest) {
   try {
+    const token = request.headers.get("Authorization") as any;
+
+    const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
+    const userData = request.cookies.get("userData");
+
+    const tokenValidated = (await validateToken({
+      token: _.isEmpty(tokenWithoutBearer)
+        ? userData?.value
+        : tokenWithoutBearer,
+    })) as any;
+
     const json = await request.json();
 
     const resultValid = validateSchema({
       data: json,
     });
 
-    const { user } = await loginUser({ email: resultValid.email });
+    if (tokenValidated) {
+      const result = await findStockBox({
+        value: resultValid.value,
+      });
 
-    if (user) {
-      if (!user?.inActive) {
-        const generateTokens = await generateToken({
-          userId: user?.userId,
-          userPassword: resultValid.password,
-          dbPassword: user?.password,
-        });
-
-        const tokenData: any = {
-          token: generateTokens.token,
-          userId: user.userId,
-          fullname: user.fullname,
-          phone: user.phone,
-          email: user.email,
-          createdAt: user.createdAt,
-        };
-
-        return NextResponse.json(
-          {
-            userData: tokenData,
-          },
-          {
-            status: 200,
-          }
-        );
-      } else {
-        throw new Error("Unfortunately, your account is no longer active.");
-      }
+      return NextResponse.json(
+        {
+          dataBox: result,
+        },
+        {
+          status: 200,
+        }
+      );
     } else {
-      throw new Error(
-        "Unable to find the user. Please check if the user exists and try again."
+      return NextResponse.json(
+        {
+          message: "Invalid token. Authentication failed.",
+        },
+        {
+          status: 401,
+        }
       );
     }
   } catch (error: any) {

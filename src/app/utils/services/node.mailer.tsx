@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASSWORD,
   },
-  tls: { rejectUnauthorized: false },
+  secure: true,
 });
 
 // async..await is not allowed in the global scope, must use a wrapper

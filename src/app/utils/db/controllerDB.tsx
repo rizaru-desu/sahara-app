@@ -2342,6 +2342,23 @@ const dashboardDRMob = async ({ userId }: { userId: string }) => {
   }
 };
 
+const findDRMob = async ({ value }: { value: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const drList = await tx.suratJalan.findMany({
+        where: { noSurat: { contains: value } },
+        include: {
+          _count: { select: { suratJalanProduct: true } },
+        },
+      });
+
+      return { drList };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 const findProductDRMob = async ({ suratJalanId }: { suratJalanId: string }) => {
   try {
     return prisma.$transaction(async (tx) => {
@@ -2594,6 +2611,7 @@ export {
   forgotPasswordUser,
   addUserMobile,
   dashboardDRMob,
+  findDRMob,
   changePasswordMob,
   settingMob,
   findAgentId,

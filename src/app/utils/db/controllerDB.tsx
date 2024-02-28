@@ -2297,10 +2297,25 @@ const findUser = async ({ tx, userId }: any) => {
 
 const detailUserMob = async ({ userId }: { userId: string }) => {
   try {
-    return prisma.$transaction(async (tx) => {
-      const userDetail = await findUser({ tx, userId });
-      return { userDetail };
-    });
+    const [userDetail, stringRole] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        select: {
+          fullname: true,
+          phone: true,
+          dateOfBirth: true,
+          email: true,
+          roles: true,
+          leader: true,
+        },
+      }),
+      prisma.stringMap.findMany({
+        where: { objectName: "Roles" },
+        select: { stringId: true, value: true },
+      }),
+    ]);
+
+    return { userDetail, stringRole };
   } catch (e: any) {
     throw new Error(e.message);
   }

@@ -19,13 +19,14 @@ export async function POST(request: NextRequest) {
     if (tokenValidated) {
       const { userId } = tokenValidated;
 
-      const { userDetail } = await detailUserMob({
+      const { userDetail, stringRole } = await detailUserMob({
         userId,
       });
 
       return NextResponse.json(
         {
           userDetail,
+          stringRole,
         },
         {
           status: 200,

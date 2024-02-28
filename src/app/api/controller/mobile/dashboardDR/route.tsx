@@ -23,9 +23,21 @@ export async function POST(request: NextRequest) {
         userId,
       });
 
+      const objStatus = {
+        1: "Create",
+        2: "OnDelivery",
+        3: "Recaive",
+        4: "Cancel",
+      } as any;
+
+      let transformedData = _.map(deliveryList, (item) => ({
+        ...item,
+        status: objStatus[item.status],
+      }));
+
       return NextResponse.json(
         {
-          deliveryList,
+          deliveryList: transformedData,
           userDetail,
         },
         {

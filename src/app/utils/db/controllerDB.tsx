@@ -2295,6 +2295,17 @@ const findUser = async ({ tx, userId }: any) => {
   });
 };
 
+const detailUserMob = async ({ userId }: { userId: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const userDetail = await findUser({ tx, userId });
+      return { userDetail };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 const dashboardDRMob = async ({ userId }: { userId: string }) => {
   try {
     const thirtyDaysAgo = moment().subtract(30, "days").toDate();
@@ -2561,6 +2572,7 @@ export {
   deliveryOrderFind,
 
   /** Mobile */
+  detailUserMob,
   forgotPasswordUser,
   addUserMobile,
   dashboardDRMob,

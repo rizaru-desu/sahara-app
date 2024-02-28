@@ -3,6 +3,7 @@ import { validateToken } from "@/app/utils/token/validate";
 import { changePasswordMob } from "@/app/utils/db/controllerDB";
 import z from "zod";
 import _ from "lodash";
+import bcrypt from "bcrypt";
 
 const Schema = z
   .object({
@@ -53,9 +54,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
+      const hashedPassword = await bcrypt.hash(resultValid.newPassword, 10);
+
       await changePasswordMob({
         userId: tokenValidated.userId,
-        password: resultValid.newPassword,
+        password: hashedPassword,
         createdBy: resultValid.createdBy,
       });
 

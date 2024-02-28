@@ -2330,6 +2330,9 @@ const dashboardDRMob = async ({ userId }: { userId: string }) => {
 
       const deliveryList = await tx.suratJalan.findMany({
         where: { createdAt: { gte: thirtyDaysAgo } },
+        include: {
+          _count: { select: { suratJalanProduct: true } },
+        },
       });
 
       return { userDetail, deliveryList };

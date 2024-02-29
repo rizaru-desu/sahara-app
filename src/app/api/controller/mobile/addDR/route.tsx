@@ -77,14 +77,14 @@ export async function POST(request: NextRequest) {
         createdBy: resultValid.createdBy,
         status: resultValid.data.status,
         product: _.map(resultValid.data.productList, (product) => {
-          return _.assign({}, product, {
+          return {
             shipQty: product.shipQty,
-            labelBox: String(product.labelBox),
-            labelBoxId: String(product.labelBoxId),
-            stockId: String(product.stockId),
-            createdBy: String(resultValid.createdBy),
+            labelBox: product.labelBox,
+            labelBoxId: product.labelBoxId,
+            stockId: product.stockId,
+            createdBy: resultValid.createdBy,
             statusProduct: product.status,
-          });
+          };
         }),
         updateData: runningNumber,
       });

@@ -1,36 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { findAgentId } from "@/app/utils/db/controllerDB";
-import z from "zod";
+import { findAgentMob } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
-
-const Schema = z
-  .object({
-    value: z.string(),
-  })
-  .strict();
-
-function validateSchema({ data }: { data: any }) {
-  try {
-    const parseData = Schema.parse(data);
-    return parseData;
-  } catch (error: any) {
-    if (error.issues && error.issues.length > 0) {
-      const validationErrors = error.issues.map((issue: any) => ({
-        path: issue.path.join("."),
-        message: issue.message,
-      }));
-
-      const errorMessage = validationErrors
-        .map((error: any) => `Field '${error.path}' ${error.message}`)
-        .join(" \n");
-
-      throw new Error(errorMessage);
-    } else {
-      throw new Error("Invalid Schema.");
-    }
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,16 +16,8 @@ export async function POST(request: NextRequest) {
         : tokenWithoutBearer,
     })) as any;
 
-    const json = await request.json();
-
-    const resultValid = validateSchema({
-      data: json,
-    });
-
     if (tokenValidated) {
-      const result = await findAgentId({
-        value: resultValid.value,
-      });
+      const result = await findAgentMob();
 
       return NextResponse.json(
         {

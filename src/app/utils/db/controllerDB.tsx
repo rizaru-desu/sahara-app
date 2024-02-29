@@ -2385,15 +2385,9 @@ const settingMob = async ({ userId }: { userId: string }) => {
   }
 };
 
-const findAgentId = async ({ value }: { value: string }) => {
+const findAgentMob = async () => {
   try {
-    const [result] = await prisma.$transaction([
-      prisma.agent.findMany({
-        where: {
-          customerName: { contains: value },
-        },
-      }),
-    ]);
+    const [result] = await prisma.$transaction([prisma.agent.findMany()]);
 
     return result;
   } catch (e: any) {
@@ -2614,6 +2608,6 @@ export {
   findDRMob,
   changePasswordMob,
   settingMob,
-  findAgentId,
+  findAgentMob,
   findStockBox,
 };

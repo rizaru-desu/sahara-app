@@ -78,13 +78,12 @@ export async function POST(request: NextRequest) {
         status: resultValid.data.noSurat,
         product: _.map(resultValid.data.productList, (product) => {
           return _.assign({}, product, {
-            shipQty: Number(product.shipQty),
+            shipQty: product.shipQty,
             labelBox: String(product.labelBox),
             labelBoxId: String(product.labelBoxId),
             stockId: String(product.stockId),
-            createdBy: String(product.createdBy),
-            statusProduct: Number(product.statusProduct),
-            CreatedBy: resultValid.createdBy,
+            createdBy: String(resultValid.createdBy),
+            statusProduct: product.status,
           });
         }),
         updateData: runningNumber,

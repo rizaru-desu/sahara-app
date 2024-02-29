@@ -311,3 +311,15 @@ model StringMap {
 
   @@index([stringId])
 }
+
+model runningNumber {
+  id   String   @id @default(uuid()) @db.VarChar(255)
+  objectName String?  @db.VarChar(255)
+  value      Int? 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  modifiedBy String?  @db.VarChar(255)
+  createdBy  String   @default("bySystem") @db.VarChar(255)
+
+  @@index([id])
+}

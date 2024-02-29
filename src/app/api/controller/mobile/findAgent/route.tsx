@@ -17,11 +17,13 @@ export async function POST(request: NextRequest) {
     })) as any;
 
     if (tokenValidated) {
-      const result = await findAgentMob();
+      const { result, lastNoOrder, lastNoSurat } = await findAgentMob();
 
       return NextResponse.json(
         {
           agentList: result,
+          lastNoOrder,
+          lastNoSurat,
         },
         {
           status: 200,

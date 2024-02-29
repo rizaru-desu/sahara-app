@@ -2387,9 +2387,19 @@ const settingMob = async ({ userId }: { userId: string }) => {
 
 const findAgentMob = async () => {
   try {
-    const [result] = await prisma.$transaction([prisma.agent.findMany()]);
+    const [result, lastNoSurat, lastNoOrder] = await prisma.$transaction([
+      prisma.agent.findMany(),
+      prisma.runningNumber.findUnique({
+        where: { id: "ba1ea257-d5e8-11ee-a707-1692f949cb11" },
+        select: { id: true, value: true },
+      }),
+      prisma.runningNumber.findUnique({
+        where: { id: "ba1ea257-d5e8-11ee-a707-1692f949cb22" },
+        select: { id: true, value: true },
+      }),
+    ]);
 
-    return result;
+    return { result, lastNoSurat, lastNoOrder };
   } catch (e: any) {
     throw new Error(e.message);
   }

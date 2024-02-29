@@ -2407,16 +2407,9 @@ const findAgentMob = async () => {
 
 const findStockBox = async ({ value }: { value?: string }) => {
   try {
-    let whereCondition = {};
-    if (value) {
-      whereCondition = {
-        labelBox: value,
-      };
-    }
-
     const [result] = await prisma.$transaction([
       prisma.stokPorudct.findMany({
-        where: whereCondition,
+        where: { labelBoxs: value },
       }),
     ]);
 

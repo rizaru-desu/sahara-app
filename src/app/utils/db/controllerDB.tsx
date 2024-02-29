@@ -2415,9 +2415,8 @@ const findStockBox = async ({ value }: { value?: string }) => {
     }
 
     const [result] = await prisma.$transaction([
-      prisma.labelBox.findFirst({
-        where: { labelCodeBox: value },
-        include: { labelProduct: true },
+      prisma.stokPorudct.findFirst({
+        where: whereCondition,
       }),
     ]);
 

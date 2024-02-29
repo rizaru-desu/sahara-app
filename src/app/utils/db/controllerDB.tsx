@@ -2467,18 +2467,25 @@ const newDeliveyOrderMob = async ({
           totalWeight,
           createdBy,
           status: 1,
-          suratJalanProduct: {
-            createMany: { data: product },
-          },
         },
       });
 
       if (createDR) {
-        for (const updateItem of updateData) {
-          await tx.runningNumber.updateMany({
-            where: { id: updateItem.id }, // Condition to match record
-            data: { value: updateItem.value }, // New value to set
-          });
+        const finalProduct = _.map(product, (item) => {
+          return { ...item, suratJalanId: createDR.suratJalanId };
+        });
+
+        const insertBox = await tx.suratJalanProduct.createMany({
+          data: finalProduct,
+        });
+
+        if (insertBox) {
+          for (const updateItem of updateData) {
+            await tx.runningNumber.updateMany({
+              where: { id: updateItem.id }, // Condition to match record
+              data: { value: updateItem.value }, // New value to set
+            });
+          }
         }
       }
 

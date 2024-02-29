@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         totalWeight: resultValid.data.totalWeight,
         createdBy: resultValid.createdBy,
         status: resultValid.data.noSurat,
-        product: _.map(resultValid.data.product, (product) => {
+        product: _.map(resultValid.data.productList, (product) => {
           return _.assign({}, product, {
             shipQty: Number(product.shipQty),
             labelBox: String(product.labelBox),

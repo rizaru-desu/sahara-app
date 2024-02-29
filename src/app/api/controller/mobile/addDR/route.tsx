@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
             labelBoxId: String(product.labelBoxId),
             stockId: String(product.stockId),
             createdBy: String(resultValid.createdBy),
-            statusProduct: product.status,
+            statusProduct: 2,
           });
         }),
         updateData: runningNumber,

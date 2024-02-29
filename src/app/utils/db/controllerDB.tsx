@@ -2467,9 +2467,6 @@ const newDeliveyOrderMob = async ({
           totalWeight,
           createdBy,
           status,
-          suratJalanProduct: {
-            createMany: { data: product },
-          },
         },
       });
 

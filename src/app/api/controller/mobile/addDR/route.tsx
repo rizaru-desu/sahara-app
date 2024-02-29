@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       const { createDR } = await newDeliveyOrderMob({
         noSurat: resultValid.data.noSurat,
         orderNo: resultValid.data.noOrder,
-        shippingDate: moment(resultValid.data.noSurat).toDate(),
+        shippingDate: moment(resultValid.data.shippingDate).toDate(),
         agentId: resultValid.data.agentId,
         customerName: resultValid.data.customerName,
         deliveryAddress: resultValid.data.deliveryAddress,

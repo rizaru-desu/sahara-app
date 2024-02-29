@@ -2466,7 +2466,7 @@ const newDeliveyOrderMob = async ({
           deliveryNote,
           totalWeight,
           createdBy,
-          status: 1,
+          status,
           suratJalanProduct: {
             createMany: { data: product },
           },
@@ -2474,11 +2474,20 @@ const newDeliveyOrderMob = async ({
       });
 
       if (createDR) {
-        for (const updateItem of updateData) {
-          await tx.runningNumber.updateMany({
-            where: { id: updateItem.id }, // Condition to match record
-            data: { value: updateItem.value }, // New value to set
-          });
+        const labelCodeIds = _.map(product, "labelBoxId");
+
+        const updateStock = await tx.stokPorudct.updateMany({
+          where: { productId: { in: labelCodeIds } },
+          data: { status: 2 },
+        });
+
+        if (updateStock) {
+          for (const updateItem of updateData) {
+            await tx.runningNumber.updateMany({
+              where: { id: updateItem.id }, // Condition to match record
+              data: { value: updateItem.value }, // New value to set
+            });
+          }
         }
       }
 

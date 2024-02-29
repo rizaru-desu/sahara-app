@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         deliveryNote: resultValid.data.deliveryNote,
         totalWeight: resultValid.data.totalWeight,
         createdBy: resultValid.createdBy,
-        status: resultValid.data.noSurat,
+        status: resultValid.data.status,
         product: _.map(resultValid.data.productList, (product) => {
           return _.assign({}, product, {
             shipQty: product.shipQty,
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
             labelBoxId: String(product.labelBoxId),
             stockId: String(product.stockId),
             createdBy: String(resultValid.createdBy),
-            statusProduct: 2,
+            statusProduct: product.status,
           });
         }),
         updateData: runningNumber,

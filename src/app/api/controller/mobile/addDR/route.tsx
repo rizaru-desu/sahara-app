@@ -1,12 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { findStockBox } from "@/app/utils/db/controllerDB";
+import { findStockBox, newDeliveyOrderMob } from "@/app/utils/db/controllerDB";
 import z from "zod";
 import _ from "lodash";
+import moment from "moment";
 
 const Schema = z
   .object({
-    data: z.unknown(),
+    data: z.any(),
+    createdBy: z.string(),
   })
   .strict();
 
@@ -52,9 +54,44 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
+      const runningNumber = [
+        {
+          id: "ba1ea257-d5e8-11ee-a707-1692f949cb11",
+          value: Number(_.last(_.split(resultValid.data.noSurat, "FG/OUT/"))),
+        },
+        {
+          id: "ba1ea257-d5e8-11ee-a707-1692f949cb22",
+          value: Number(resultValid.data.noOrder),
+        },
+      ];
+
+      const { createDR } = await newDeliveyOrderMob({
+        noSurat: resultValid.data.noSurat,
+        orderNo: resultValid.data.noOrder,
+        shippingDate: moment(resultValid.data.noSurat).toDate(),
+        agentId: resultValid.data.agentId,
+        customerName: resultValid.data.customerName,
+        deliveryAddress: resultValid.data.deliveryAddress,
+        deliveryNote: resultValid.data.deliveryNote,
+        totalWeight: resultValid.data.totalWeight,
+        createdBy: resultValid.createdBy,
+        status: resultValid.data.noSurat,
+        product: _.map(resultValid.data.product, (product) => {
+          return _.assign({}, product, {
+            shipQty: Number(product.shipQty),
+            labelBox: String(product.labelBox),
+            labelBoxId: String(product.labelBoxId),
+            stockId: String(product.stockId),
+            createdBy: String(product.createdBy),
+            statusProduct: Number(product.statusProduct),
+            CreatedBy: resultValid.createdBy,
+          });
+        }),
+        updateData: runningNumber,
+      });
       return NextResponse.json(
         {
-          message: resultValid,
+          message: `No DR ${createDR.noSurat} has been created.`,
         },
         {
           status: 200,

@@ -2431,6 +2431,7 @@ const newDeliveyOrderMob = async ({
   createdBy,
   status,
   product,
+  updateData,
 }: {
   noSurat: string;
   orderNo: string;
@@ -2443,7 +2444,6 @@ const newDeliveyOrderMob = async ({
   createdBy: string;
   status: number;
   product: {
-    suratJalanId: string;
     shipQty: number;
     labelBox: string;
     labelBoxId: string;
@@ -2451,6 +2451,7 @@ const newDeliveyOrderMob = async ({
     createdBy: string;
     statusProduct: number;
   }[];
+  updateData: any[];
 }) => {
   try {
     return prisma.$transaction(async (tx) => {
@@ -2471,6 +2472,15 @@ const newDeliveyOrderMob = async ({
           },
         },
       });
+
+      if (createDR) {
+        for (const updateItem of updateData) {
+          await tx.runningNumber.updateMany({
+            where: { id: updateItem.id }, // Condition to match record
+            data: { value: updateItem.value }, // New value to set
+          });
+        }
+      }
 
       return { createDR };
     });
@@ -2613,4 +2623,5 @@ export {
   settingMob,
   findAgentMob,
   findStockBox,
+  newDeliveyOrderMob,
 };

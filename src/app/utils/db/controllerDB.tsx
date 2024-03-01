@@ -2331,7 +2331,7 @@ const dashboardDRMob = async ({ userId }: { userId: string }) => {
       const deliveryList = await tx.suratJalan.findMany({
         where: { createdAt: { gte: thirtyDaysAgo } },
         include: {
-          suratJalanProduct: { select: { shipQty: true } },
+          suratJalanProduct: true,
         },
       });
 
@@ -2359,11 +2359,11 @@ const findDRMob = async ({ value }: { value: string }) => {
   }
 };
 
-const findProductDRMob = async ({ suratJalanId }: { suratJalanId: string }) => {
+const findProductDRMob = async ({ labelBoxId }: { labelBoxId: string[] }) => {
   try {
     return prisma.$transaction(async (tx) => {
-      const productList = await tx.suratJalanProduct.findMany({
-        where: { suratJalanId },
+      const productList = await tx.stokPorudct.findMany({
+        where: { labelBoxId: { in: labelBoxId } },
       });
 
       return { productList };
@@ -2629,4 +2629,5 @@ export {
   findAgentMob,
   findStockBox,
   newDeliveyOrderMob,
+  findProductDRMob,
 };

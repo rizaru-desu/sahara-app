@@ -2429,7 +2429,7 @@ const newDeliveyOrderMob = async ({
   deliveryNote,
   totalWeight,
   createdBy,
-  status,
+
   product,
   updateData,
 }: {
@@ -2442,8 +2442,13 @@ const newDeliveyOrderMob = async ({
   totalWeight: number;
   deliveryNote?: string;
   createdBy: string;
-  status: number;
-  product: any[];
+  product: {
+    labelBox: string;
+    labelBoxId: string;
+    shipQty: number;
+    statusProduct: number;
+    stockId: string;
+  }[];
   updateData: any[];
 }) => {
   try {
@@ -2459,7 +2464,7 @@ const newDeliveyOrderMob = async ({
           deliveryNote,
           totalWeight,
           createdBy,
-          status,
+          status: 1,
           suratJalanProduct: { createMany: { data: product } },
         },
       });

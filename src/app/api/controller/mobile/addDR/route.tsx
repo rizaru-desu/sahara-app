@@ -65,18 +65,8 @@ export async function POST(request: NextRequest) {
         },
       ];
 
-      const { createDR } = await newDeliveyOrderMob({
-        noSurat: resultValid.data.noSurat,
-        orderNo: resultValid.data.noOrder,
-        shippingDate: moment(resultValid.data.shippingDate).toDate(),
-        agentId: resultValid.data.agentId,
-        customerName: resultValid.data.customerName,
-        deliveryAddress: resultValid.data.deliveryAddress,
-        deliveryNote: resultValid.data.deliveryNote,
-        totalWeight: resultValid.data.totalWeight,
-        createdBy: resultValid.createdBy,
-        status: resultValid.data.status,
-        product: _.map(resultValid.data.productList, (product) => {
+      console.log(
+        _.map(resultValid.data.productList, (product) => {
           return {
             shipQty: product.shipQty,
             labelBox: product.labelBox,
@@ -84,6 +74,30 @@ export async function POST(request: NextRequest) {
             stockId: product.stockId,
             createdBy: resultValid.createdBy,
             statusProduct: product.status,
+          };
+        })
+      );
+      const { createDR } = await newDeliveyOrderMob({
+        noSurat: resultValid.data.noSurat,
+        orderNo: String(resultValid.data.noOrder),
+        shippingDate: moment(
+          resultValid.data.shippingDate,
+          "YYYY-MM-DD HH:mm:ss A"
+        ).toDate(),
+        agentId: resultValid.data.agentId,
+        customerName: resultValid.data.customerName,
+        deliveryAddress: resultValid.data.deliveryAddress,
+        deliveryNote: resultValid.data.deliveryNote,
+        totalWeight: resultValid.data.totalWeight,
+        createdBy: resultValid.createdBy,
+        product: _.map(resultValid.data.productList, (product) => {
+          return {
+            shipQty: product.shipQty,
+            labelBox: product.labelBox,
+            labelBoxId: product.labelBoxId,
+            stockId: product.stockId,
+            createdBy: resultValid.createdBy,
+            statusProduct: product.statusProduct,
           };
         }),
         updateData: runningNumber,

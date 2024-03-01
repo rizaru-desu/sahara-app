@@ -2323,7 +2323,7 @@ const detailUserMob = async ({ userId }: { userId: string }) => {
 
 const dashboardDRMob = async ({ userId }: { userId: string }) => {
   try {
-    const thirtyDaysAgo = moment().subtract(30, "days").toDate();
+    const thirtyDaysAgo = moment().subtract(90, "days").toDate();
 
     return prisma.$transaction(async (tx) => {
       const userDetail = await findUser({ tx, userId });
@@ -2331,7 +2331,7 @@ const dashboardDRMob = async ({ userId }: { userId: string }) => {
       const deliveryList = await tx.suratJalan.findMany({
         where: { createdAt: { gte: thirtyDaysAgo } },
         include: {
-          _count: { select: { suratJalanProduct: true } },
+          suratJalanProduct: { select: { shipQty: true } },
         },
       });
 

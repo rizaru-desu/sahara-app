@@ -52,13 +52,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const result = await findProductDRMob({
+      const { productList } = await findProductDRMob({
         labelBoxId: resultValid.labelId,
       });
 
       return NextResponse.json(
         {
-          productList: result,
+          productList,
         },
         {
           status: 200,

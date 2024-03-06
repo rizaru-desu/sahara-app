@@ -2766,6 +2766,54 @@ const changePasswordMob = async ({
   }
 };
 
+const addDetailBoothOwner = async ({
+  userId,
+  alamatOwner,
+  facebook,
+  instagram,
+  ecommerce,
+  berdiriSejak,
+  createdBy,
+}: {
+  userId: string;
+  alamatOwner: string;
+  instagram?: string;
+  facebook?: string;
+  ecommerce?: string;
+  berdiriSejak: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const detailUser = await tx.user.findUnique({
+        where: { userId },
+      });
+
+      if (detailUser) {
+        const addBoothOwner = await tx.boothOwner.create({
+          data: {
+            userId: detailUser.userId,
+            alamatOwner,
+            facebook,
+            instagram,
+            ecommerce,
+            dateEstablishment: berdiriSejak,
+            fullname: detailUser.fullname,
+            phone: detailUser.phone,
+            email: detailUser.email,
+            createdBy,
+          },
+        });
+
+        return { addBoothOwner };
+      }
+      return null;
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 /** END SECTION MOBILE */
 
 export {
@@ -2883,4 +2931,5 @@ export {
   findStockBox,
   newDeliveyOrderMob,
   findProductDRMob,
+  addDetailBoothOwner
 };

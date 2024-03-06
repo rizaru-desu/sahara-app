@@ -2549,8 +2549,39 @@ const dashboardMemberMob = async ({ userId }: { userId: string }) => {
         where: { userId: userDetail.userId },
         select: { loyaltyPoint: true },
       });
+      const historyPoint = await tx.loyaltyPointLog.findMany({
+        where: { userId: userDetail.userId },
+      });
 
-      return { userDetail, pointLoyalty };
+      const role = await tx.stringMap.findMany({
+        where: { objectName: "Roles" },
+      });
+
+      const excDR = _.filter(
+        role,
+        (item: any) =>
+          !["6467c855-165d-4dc8-88b5-68c54599e930"].includes(item.stringId)
+      );
+
+      const isOwner = !_.isEmpty(excDR);
+
+      if (isOwner) {
+        const dataOwner = await tx.boothOwner.findFirst({
+          where: { userId: userDetail.userId },
+        });
+
+        if (dataOwner) {
+          const listMember = await tx.booth.findFirst({
+            where: { boothOwnerId: dataOwner.boothOwnerId },
+          });
+
+          return { listMember };
+        }
+
+        return { dataOwner };
+      }
+
+      return { userDetail, pointLoyalty, isOwner, historyPoint };
     });
   } catch (e: any) {
     throw new Error(e.message);

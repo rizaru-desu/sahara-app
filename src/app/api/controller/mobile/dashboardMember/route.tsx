@@ -19,7 +19,14 @@ export async function POST(request: NextRequest) {
     if (tokenValidated) {
       const { userId } = tokenValidated;
 
-      const { userDetail, pointLoyalty } = await dashboardMemberMob({
+      const {
+        userDetail,
+        pointLoyalty,
+        isOwner,
+        dataOwner,
+        listMember,
+        historyPoint,
+      } = await dashboardMemberMob({
         userId,
       });
 
@@ -27,6 +34,10 @@ export async function POST(request: NextRequest) {
         {
           userDetail,
           currentPoint: pointLoyalty,
+          isOwner,
+          dataOwner,
+          listMember,
+          historyPoint,
         },
         {
           status: 200,

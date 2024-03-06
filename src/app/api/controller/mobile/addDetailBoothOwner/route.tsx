@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      await addDetailBoothOwner({
+      const { addBoothOwner } = await addDetailBoothOwner({
         userId: tokenValidated.userId,
         alamatOwner: resultValid.alamatOwner,
         facebook: resultValid.facebook || undefined,
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message: `Successfully saved.`,
+          data: addBoothOwner,
         },
         {
           status: 200,

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { dashboardDRMob } from "@/app/utils/db/controllerDB";
+import { dashboardMemberMob } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 
 export async function POST(request: NextRequest) {
@@ -19,13 +19,14 @@ export async function POST(request: NextRequest) {
     if (tokenValidated) {
       const { userId } = tokenValidated;
 
-      const { userDetail } = await dashboardDRMob({
+      const { userDetail, pointLoyalty } = await dashboardMemberMob({
         userId,
       });
 
       return NextResponse.json(
         {
           userDetail,
+          currentPoint: pointLoyalty,
         },
         {
           status: 200,

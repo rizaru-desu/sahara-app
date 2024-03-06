@@ -2483,6 +2483,7 @@ const findUser = async ({ tx, userId }: any) => {
   return await tx.user.findUnique({
     where: { userId },
     select: {
+      userId: true,
       fullname: true,
       phone: true,
       dateOfBirth: true,
@@ -2544,8 +2545,12 @@ const dashboardMemberMob = async ({ userId }: { userId: string }) => {
   try {
     return prisma.$transaction(async (tx) => {
       const userDetail = await findUser({ tx, userId });
+      const pointLoyalty = await tx.loyaltyPoint.findFirst({
+        where: { userId: userDetail.userId },
+        select: { loyaltyPoint: true },
+      });
 
-      return { userDetail };
+      return { userDetail, pointLoyalty };
     });
   } catch (e: any) {
     throw new Error(e.message);

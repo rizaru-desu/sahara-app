@@ -2540,6 +2540,18 @@ const dashboardDRMob = async ({ userId }: { userId: string }) => {
   }
 };
 
+const dashboardMemberMob = async ({ userId }: { userId: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const userDetail = await findUser({ tx, userId });
+
+      return { userDetail };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 const findDRMob = async ({ value }: { value: string }) => {
   try {
     return prisma.$transaction(async (tx) => {
@@ -2822,6 +2834,7 @@ export {
   forgotPasswordUser,
   addUserMobile,
   dashboardDRMob,
+  dashboardMemberMob,
   findDRMob,
   changePasswordMob,
   settingMob,

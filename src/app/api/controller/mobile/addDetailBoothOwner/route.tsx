@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
       await addDetailBoothOwner({
         userId: tokenValidated.userId,
         alamatOwner: resultValid.alamatOwner,
-        facebook: resultValid.facebook,
-        instagram: resultValid.instagram,
-        ecommerce: resultValid.ecommerce,
+        facebook: resultValid.facebook || undefined,
+        instagram: resultValid.instagram || undefined,
+        ecommerce: resultValid.ecommerce || undefined,
         berdiriSejak: resultValid.berdiriSejak,
         createdBy: resultValid.createdBy,
       });

@@ -2580,6 +2580,7 @@ const dashboardMemberMob = async ({ userId }: { userId: string }) => {
             userDetail,
             pointLoyalty,
             isOwner,
+            dataOwner,
             historyPoint,
           };
         }
@@ -2931,5 +2932,5 @@ export {
   findStockBox,
   newDeliveyOrderMob,
   findProductDRMob,
-  addDetailBoothOwner
+  addDetailBoothOwner,
 };

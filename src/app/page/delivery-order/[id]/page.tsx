@@ -22,8 +22,6 @@ export default function Home({ params }: { params: { id: string } }) {
   const [menuOpen, isMenuOpen] = React.useState(false);
   const [detailUsers, setDetailUsers] = React.useState<any>(undefined);
   const [listDeliveryOrder, setListDeliveryOrder] = React.useState<any[]>([]);
-  const [totalPage, setTotalPage] = React.useState<number>(0);
-  const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const open = React.useCallback(() => {
     isMenuOpen(!menuOpen);
@@ -72,42 +70,8 @@ export default function Home({ params }: { params: { id: string } }) {
           const { allSurat, totalSurat, userDetail } = responseApi.data;
           setLoading(false);
           setListDeliveryOrder(allSurat);
-          setTotalPage(Math.ceil(totalSurat / 100));
+
           setDetailUsers(userDetail);
-        }
-      } catch (e: any) {
-        setLoading(false);
-        if (e.response && e.response.status === 500) {
-          toastMessage({
-            message: e.response.data.message,
-            type: "error",
-          });
-        } else if (e.response && e.response.status === 401) {
-          logoutUser();
-        } else {
-          toastMessage({ message: e.message, type: "error" });
-        }
-      }
-    },
-    [logoutUser, params.id]
-  );
-
-  const getAllDeliveryOrder = React.useCallback(
-    async ({ skip, take }: { skip: number; take: number }) => {
-      try {
-        setLoading(true);
-        const authService = new Services();
-        const responseApi = await authService.getDeliveryOrderProduct({
-          skip,
-          take,
-          suratJalanId: params.id,
-        });
-
-        if (responseApi.status === 200) {
-          const { allSurat, totalSurat } = responseApi.data;
-          setLoading(false);
-          setListDeliveryOrder(allSurat);
-          setTotalPage(Math.ceil(totalSurat / 100));
         }
       } catch (e: any) {
         setLoading(false);
@@ -237,24 +201,6 @@ export default function Home({ params }: { params: { id: string } }) {
                       moment(params?.value).format("DD/MM/YYYY hh:mm"),
                   },
                 ]}
-              />
-            </div>
-
-            <div className="flex justify-center py-4">
-              <Pagination
-                count={totalPage}
-                page={currentPage}
-                onChange={async (
-                  event: React.ChangeEvent<unknown>,
-                  value: number
-                ) => {
-                  setCurrentPage(value);
-                  getAllDeliveryOrder({
-                    skip: Math.max(0, (value - 1) * 100),
-                    take: 100,
-                  });
-                }}
-                shape="rounded"
               />
             </div>
           </div>

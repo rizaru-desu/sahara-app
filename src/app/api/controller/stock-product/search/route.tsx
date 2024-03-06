@@ -52,13 +52,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const result = await stockProdutSearch({
+      const { result, statusMap } = await stockProdutSearch({
         value: resultValid.value,
+      });
+
+      const mappedData = _.map(result, (d) => {
+        const statusValue = _.find(statusMap as any, { key: d.status }).value;
+        return { ...d, status: statusValue };
       });
 
       return NextResponse.json(
         {
-          data: result,
+          data: mappedData,
         },
         {
           status: 200,

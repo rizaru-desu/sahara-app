@@ -687,7 +687,7 @@ export default function Home() {
                       field: "startDate",
                       headerName: "Start Date",
                       minWidth: 250,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                       valueFormatter: (params: any) =>
@@ -748,6 +748,7 @@ export default function Home() {
                     {
                       field: "createdBy",
                       headerName: "Created By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -755,6 +756,7 @@ export default function Home() {
                     {
                       field: "createdAt",
                       headerName: "Created At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -764,6 +766,7 @@ export default function Home() {
                     {
                       field: "modifiedBy",
                       headerName: "Modified By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -771,6 +774,7 @@ export default function Home() {
                     {
                       field: "modifedAt",
                       headerName: "Modifed At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,

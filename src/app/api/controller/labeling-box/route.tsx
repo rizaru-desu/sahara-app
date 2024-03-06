@@ -54,12 +54,18 @@ export async function POST(request: NextRequest) {
 
     if (tokenValidated) {
       const { userId } = tokenValidated;
-      const { detail, allLabelBox, totalLabelBox, allLabel, totalLabel } =
-        await pageAllLabelingBox({
-          skip: resultValid.skip,
-          take: resultValid.take,
-          userId: userId,
-        });
+      const {
+        detail,
+        allLabelBox,
+        totalLabelBox,
+        allLabel,
+        totalLabel,
+        statusMap,
+      } = await pageAllLabelingBox({
+        skip: resultValid.skip,
+        take: resultValid.take,
+        userId: userId,
+      });
 
       const labelBoxResult = _.map(allLabelBox, (item) => {
         return Object.assign(
@@ -81,9 +87,16 @@ export async function POST(request: NextRequest) {
         );
       });
 
+      const mappedData = _.map(labelBoxResult, (d) => {
+        const statusValue = _.find(statusMap as any, {
+          key: d.statusBox,
+        }).value;
+        return { ...d, statusBox: statusValue };
+      });
+
       return NextResponse.json(
         {
-          allLabelBox: labelBoxResult,
+          allLabelBox: mappedData,
           userDetail: detail,
           allLabel: labelResult,
           countLabel: totalLabel,

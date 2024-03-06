@@ -56,14 +56,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, count } = await deliveryOrderPagination({
+      const { result, count, statusMap } = await deliveryOrderPagination({
         skip: resultValid.skip,
         take: resultValid.take,
       });
 
+      const mappedData = _.map(result, (d) => {
+        const statusValue = _.find(statusMap as any, { key: d.status }).value;
+        return { ...d, status: statusValue };
+      });
+
       return NextResponse.json(
         {
-          allSurat: result,
+          allSurat: mappedData,
           totalSurat: count,
         },
         {

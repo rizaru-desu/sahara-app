@@ -380,27 +380,34 @@ export default function Home() {
                     headerAlign: "center",
                     editable: false,
                     renderCell: (params) => {
-                      const sampleNames: any = {
-                        1: "Created",
-                        2: "InStock",
-                        3: "OnDelivery",
-                        4: "Sold",
-                        5: "Expired",
-                        6: "Damage",
-                      };
+                      const status = [
+                        { text: "On Created", color: "bg-blue-500" },
+                        { text: "InStock", color: "bg-green-500" },
+                        { text: "On Delivery", color: "bg-yellow-500" },
+                        { text: "Sold", color: "bg-purple-500" },
+                        { text: "Expired", color: "bg-red-500" },
+                        { text: "Damage", color: "bg-red-500" },
+                        { text: "Canceled", color: "bg-red-500" },
+                      ] as any;
 
-                      const statusText =
-                        (sampleNames[params.value] as any) ||
-                        ("Unknown" as any);
+                      const getStatusInfo = _.find(status, {
+                        text: params.value,
+                      });
 
-                      return <span className="text-black">{statusText}</span>;
+                      return (
+                        <span
+                          className={`justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm ${getStatusInfo.color}`}
+                        >
+                          {params.value}
+                        </span>
+                      );
                     },
                   },
                   {
                     field: "location",
                     headerName: "Location",
                     minWidth: 250,
-                    align: "left",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
@@ -424,7 +431,7 @@ export default function Home() {
                     field: "labelProducts",
                     headerName: "Label Product",
                     minWidth: 250,
-                    align: "left",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
@@ -433,7 +440,7 @@ export default function Home() {
                     field: "labelBoxs",
                     headerName: "Label Box",
                     minWidth: 250,
-                    align: "left",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
@@ -441,7 +448,7 @@ export default function Home() {
                     field: "weight",
                     headerName: "wieght (kg)",
                     minWidth: 50,
-                    align: "right",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
@@ -449,13 +456,14 @@ export default function Home() {
                     field: "unit",
                     headerName: "Unit",
                     minWidth: 250,
-                    align: "left",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
                   {
                     field: "expiredDate",
                     headerName: "Expired Date",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -465,6 +473,7 @@ export default function Home() {
                   {
                     field: "createdBy",
                     headerName: "Created By",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -472,6 +481,7 @@ export default function Home() {
                   {
                     field: "createdAt",
                     headerName: "Created At",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -481,6 +491,7 @@ export default function Home() {
                   {
                     field: "modifiedBy",
                     headerName: "Modified By",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -488,6 +499,7 @@ export default function Home() {
                   {
                     field: "modifedAt",
                     headerName: "Modifed At",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,

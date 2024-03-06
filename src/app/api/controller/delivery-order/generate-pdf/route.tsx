@@ -53,17 +53,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { findSuratJalan, findProduct, statusStock } =
-        await deliveryOrderFind({
-          suratJalanId: resultValid.suratJalanId,
-          createdBy: resultValid.createdBy,
-        });
+      const { findSuratJalan, findProductInStock } = await deliveryOrderFind({
+        suratJalanId: resultValid.suratJalanId,
+        createdBy: resultValid.createdBy,
+      });
 
       return NextResponse.json(
         {
           findSuratJalan,
-          findProduct,
-          statusStock,
+          findProductInStock,
         },
         {
           status: 200,

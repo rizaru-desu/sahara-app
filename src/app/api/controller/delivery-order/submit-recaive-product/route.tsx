@@ -1,14 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { deliveryOrderProductPagination } from "@/app/utils/db/controllerDB";
+import { orderDeliveryRecaive } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
 
 const Schema = z
   .object({
-    skip: z.number(),
-    take: z.number(),
     suratJalanId: z.string(),
+    recaiveDate: z.string(),
+    recaiveBy: z.string(),
+    recaiveNote: z.string().optional(),
+    createdBy: z.string(),
+    dataQty: z.array(
+      z.object({ suratJalanProductId: z.string(), recaivedQty: z.number() })
+    ),
   })
   .strict();
 
@@ -54,16 +59,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, count } = await deliveryOrderProductPagination({
-        skip: resultValid.skip,
-        take: resultValid.take,
+      await orderDeliveryRecaive({
         suratJalanId: resultValid.suratJalanId,
+        recaiveDate: resultValid.recaiveDate,
+        recaiveBy: resultValid.recaiveBy,
+        recaiveNote: resultValid.recaiveNote,
+        dataQty: resultValid.dataQty,
+        createdBy: resultValid.createdBy,
       });
 
       return NextResponse.json(
         {
-          allSurat: result,
-          totalSurat: count,
+          message: "Received Delivery Request completed",
         },
         {
           status: 200,

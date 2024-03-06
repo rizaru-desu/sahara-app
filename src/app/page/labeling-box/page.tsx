@@ -513,7 +513,7 @@ export default function Home() {
                       field: "productCode",
                       headerName: "Product Code",
                       minWidth: 250,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                     },
@@ -521,7 +521,7 @@ export default function Home() {
                       field: "labelCode",
                       headerName: "Label Product Code",
                       minWidth: 250,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                     },
@@ -553,6 +553,7 @@ export default function Home() {
                     {
                       field: "createdBy",
                       headerName: "Created By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -560,6 +561,7 @@ export default function Home() {
                     {
                       field: "createdAt",
                       headerName: "Created At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -569,6 +571,7 @@ export default function Home() {
                     {
                       field: "modifiedBy",
                       headerName: "Modified By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -576,6 +579,7 @@ export default function Home() {
                     {
                       field: "modifedAt",
                       headerName: "Modifed At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -649,7 +653,7 @@ export default function Home() {
                       field: "PackageDate",
                       headerName: "Package Date",
                       minWidth: 250,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                       valueFormatter: (params: any) =>
@@ -659,7 +663,7 @@ export default function Home() {
                       field: "labelCodeBox",
                       headerName: "Label Box Code",
                       minWidth: 250,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                     },
@@ -675,7 +679,7 @@ export default function Home() {
                       field: "leader",
                       headerName: "Leader / Atasan",
                       minWidth: 250,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                     },
@@ -687,13 +691,21 @@ export default function Home() {
                       headerAlign: "center",
                       editable: false,
                       renderCell: (params) => {
+                        const status = [
+                          { text: "On Created", color: "bg-blue-500" },
+                          { text: "Printed", color: "bg-green-500" },
+                          { text: "Canceled", color: "bg-red-500" },
+                        ] as any;
+
+                        const getStatusInfo = _.find(status, {
+                          text: params.value,
+                        });
+
                         return (
-                          <span className="text-black">
-                            {params.value === 0
-                              ? "Generate"
-                              : params.value === 1
-                              ? "Printed"
-                              : "Canceled"}
+                          <span
+                            className={`justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm ${getStatusInfo.color}`}
+                          >
+                            {params.value}
                           </span>
                         );
                       },
@@ -701,6 +713,7 @@ export default function Home() {
                     {
                       field: "createdBy",
                       headerName: "Created By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -708,6 +721,7 @@ export default function Home() {
                     {
                       field: "createdAt",
                       headerName: "Created At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -717,6 +731,7 @@ export default function Home() {
                     {
                       field: "modifiedBy",
                       headerName: "Modified By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,
@@ -724,6 +739,7 @@ export default function Home() {
                     {
                       field: "modifedAt",
                       headerName: "Modifed At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 250,
                       editable: false,

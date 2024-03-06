@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const result = await labelBoxSearch({
+      const { statusMap, result } = await labelBoxSearch({
         value: resultValid.value,
       });
 
@@ -67,9 +67,16 @@ export async function POST(request: NextRequest) {
         );
       });
 
+      const mappedData = _.map(updated, (d) => {
+        const statusValue = _.find(statusMap as any, {
+          key: d.statusBox,
+        }).value;
+        return { ...d, statusBox: statusValue };
+      });
+
       return NextResponse.json(
         {
-          data: updated,
+          data: mappedData,
         },
         {
           status: 200,

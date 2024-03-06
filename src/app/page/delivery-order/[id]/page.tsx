@@ -13,7 +13,6 @@ import SideBar from "@/app/component/sideBar";
 import NavBar from "@/app/component/navBar";
 import Loader from "@/app/component/loader";
 import Loading from "@/app/loading";
-import Search from "@/app/component/search";
 import moment from "moment";
 
 export default function Home({ params }: { params: { id: string } }) {
@@ -156,7 +155,7 @@ export default function Home({ params }: { params: { id: string } }) {
                     field: "labelBox",
                     headerName: "Label Box",
                     minWidth: 250,
-                    align: "left",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
@@ -170,13 +169,16 @@ export default function Home({ params }: { params: { id: string } }) {
                     renderCell: (params) => {
                       return (
                         <div className="flex flex-col gap-5">
-                          {_.map(params.value.labelProduct, (item: any) => {
-                            return (
-                              <span>
-                                [{item.productCode}] {item.productName}
-                              </span>
-                            );
-                          })}
+                          {_.map(
+                            _.uniqBy(params.value.labelProduct, "productId"),
+                            (item: any) => {
+                              return (
+                                <span>
+                                  [{item.productCode}] {item.productName}
+                                </span>
+                              );
+                            }
+                          )}
                         </div>
                       );
                     },
@@ -200,6 +202,7 @@ export default function Home({ params }: { params: { id: string } }) {
                   {
                     field: "createdBy",
                     headerName: "Created By",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -208,6 +211,7 @@ export default function Home({ params }: { params: { id: string } }) {
                   {
                     field: "createdAt",
                     headerName: "Created At",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -217,6 +221,7 @@ export default function Home({ params }: { params: { id: string } }) {
                   {
                     field: "modifiedBy",
                     headerName: "Modified By",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -224,6 +229,7 @@ export default function Home({ params }: { params: { id: string } }) {
                   {
                     field: "modifedAt",
                     headerName: "Modifed At",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,

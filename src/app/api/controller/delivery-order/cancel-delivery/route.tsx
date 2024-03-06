@@ -1,12 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { deliveryOrderSearch } from "@/app/utils/db/controllerDB";
+import {
+  deliveryOrderSearch,
+  orderDeliveryCancel,
+} from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
 
 const Schema = z
   .object({
-    value: z.string(),
+    suratJalanId: z.string(),
+    createdBy: z.string(),
   })
   .strict();
 
@@ -52,18 +56,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, statusMap } = await deliveryOrderSearch({
-        value: resultValid.value,
-      });
-
-      const mappedData = _.map(result, (d) => {
-        const statusValue = _.find(statusMap as any, { key: d.status }).value;
-        return { ...d, status: statusValue };
+      const { updateSuratJalan } = await orderDeliveryCancel({
+        suratJalanId: resultValid.suratJalanId,
+        createdBy: resultValid.createdBy,
       });
 
       return NextResponse.json(
         {
-          data: mappedData,
+          message: `${updateSuratJalan.noSurat} it's been cancelled`,
         },
         {
           status: 200,

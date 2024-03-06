@@ -957,18 +957,10 @@ export class Services {
     return response;
   };
 
-  getDeliveryOrderProduct = async ({
-    skip,
-    take,
-    suratJalanId,
-  }: {
-    skip: number;
-    take: number;
-    suratJalanId: string;
-  }) => {
+  getRecaiveProduct = async ({ suratJalanId }: { suratJalanId: string }) => {
     const response: AxiosResponse<any> = await this.instance.post(
-      "api/controller/delivery-order/product/all-product",
-      { skip, take, suratJalanId }
+      "api/controller/delivery-order/recaive-product/",
+      { suratJalanId }
     );
 
     return response;
@@ -993,6 +985,44 @@ export class Services {
     const response: AxiosResponse<any> = await this.instance.post(
       "api/controller/delivery-order/search",
       { value }
+    );
+
+    return response;
+  };
+
+  recaiveDeliveryOrder = async ({
+    suratJalanId,
+    recaiveDate,
+    recaiveBy,
+    recaiveNote,
+    dataQty,
+    createdBy,
+  }: {
+    suratJalanId: string;
+    recaiveDate: string;
+    recaiveBy: string;
+    recaiveNote?: string;
+    createdBy: string;
+    dataQty: any[];
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/submit-recaive-product",
+      { suratJalanId, recaiveDate, recaiveBy, recaiveNote, createdBy, dataQty }
+    );
+
+    return response;
+  };
+
+  cancelDeliveryOrder = async ({
+    suratJalanId,
+    createdBy,
+  }: {
+    suratJalanId: string;
+    createdBy: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/delivery-order/cancel-delivery",
+      { suratJalanId, createdBy }
     );
 
     return response;

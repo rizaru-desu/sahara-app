@@ -56,14 +56,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, count } = await stockProdutPagination({
+      const { result, count, statusMap } = await stockProdutPagination({
         skip: resultValid.skip,
         take: resultValid.take,
       });
 
+      const mappedData = _.map(result, (d) => {
+        const statusValue = _.find(statusMap as any, { key: d.status }).value;
+        return { ...d, status: statusValue };
+      });
+
       return NextResponse.json(
         {
-          allStockProduct: result,
+          allStockProduct: mappedData,
           countStockProduct: count,
         },
         {

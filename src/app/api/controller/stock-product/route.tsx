@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import {
   pageAllLabeling,
-  pageAllStockProdut,
+  pageAllStockProduct,
 } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
@@ -57,15 +57,21 @@ export async function POST(request: NextRequest) {
 
     if (tokenValidated) {
       const { userId } = tokenValidated;
-      const { detail, allStock, totalStock } = await pageAllStockProdut({
-        skip: resultValid.skip,
-        take: resultValid.take,
-        userId: userId,
+      const { detail, allStock, totalStock, statusMap } =
+        await pageAllStockProduct({
+          skip: resultValid.skip,
+          take: resultValid.take,
+          userId: userId,
+        });
+
+      const mappedData = _.map(allStock, (d) => {
+        const statusValue = _.find(statusMap as any, { key: d.status }).value;
+        return { ...d, status: statusValue };
       });
 
       return NextResponse.json(
         {
-          allStock: allStock,
+          allStock: mappedData,
           userDetail: detail,
           countStock: totalStock,
         },

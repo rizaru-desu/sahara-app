@@ -245,7 +245,7 @@ export default function Home({ params }: { params: { id: string } }) {
                       headerName: "Member Name",
                       minWidth: 350,
                       flex: 1,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                     },
@@ -264,7 +264,7 @@ export default function Home({ params }: { params: { id: string } }) {
                       field: "email",
                       headerName: "Email",
                       minWidth: 350,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                     },
@@ -313,6 +313,7 @@ export default function Home({ params }: { params: { id: string } }) {
                     {
                       field: "createdBy",
                       headerName: "Created By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 350,
                       editable: false,
@@ -320,6 +321,7 @@ export default function Home({ params }: { params: { id: string } }) {
                     {
                       field: "createdAt",
                       headerName: "Created At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 350,
                       editable: false,
@@ -329,6 +331,7 @@ export default function Home({ params }: { params: { id: string } }) {
                     {
                       field: "modifiedBy",
                       headerName: "Modified By",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 350,
                       editable: false,
@@ -336,6 +339,7 @@ export default function Home({ params }: { params: { id: string } }) {
                     {
                       field: "modifedAt",
                       headerName: "Modifed At",
+                      align: "center",
                       headerAlign: "center",
                       minWidth: 350,
                       editable: false,

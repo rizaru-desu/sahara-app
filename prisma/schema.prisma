@@ -284,7 +284,6 @@ model SuratJalanProduct {
   shipQty             Int
   labelBox            String      @db.VarChar(255)
   labelBoxId          String      @db.VarChar(255)
-  stockId             String      @db.VarChar(255)
   recaivedQty         Int?
   statusProduct       Int?
   createdAt           DateTime    @default(now())

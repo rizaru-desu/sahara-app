@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { pageAllLabelingBox, pageAllPoCam } from "@/app/utils/db/controllerDB";
+import { pageAllPoCam } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
 

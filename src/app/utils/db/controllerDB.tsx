@@ -27,7 +27,14 @@ const pageAllUser = async ({ userId, skip, take }: pageAll) => {
     const [detail, roles, allUser, totalUser] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.stringMap.findMany({
         where: { objectName: "Roles" },
@@ -198,7 +205,14 @@ const detailUser = async ({ userId }: detailUserInput) => {
     const [result] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
     ]);
 
@@ -407,7 +421,14 @@ const loginUser = async ({ email }: { email: string }) => {
     const [user, roles] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { email },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.stringMap.findMany({
         where: { objectName: "Roles" },
@@ -429,7 +450,14 @@ const pageAllAgent = async ({ userId, skip, take }: pageAll) => {
     const [detail, allAgent, totalAgent] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.agent.findMany({
         skip,
@@ -589,7 +617,14 @@ const pageAllProduct = async ({ userId, skip, take }: pageAll) => {
     const [detail, allProduct, totalProduct] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.product.findMany({
         skip,
@@ -728,7 +763,14 @@ const pageAllOwnerBooth = async ({ userId, skip, take }: pageAll) => {
     const [detail, allBoothOwner, totalBoothOwner] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.boothOwner.findMany({
         skip,
@@ -763,7 +805,14 @@ const pageAllMemberBooth = async ({
       await prisma.$transaction([
         prisma.user.findUnique({
           where: { userId },
-          include: { roles: { select: { stringId: true } } },
+          select: {
+            userId: true,
+            fullname: true,
+            inActive: true,
+            email: true,
+            leader: true,
+            roles: { select: { stringId: true } },
+          },
         }),
         prisma.booth.findMany({
           skip,
@@ -926,7 +975,14 @@ const pageAllLabeling = async ({ userId, skip, take }: pageAll) => {
       await prisma.$transaction([
         prisma.user.findUnique({
           where: { userId },
-          include: { roles: { select: { stringId: true } } },
+          select: {
+            userId: true,
+            fullname: true,
+            inActive: true,
+            email: true,
+            leader: true,
+            roles: { select: { stringId: true } },
+          },
         }),
         prisma.product.findMany({
           orderBy: { productName: "asc" },
@@ -1095,31 +1151,52 @@ const labelProductPrinter = async ({
 /** SECTION LABELING BOX */
 const pageAllLabelingBox = async ({ userId, skip, take }: pageAll) => {
   try {
-    const [detail, allLabelBox, totalLabelBox, allLabel, totalLabel] =
-      await prisma.$transaction([
-        prisma.user.findUnique({
-          where: { userId },
-          include: { roles: { select: { stringId: true } } },
-        }),
-        prisma.labelBox.findMany({
-          skip,
-          take,
-          include: { labelProduct: true },
-          orderBy: { createdAt: "desc" },
-        }),
-        prisma.labelBox.count(),
-        prisma.labelProduct.findMany({
-          where: { AND: [{ labelBoxId: null }] },
-          skip,
-          take,
-          orderBy: { createdAt: "desc" },
-        }),
-        prisma.labelProduct.count({
-          where: { AND: [{ labelBoxId: null }] },
-        }),
-      ]);
+    const [
+      detail,
+      allLabelBox,
+      totalLabelBox,
+      allLabel,
+      totalLabel,
+      statusMap,
+    ] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
+      }),
+      prisma.labelBox.findMany({
+        skip,
+        take,
+        include: { labelProduct: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.labelBox.count(),
+      prisma.labelProduct.findMany({
+        where: { AND: [{ labelBoxId: null }] },
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.labelProduct.count({
+        where: { AND: [{ labelBoxId: null }] },
+      }),
+      prisma.stringMap.findMany({ where: { objectName: "Labeling Box" } }),
+    ]);
 
-    return { detail, allLabelBox, totalLabelBox, allLabel, totalLabel };
+    return {
+      detail,
+      allLabelBox,
+      totalLabelBox,
+      allLabel,
+      totalLabel,
+      statusMap,
+    };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1141,7 +1218,14 @@ const pageAllLabelingBoxChild = async ({
       await prisma.$transaction([
         prisma.user.findUnique({
           where: { userId },
-          include: { roles: { select: { stringId: true } } },
+          select: {
+            userId: true,
+            fullname: true,
+            inActive: true,
+            email: true,
+            leader: true,
+            roles: { select: { stringId: true } },
+          },
         }),
         prisma.labelBox.findUnique({
           where: { labelBoxId },
@@ -1166,7 +1250,7 @@ const pageAllLabelingBoxChild = async ({
 
 const labelBoxPagination = async ({ skip, take }: paginations) => {
   try {
-    const [result, count] = await prisma.$transaction([
+    const [result, count, statusMap] = await prisma.$transaction([
       prisma.labelBox.findMany({
         skip,
         take,
@@ -1174,9 +1258,10 @@ const labelBoxPagination = async ({ skip, take }: paginations) => {
         orderBy: { createdAt: "desc" },
       }),
       prisma.labelBox.count(),
+      prisma.stringMap.findMany({ where: { objectName: "Labeling Box" } }),
     ]);
 
-    return { result, count };
+    return { result, count, statusMap };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1199,7 +1284,7 @@ const labelBoxFind = async ({ labelBoxId }: { labelBoxId: string }) => {
 
 const labelBoxSearch = async ({ value }: valueSearch) => {
   try {
-    const [result] = await prisma.$transaction([
+    const [result, statusMap] = await prisma.$transaction([
       prisma.labelBox.findMany({
         where: {
           OR: [
@@ -1211,9 +1296,10 @@ const labelBoxSearch = async ({ value }: valueSearch) => {
         include: { labelProduct: true },
         orderBy: { createdAt: "desc" },
       }),
+      prisma.stringMap.findMany({ where: { objectName: "Labeling Box" } }),
     ]);
 
-    return result;
+    return { statusMap, result };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1379,22 +1465,35 @@ const labelBoxPrinter = async ({ labelId, modifiedBy }: printabelsProduct) => {
 /** END SECTION LABELING BOX*/
 
 /** SECTION STOCK PRODUCT */
-const pageAllStockProdut = async ({ userId, skip, take }: pageAll) => {
+const pageAllStockProduct = async ({ userId, skip, take }: pageAll) => {
   try {
-    const [detail, allStock, totalStock] = await prisma.$transaction([
-      prisma.user.findUnique({
-        where: { userId },
-        include: { roles: { select: { stringId: true } } },
-      }),
-      prisma.stokPorudct.findMany({
-        skip,
-        take,
-        orderBy: { status: "desc" },
-      }),
-      prisma.stokPorudct.count(),
-    ]);
+    const [detail, allStock, totalStock, statusMap] = await prisma.$transaction(
+      [
+        prisma.user.findUnique({
+          where: { userId },
+          select: {
+            userId: true,
+            fullname: true,
+            inActive: true,
+            email: true,
+            leader: true,
+            roles: { select: { stringId: true } },
+          },
+        }),
+        prisma.stokPorudct.findMany({
+          skip,
+          take,
+          orderBy: { status: "desc" },
+        }),
+        prisma.stokPorudct.count(),
+        prisma.stringMap.findMany({
+          where: { objectName: "Stock Product" },
+          orderBy: { key: "asc" },
+        }),
+      ]
+    );
 
-    return { detail, allStock, totalStock };
+    return { detail, allStock, totalStock, statusMap };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1402,16 +1501,20 @@ const pageAllStockProdut = async ({ userId, skip, take }: pageAll) => {
 
 const stockProdutPagination = async ({ skip, take }: paginations) => {
   try {
-    const [result, count] = await prisma.$transaction([
+    const [result, count, statusMap] = await prisma.$transaction([
       prisma.stokPorudct.findMany({
         skip,
         take,
         orderBy: { status: "desc" },
       }),
       prisma.stokPorudct.count(),
+      prisma.stringMap.findMany({
+        where: { objectName: "Stock Product" },
+        orderBy: { key: "asc" },
+      }),
     ]);
 
-    return { result, count };
+    return { result, count, statusMap };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1419,7 +1522,7 @@ const stockProdutPagination = async ({ skip, take }: paginations) => {
 
 const stockProdutSearch = async ({ value }: valueSearch) => {
   try {
-    const [result] = await prisma.$transaction([
+    const [result, statusMap] = await prisma.$transaction([
       prisma.stokPorudct.findMany({
         where: {
           OR: [
@@ -1431,9 +1534,13 @@ const stockProdutSearch = async ({ value }: valueSearch) => {
         },
         orderBy: { status: "desc" },
       }),
+      prisma.stringMap.findMany({
+        where: { objectName: "Stock Product" },
+        orderBy: { key: "asc" },
+      }),
     ]);
 
-    return result;
+    return { result, statusMap };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1526,7 +1633,14 @@ const pageAllLoyalty = async ({ userId, skip, take }: pageAll) => {
     const [detail, allLoyalty, totalLoyalty] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.loyaltyPoint.findMany({
         skip,
@@ -1550,7 +1664,14 @@ const pageAllLoyaltyLog = async ({ userId, skip, take }: pageAll) => {
     const [detail, allLoyaltyLog, totalLoyaltyLog] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.loyaltyPointLog.findMany({
         skip,
@@ -1708,7 +1829,14 @@ const pageAllPoCam = async ({ userId, skip, take }: pageAll) => {
       await prisma.$transaction([
         prisma.user.findUnique({
           where: { userId },
-          include: { roles: { select: { stringId: true } } },
+          select: {
+            userId: true,
+            fullname: true,
+            inActive: true,
+            email: true,
+            leader: true,
+            roles: { select: { stringId: true } },
+          },
         }),
         prisma.campaign.findMany({
           skip,
@@ -1927,7 +2055,14 @@ const pageDashboard = async ({ userId }: { userId: string }) => {
     const [detail, topTenPoint, activeCampaign] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.loyaltyPoint.findMany({
         orderBy: { loyaltyPoint: "desc" },
@@ -1951,20 +2086,33 @@ const pageDashboard = async ({ userId }: { userId: string }) => {
 /** SECTION DELIVERY ORDER */
 const pageAllDeliveryOrder = async ({ userId, skip, take }: pageAll) => {
   try {
-    const [detail, allSurat, totalSurat] = await prisma.$transaction([
-      prisma.user.findUnique({
-        where: { userId },
-        include: { roles: { select: { stringId: true } } },
-      }),
-      prisma.suratJalan.findMany({
-        skip,
-        take,
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.suratJalan.count(),
-    ]);
+    const [detail, allSurat, totalSurat, statusMap] = await prisma.$transaction(
+      [
+        prisma.user.findUnique({
+          where: { userId },
+          select: {
+            userId: true,
+            fullname: true,
+            inActive: true,
+            email: true,
+            leader: true,
+            roles: { select: { stringId: true } },
+          },
+        }),
+        prisma.suratJalan.findMany({
+          skip,
+          take,
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.suratJalan.count(),
+        prisma.stringMap.findMany({
+          where: { objectName: "Delivery Request" },
+          orderBy: { key: "asc" },
+        }),
+      ]
+    );
 
-    return { detail, allSurat, totalSurat };
+    return { detail, allSurat, totalSurat, statusMap };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -1985,7 +2133,14 @@ const pageAllDeliveryOrderProduct = async ({
     const [detail, allSurat, totalSurat] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { userId },
-        include: { roles: { select: { stringId: true } } },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
       }),
       prisma.suratJalanProduct.findMany({
         where: { suratJalanId },
@@ -2005,16 +2160,20 @@ const pageAllDeliveryOrderProduct = async ({
 
 const deliveryOrderPagination = async ({ skip, take }: paginations) => {
   try {
-    const [result, count] = await prisma.$transaction([
+    const [result, count, statusMap] = await prisma.$transaction([
       prisma.suratJalan.findMany({
         skip,
         take,
         orderBy: { createdAt: "desc" },
       }),
       prisma.suratJalan.count(),
+      prisma.stringMap.findMany({
+        where: { objectName: "Delivery Request" },
+        orderBy: { key: "asc" },
+      }),
     ]);
 
-    return { result, count };
+    return { result, count, statusMap };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -2055,16 +2214,20 @@ const deliveryOrderProductPagination = async ({
 
 const deliveryOrderSearch = async ({ value }: valueSearch) => {
   try {
-    const [result] = await prisma.$transaction([
+    const [result, statusMap] = await prisma.$transaction([
       prisma.suratJalan.findMany({
         where: {
           OR: [{ noSurat: { contains: value } }],
         },
         orderBy: { createdAt: "desc" },
       }),
+      prisma.stringMap.findMany({
+        where: { objectName: "Delivery Request" },
+        orderBy: { key: "asc" },
+      }),
     ]);
 
-    return result;
+    return { result, statusMap };
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -2085,31 +2248,22 @@ const deliveryOrderFind = async ({
       });
 
       if (insertSuratJalan) {
-        if (insertSuratJalan.status === 2) {
-          const findSuratJalan = await tx.suratJalan.findUnique({
-            where: { suratJalanId: insertSuratJalan.suratJalanId },
+        const findSuratJalan = await tx.suratJalan.findUnique({
+          where: { suratJalanId: insertSuratJalan.suratJalanId },
+          include: { suratJalanProduct: true },
+        });
+
+        if (findSuratJalan) {
+          const productIds = _.map(
+            findSuratJalan.suratJalanProduct,
+            "labelBoxId"
+          );
+
+          const findProductInStock = await tx.stokPorudct.findMany({
+            where: { labelBoxId: { in: productIds } },
           });
 
-          const findProduct = await tx.suratJalanProduct.findMany({
-            where: { suratJalanId: insertSuratJalan.suratJalanId },
-            include: {
-              box: {
-                include: {
-                  labelProduct: true,
-                },
-              },
-            },
-            orderBy: { createdAt: "desc" },
-          });
-
-          const stockIds = _.map(findProduct, "stockId");
-
-          const statusStock = await tx.stokPorudct.updateMany({
-            where: { stockId: { in: stockIds } },
-            data: { status: 3 },
-          });
-
-          return { findProduct, statusStock, findSuratJalan };
+          return { findProductInStock, findSuratJalan };
         }
       }
 
@@ -2120,59 +2274,110 @@ const deliveryOrderFind = async ({
   }
 };
 
-const orderDeiveryCancel = async ({
+const getRecaiveProduct = async ({
   suratJalanId,
-  createdBy,
 }: {
   suratJalanId: string;
-  createdBy: string;
 }) => {
   try {
     return prisma.$transaction(async (tx) => {
-      const insertSuratJalan = await tx.suratJalan.update({
+      const productSuratJalan = await tx.suratJalanProduct.findMany({
         where: { suratJalanId },
-        data: { status: 4, modifiedBy: createdBy },
       });
 
-      return { insertSuratJalan };
+      return { productSuratJalan };
     });
   } catch (e: any) {
     throw new Error(e.message);
   }
 };
 
-const orderDeiveryRecaive = async ({
+const orderDeliveryCancel = async ({
   suratJalanId,
-  status,
   createdBy,
 }: {
   suratJalanId: string;
-  status: any[];
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const updateSuratJalan = await tx.suratJalan.update({
+        where: { suratJalanId },
+        data: { status: 4, modifiedBy: createdBy },
+        include: { suratJalanProduct: true },
+      });
+
+      if (updateSuratJalan) {
+        const labelBoxId = _.map(
+          updateSuratJalan.suratJalanProduct,
+          "labelBoxId"
+        );
+
+        const updateStock = await tx.stokPorudct.updateMany({
+          where: { labelBoxId: { in: labelBoxId } },
+          data: { status: 2 },
+        });
+
+        return { updateStock, updateSuratJalan };
+      }
+
+      return { updateSuratJalan };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const orderDeliveryRecaive = async ({
+  suratJalanId,
+  recaiveDate,
+  recaiveBy,
+  recaiveNote,
+  dataQty,
+  createdBy,
+}: {
+  suratJalanId: string;
+  recaiveDate: string;
+  recaiveBy: string;
+  recaiveNote?: string;
+  dataQty: { suratJalanProductId: string; recaivedQty: number }[];
   createdBy: string;
 }) => {
   try {
     return prisma.$transaction(async (tx) => {
       const insertSuratJalan = await tx.suratJalan.update({
         where: { suratJalanId },
-        data: { status: 3, modifiedBy: createdBy },
+        data: {
+          status: 3,
+          recaiveBy,
+          recaiveDate,
+          recaiveNote,
+          modifiedBy: createdBy,
+        },
+        include: {
+          suratJalanProduct: true,
+        },
       });
 
       if (insertSuratJalan) {
-        for (const item of status) {
-          await tx.stokPorudct.updateMany({
-            where: { stockId: item.stockId },
-            data: { status: item.status },
+        const labelBoxId = _.map(
+          insertSuratJalan.suratJalanProduct,
+          "labelBoxId"
+        );
+
+        for (const record of dataQty) {
+          await tx.suratJalanProduct.update({
+            where: { suratJalanProductId: record.suratJalanProductId },
+            data: { recaivedQty: record.recaivedQty, statusProduct: 4 },
           });
         }
 
-        for (const item of status) {
-          await tx.suratJalanProduct.updateMany({
-            where: { stockId: item.stockId },
-            data: { statusProduct: item.status },
-          });
-        }
+        const updateStatusStock = await tx.stokPorudct.updateMany({
+          where: { labelBoxId: { in: labelBoxId } },
+          data: { status: 4 },
+        });
 
-        return null;
+        return { updateStatusStock };
       }
 
       return insertSuratJalan;
@@ -2429,7 +2634,6 @@ const newDeliveyOrderMob = async ({
   deliveryNote,
   totalWeight,
   createdBy,
-
   product,
   updateData,
 }: {
@@ -2447,7 +2651,6 @@ const newDeliveyOrderMob = async ({
     labelBoxId: string;
     shipQty: number;
     statusProduct: number;
-    stockId: string;
   }[];
   updateData: any[];
 }) => {
@@ -2582,7 +2785,7 @@ export {
   labelBoxPrinter,
 
   /** STOCK PRODUCT */
-  pageAllStockProdut,
+  pageAllStockProduct,
   stockProdutPagination,
   stockProdutRangeSearch,
   stockProdutSearch,
@@ -2617,6 +2820,9 @@ export {
   deliveryOrderProductPagination,
   pageAllDeliveryOrderProduct,
   deliveryOrderFind,
+  getRecaiveProduct,
+  orderDeliveryRecaive,
+  orderDeliveryCancel,
 
   /** Mobile */
   detailUserMob,

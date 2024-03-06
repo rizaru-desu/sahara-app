@@ -54,15 +54,21 @@ export async function POST(request: NextRequest) {
 
     if (tokenValidated) {
       const { userId } = tokenValidated;
-      const { detail, allSurat, totalSurat } = await pageAllDeliveryOrder({
-        skip: resultValid.skip,
-        take: resultValid.take,
-        userId: userId,
+      const { detail, allSurat, totalSurat, statusMap } =
+        await pageAllDeliveryOrder({
+          skip: resultValid.skip,
+          take: resultValid.take,
+          userId: userId,
+        });
+
+      const mappedData = _.map(allSurat, (d) => {
+        const statusValue = _.find(statusMap as any, { key: d.status }).value;
+        return { ...d, status: statusValue };
       });
 
       return NextResponse.json(
         {
-          allSurat,
+          allSurat: mappedData,
           totalSurat,
           userDetail: detail,
         },

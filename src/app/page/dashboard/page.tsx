@@ -113,7 +113,7 @@ export default function Home() {
                       field: "fullName",
                       headerName: "Fullname",
                       minWidth: 250,
-                      align: "left",
+                      align: "center",
                       headerAlign: "center",
                       editable: false,
                     },

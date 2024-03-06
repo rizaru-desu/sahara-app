@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, count } = await labelBoxPagination({
+      const { result, count, statusMap } = await labelBoxPagination({
         skip: resultValid.skip,
         take: resultValid.take,
       });
@@ -69,9 +69,16 @@ export async function POST(request: NextRequest) {
         );
       });
 
+      const mappedData = _.map(finalResult, (d) => {
+        const statusValue = _.find(statusMap as any, {
+          key: d.statusBox,
+        }).value;
+        return { ...d, statusBox: statusValue };
+      });
+
       return NextResponse.json(
         {
-          allLabelBox: finalResult,
+          allLabelBox: mappedData,
           countLabelBox: count,
         },
         {

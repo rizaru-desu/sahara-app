@@ -19,25 +19,12 @@ export async function POST(request: NextRequest) {
     if (tokenValidated) {
       const { userId } = tokenValidated;
 
-      const { deliveryList, userDetail } = await dashboardDRMob({
+      const { userDetail } = await dashboardDRMob({
         userId,
       });
 
-      const objStatus = {
-        1: "Create",
-        2: "OnDelivery",
-        3: "Recaive",
-        4: "Cancel",
-      } as any;
-
-      let transformedData = _.map(deliveryList, (item) => ({
-        ...item,
-        status: objStatus[item.status],
-      }));
-
       return NextResponse.json(
         {
-          deliveryList: transformedData,
           userDetail,
         },
         {

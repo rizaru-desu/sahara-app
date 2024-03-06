@@ -2575,12 +2575,17 @@ const dashboardMemberMob = async ({ userId }: { userId: string }) => {
             where: { boothOwnerId: dataOwner.boothOwnerId },
           });
 
-          return { listMember };
+          return {
+            listMember,
+            userDetail,
+            pointLoyalty,
+            isOwner,
+            historyPoint,
+          };
         }
 
-        return { dataOwner };
+        return { dataOwner, userDetail, pointLoyalty, isOwner, historyPoint };
       }
-
       return { userDetail, pointLoyalty, isOwner, historyPoint };
     });
   } catch (e: any) {

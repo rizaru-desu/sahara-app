@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     if (tokenValidated) {
       const { userId } = tokenValidated;
-      const { detail, allSurat, totalSurat, productList } =
+      const { detail, allSurat, totalSurat } =
         await pageAllDeliveryOrderProduct({
           skip: resultValid.skip,
           take: resultValid.take,
@@ -63,21 +63,11 @@ export async function POST(request: NextRequest) {
           suratJalanId: resultValid.suratJalanId,
         });
 
-      const groupedData = _.chain(productList)
-        .groupBy("labelBoxs")
-        .map((products, labelBoxs) => ({
-          labelBox: labelBoxs,
-          totalWeight: _.sumBy(products, (product) => Number(product.weight)),
-          product: _.map(products),
-        }))
-        .value();
-
       return NextResponse.json(
         {
           allSurat: allSurat,
           totalSurat,
           userDetail: detail,
-          productList: groupedData,
         },
         {
           status: 200,

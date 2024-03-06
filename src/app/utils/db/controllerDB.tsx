@@ -421,14 +421,7 @@ const loginUser = async ({ email }: { email: string }) => {
     const [user, roles] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { email },
-        select: {
-          userId: true,
-          fullname: true,
-          inActive: true,
-          email: true,
-          leader: true,
-          roles: { select: { stringId: true } },
-        },
+        include: { roles: { select: { stringId: true } } },
       }),
       prisma.stringMap.findMany({
         where: { objectName: "Roles" },

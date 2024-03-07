@@ -432,7 +432,9 @@ export default function Home() {
                           <button
                             type="button"
                             className={`${
-                              params.row.status === 1 ? "block" : "hidden"
+                              params.row.status === "On Created"
+                                ? "block"
+                                : "hidden"
                             } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
                             onClick={async (e: any) => {
                               e.preventDefault();
@@ -448,7 +450,9 @@ export default function Home() {
                           <button
                             type="button"
                             className={`${
-                              params.row.status === 2 ? "block" : "hidden"
+                              params.row.status === "On Delivery"
+                                ? "block"
+                                : "hidden"
                             } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
                             onClick={async (e: any) => {
                               e.preventDefault();
@@ -465,7 +469,9 @@ export default function Home() {
                           <button
                             type="button"
                             className={`${
-                              params.row.status === 1 ? "block" : "hidden"
+                              params.row.status === "On Created"
+                                ? "block"
+                                : "hidden"
                             } justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700`}
                             onClick={(e: any) => {
                               e.preventDefault();

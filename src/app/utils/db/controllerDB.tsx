@@ -2808,7 +2808,7 @@ const addDetailBoothOwner = async ({
 
         return { addBoothOwner };
       }
-      return {detailUser};
+      return { detailUser };
     });
   } catch (e: any) {
     throw new Error(e.message);

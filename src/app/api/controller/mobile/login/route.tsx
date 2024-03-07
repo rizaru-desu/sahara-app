@@ -40,10 +40,25 @@ export async function POST(request: NextRequest) {
       data: json,
     });
 
-    const { user } = await loginUser({ email: resultValid.email });
+    const { user, roles } = await loginUser({ email: resultValid.email });
 
     if (user) {
       if (!user?.inActive) {
+        const excBooth = _.filter(roles, (item: any) =>
+          [
+            "d4ead12a-564e-4f32-b5bb-84ccd253f904", //Super
+            "8f595a1e-cb1f-11ee-b237-38f9d362e2c9", //Delivery
+            "503da001-3e56-414b-81c0-4329287ea6c7", //member
+            "6467c855-165d-4dc8-88b5-68c54599e930", //owner
+          ].includes(item.stringId)
+        );
+
+        const isEqualRole = _.intersectionBy(
+          excBooth,
+          user?.roles as any,
+          "stringId"
+        );
+
         const generateTokens = await generateToken({
           userId: user?.userId,
           userPassword: resultValid.password,
@@ -57,6 +72,8 @@ export async function POST(request: NextRequest) {
           phone: user.phone,
           email: user.email,
           createdAt: user.createdAt,
+          previlege: isEqualRole,
+          roles: excBooth,
         };
 
         return NextResponse.json(

@@ -2520,13 +2520,11 @@ const detailUserMob = async ({ userId }: { userId: string }) => {
   }
 };
 
-const dashboardDRMob = async ({ userId }: { userId: string }) => {
+const dashboardDRMob = async () => {
   try {
     const thirtyDaysAgo = moment().subtract(90, "days").toDate();
 
     return prisma.$transaction(async (tx) => {
-      const userDetail = await findUser({ tx, userId });
-
       const deliveryList = await tx.suratJalan.findMany({
         where: { createdAt: { gte: thirtyDaysAgo } },
         include: {
@@ -2534,7 +2532,12 @@ const dashboardDRMob = async ({ userId }: { userId: string }) => {
         },
       });
 
-      return { userDetail, deliveryList };
+      const statusMap = tx.stringMap.findMany({
+        where: { objectName: "Delivery Request" },
+        orderBy: { key: "asc" },
+      });
+
+      return { deliveryList, statusMap };
     });
   } catch (e: any) {
     throw new Error(e.message);
@@ -2590,11 +2593,16 @@ const findDRMob = async ({ value }: { value: string }) => {
       const drList = await tx.suratJalan.findMany({
         where: { noSurat: { contains: value } },
         include: {
-          _count: { select: { suratJalanProduct: true } },
+          suratJalanProduct: true,
         },
       });
 
-      return { drList };
+      const statusMap = tx.stringMap.findMany({
+        where: { objectName: "Delivery Request" },
+        orderBy: { key: "asc" },
+      });
+
+      return { drList, statusMap };
     });
   } catch (e: any) {
     throw new Error(e.message);

@@ -52,25 +52,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { drList } = await findDRMob({
+      const { drList, statusMap } = await findDRMob({
         value: resultValid.value,
       });
 
-      const objStatus = {
-        1: "Create",
-        2: "OnDelivery",
-        3: "Recaive",
-        4: "Cancel",
-      } as any;
-
-      let transformedData = _.map(drList, (item) => ({
-        ...item,
-        status: objStatus[item.status],
-      }));
+      const mappedData = _.map(drList, (d) => {
+        const statusValue = _.find(statusMap as any, { key: d.status }).value;
+        return { ...d, status: statusValue };
+      });
 
       return NextResponse.json(
         {
-          deliveryList: transformedData,
+          deliveryList: mappedData,
         },
         {
           status: 200,

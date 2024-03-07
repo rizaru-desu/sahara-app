@@ -17,28 +17,16 @@ export async function POST(request: NextRequest) {
     })) as any;
 
     if (tokenValidated) {
-      const { userId } = tokenValidated;
+      const { deliveryList, statusMap } = await dashboardDRMob();
 
-      const { deliveryList, userDetail } = await dashboardDRMob({
-        userId,
+      const mappedData = _.map(deliveryList, (d) => {
+        const statusValue = _.find(statusMap as any, { key: d.status }).value;
+        return { ...d, status: statusValue };
       });
-
-      const objStatus = {
-        1: "Create",
-        2: "OnDelivery",
-        3: "Recaive",
-        4: "Cancel",
-      } as any;
-
-      let transformedData = _.map(deliveryList, (item) => ({
-        ...item,
-        status: objStatus[item.status],
-      }));
 
       return NextResponse.json(
         {
-          deliveryList: transformedData,
-          userDetail,
+          deliveryList: mappedData,
         },
         {
           status: 200,

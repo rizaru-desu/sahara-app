@@ -2597,7 +2597,7 @@ const findDRMob = async ({ value }: { value: string }) => {
         },
       });
 
-      const statusMap = tx.stringMap.findMany({
+      const statusMap = await tx.stringMap.findMany({
         where: { objectName: "Delivery Request" },
         orderBy: { key: "asc" },
       });

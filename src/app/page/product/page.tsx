@@ -499,6 +499,7 @@ export default function Home() {
                           unit: "Pack / Tiang / Pcs",
                           productCode: "SB1",
                           expiredPeriod: 100,
+                          basePoint: 100,
                         },
                       ] as any);
                       const wb = XLSX.utils.book_new();

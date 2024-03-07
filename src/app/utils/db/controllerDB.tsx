@@ -2840,6 +2840,47 @@ const findUserBooth = async ({ email }: { email: string }) => {
   }
 };
 
+const addUserBooth = async ({
+  userId,
+  boothOwnerId,
+  email,
+  alamatBooth,
+  photoBooth,
+  createdBy,
+}: {
+  boothOwnerId: string;
+  email: string;
+  userId: string;
+  alamatBooth: string;
+  photoBooth: Buffer;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findUser = await tx.user.findUnique({
+        where: { email },
+      });
+
+      const addBooth = await tx.booth.create({
+        data: {
+          alamatBooth,
+          userId,
+          fullname: findUser?.fullname || "",
+          email: findUser?.email || "",
+          phone: findUser?.phone || "",
+          photoBooth: photoBooth,
+          createdBy,
+          boothOwnerId,
+        },
+      });
+
+      return { addBooth };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 /** END SECTION MOBILE */
 
 export {
@@ -2959,4 +3000,5 @@ export {
   findProductDRMob,
   addDetailBoothOwner,
   findUserBooth,
+  addUserBooth,
 };

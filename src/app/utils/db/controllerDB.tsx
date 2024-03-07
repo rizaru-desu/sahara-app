@@ -2541,33 +2541,26 @@ const dashboardDRMob = async ({ userId }: { userId: string }) => {
   }
 };
 
-const dashboardMemberMob = async ({ userId }: { userId: string }) => {
+const dashboardMemberMob = async ({
+  userId,
+  isOwner,
+}: {
+  userId: string;
+  isOwner: boolean;
+}) => {
   try {
     return prisma.$transaction(async (tx) => {
-      const userDetail = await findUser({ tx, userId });
       const pointLoyalty = await tx.loyaltyPoint.findFirst({
-        where: { userId: userDetail.userId },
+        where: { userId },
         select: { loyaltyPoint: true },
       });
       const historyPoint = await tx.loyaltyPointLog.findMany({
-        where: { userId: userDetail.userId },
+        where: { userId },
       });
-
-      const role = await tx.stringMap.findMany({
-        where: { objectName: "Roles" },
-      });
-
-      const excDR = _.filter(
-        role,
-        (item: any) =>
-          !["6467c855-165d-4dc8-88b5-68c54599e930"].includes(item.stringId)
-      );
-
-      const isOwner = !_.isEmpty(excDR);
 
       if (isOwner) {
         const dataOwner = await tx.boothOwner.findFirst({
-          where: { userId: userDetail.userId },
+          where: { userId },
         });
 
         if (dataOwner) {
@@ -2577,17 +2570,14 @@ const dashboardMemberMob = async ({ userId }: { userId: string }) => {
 
           return {
             listMember,
-            userDetail,
             pointLoyalty,
-            isOwner,
             dataOwner,
             historyPoint,
           };
         }
-
-        return { dataOwner, userDetail, pointLoyalty, isOwner, historyPoint };
       }
-      return { userDetail, pointLoyalty, isOwner, historyPoint };
+
+      return { pointLoyalty, historyPoint };
     });
   } catch (e: any) {
     throw new Error(e.message);

@@ -1,7 +1,36 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
 import { dashboardMemberMob } from "@/app/utils/db/controllerDB";
+import z from "zod";
 import _ from "lodash";
+
+const Schema = z
+  .object({
+    isOwner: z.boolean(),
+  })
+  .strict();
+
+function validateSchema({ data }: { data: any }) {
+  try {
+    const parseData = Schema.parse(data);
+    return parseData;
+  } catch (error: any) {
+    if (error.issues && error.issues.length > 0) {
+      const validationErrors = error.issues.map((issue: any) => ({
+        path: issue.path.join("."),
+        message: issue.message,
+      }));
+
+      const errorMessage = validationErrors
+        .map((error: any) => `Field '${error.path}' ${error.message}`)
+        .join(" \n");
+
+      throw new Error(errorMessage);
+    } else {
+      throw new Error("Invalid Schema.");
+    }
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,28 +45,27 @@ export async function POST(request: NextRequest) {
         : tokenWithoutBearer,
     })) as any;
 
+    const json = await request.json();
+
+    const resultValid = validateSchema({
+      data: json,
+    });
+
     if (tokenValidated) {
       const { userId } = tokenValidated;
 
-      const {
-        userDetail,
-        pointLoyalty,
-        isOwner,
-        dataOwner,
-        listMember,
-        historyPoint,
-      } = await dashboardMemberMob({
-        userId,
-      });
+      const { listMember, pointLoyalty, dataOwner, historyPoint } =
+        await dashboardMemberMob({
+          userId,
+          isOwner: resultValid.isOwner,
+        });
 
       return NextResponse.json(
         {
-          userDetail,
-          currentPoint: pointLoyalty,
-          isOwner,
+          currentPoint: pointLoyalty || 0,
+          historyPoint,
           dataOwner,
           listMember,
-          historyPoint,
         },
         {
           status: 200,

@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
           email: user.email,
           createdAt: user.createdAt,
           previlege: isEqualRole,
-          roles: excBooth,
         };
 
         return NextResponse.json(

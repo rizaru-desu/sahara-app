@@ -2813,6 +2813,33 @@ const addDetailBoothOwner = async ({
   }
 };
 
+const findUserBooth = async ({ email }: { email: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findUser = await tx.user.findUnique({
+        where: { email },
+        select: { userId: true },
+      });
+
+      if (findUser) {
+        const findBooth = await tx.booth.findFirst({
+          where: { userId: findUser.userId },
+        });
+
+        if (findBooth) {
+          return { findUser, findBooth };
+        }
+
+        return { findUser };
+      }
+
+      return { findUser };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 /** END SECTION MOBILE */
 
 export {
@@ -2931,4 +2958,5 @@ export {
   newDeliveyOrderMob,
   findProductDRMob,
   addDetailBoothOwner,
+  findUserBooth,
 };

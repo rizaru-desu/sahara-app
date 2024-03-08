@@ -34,6 +34,7 @@ function validateSchema({ data }: { data: any }) {
 
 export async function POST(request: NextRequest) {
   try {
+    const baseURL = `${request.nextUrl.origin}`;
     const token = request.headers.get("Authorization") as any;
 
     const tokenWithoutBearer = token?.replace(/^Bearer\s+/i, "") || undefined;
@@ -54,11 +55,20 @@ export async function POST(request: NextRequest) {
     if (tokenValidated) {
       const { userId } = tokenValidated;
 
-      const { listMember, pointLoyalty, dataOwner, historyPoint } =
+      const { listMember, pointLoyalty, dataOwner, historyPoint, campaign } =
         await dashboardMemberMob({
           userId,
           isOwner: resultValid.isOwner,
         });
+
+      const resultCampaign = _.map(campaign, (item) => {
+        return Object.assign(
+          {
+            photo: `${baseURL}/api/controller/campaign-point/image/${item.campaignId}`,
+          },
+          _.omit(item, "photo")
+        );
+      });
 
       return NextResponse.json(
         {
@@ -66,6 +76,7 @@ export async function POST(request: NextRequest) {
           historyPoint,
           dataOwner,
           listMember,
+          campaign: resultCampaign,
         },
         {
           status: 200,

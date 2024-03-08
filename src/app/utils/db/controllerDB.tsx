@@ -2561,6 +2561,15 @@ const dashboardMemberMob = async ({
         where: { userId },
       });
 
+      const currentDate = new Date();
+      const campaign = await tx.campaign.findMany({
+        where: {
+          inActive: false,
+          startDate: { lte: currentDate },
+          endDate: { gte: currentDate },
+        },
+      });
+
       if (isOwner) {
         const dataOwner = await tx.boothOwner.findFirst({
           where: { userId },
@@ -2576,11 +2585,12 @@ const dashboardMemberMob = async ({
             pointLoyalty,
             dataOwner,
             historyPoint,
+            campaign,
           };
         }
       }
 
-      return { pointLoyalty, historyPoint };
+      return { pointLoyalty, historyPoint, campaign };
     });
   } catch (e: any) {
     throw new Error(e.message);

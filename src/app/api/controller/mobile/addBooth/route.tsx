@@ -1,16 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import { addDetailBoothOwner } from "@/app/utils/db/controllerDB";
+import { addUserBooth } from "@/app/utils/db/controllerDB";
 import z from "zod";
 import _ from "lodash";
 
 const Schema = z
   .object({
-    alamatOwner: z.string(),
-    instagram: z.string().optional(),
-    facebook: z.string().optional(),
-    ecommerce: z.string().optional(),
-    berdiriSejak: z.string(),
+    userId: z.string(),
+    boothOwnerId: z.string(),
+    email: z.string(),
+    alamatBooth: z.string(),
+    photoBooth: z.string(),
     createdBy: z.string(),
   })
   .strict();
@@ -57,20 +57,20 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { addBoothOwner } = await addDetailBoothOwner({
-        userId: tokenValidated.userId,
-        alamatOwner: resultValid.alamatOwner,
-        facebook: resultValid.facebook || undefined,
-        instagram: resultValid.instagram || undefined,
-        ecommerce: resultValid.ecommerce || undefined,
-        berdiriSejak: resultValid.berdiriSejak,
+      const photoBuffer = Buffer.from(resultValid.photoBooth, "base64");
+
+      await addUserBooth({
+        userId: resultValid.userId,
+        boothOwnerId: resultValid.boothOwnerId,
+        email: resultValid.email,
+        alamatBooth: resultValid.alamatBooth,
+        photoBooth: photoBuffer,
         createdBy: resultValid.createdBy,
       });
 
       return NextResponse.json(
         {
-          message: `Successfully saved.`,
-          data: addBoothOwner,
+          message: `Successfully add booth.`,
         },
         {
           status: 200,

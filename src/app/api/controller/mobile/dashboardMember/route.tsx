@@ -70,12 +70,21 @@ export async function POST(request: NextRequest) {
         );
       });
 
+      const resultListMember = _.map(listMember, (item: any) => {
+        return Object.assign(
+          {
+            photoBooth: `${baseURL}/api/controller/boothOwner/member/image/${item.photoBooth}`,
+          },
+          _.omit(item, "photoBooth")
+        );
+      });
+
       return NextResponse.json(
         {
           currentPoint: pointLoyalty || 0,
           historyPoint,
           dataOwner,
-          listMember,
+          listMember: resultListMember,
           campaign: resultCampaign,
         },
         {

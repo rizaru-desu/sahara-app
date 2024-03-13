@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       const resultListMember = _.map(listMember, (item: any) => {
         return Object.assign(
           {
-            photoBooth: `${baseURL}/api/controller/boothOwner/member/image/${item.photoBooth}`,
+            photoBooth: `${baseURL}/api/controller/boothOwner/member/image/${item.boothId}`,
           },
           _.omit(item, "photoBooth")
         );

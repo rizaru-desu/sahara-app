@@ -2595,6 +2595,20 @@ const dashboardMemberMob = async ({
   }
 };
 
+const deleteBooth = async ({ boothId }: { boothId: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const deleteBooth = await tx.booth.delete({
+        where: { boothId },
+      });
+
+      return { deleteBooth };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 const findDRMob = async ({ value }: { value: string }) => {
   try {
     return prisma.$transaction(async (tx) => {
@@ -2889,6 +2903,98 @@ const addUserBooth = async ({
   }
 };
 
+const addLoyaltyUser = async ({
+  userId,
+  label,
+  createdBy,
+}: {
+  userId: string;
+  label: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const existScan = await tx.logLoyalty.findMany({
+        where: { labelProduct: label, status: 1 },
+      });
+
+      if (_.isEmpty(existScan)) {
+        const findProduct = await tx.labelProduct.findFirst({
+          where: { labelCode: label },
+        });
+
+        if (!findProduct) {
+          throw new Error("The QR-Code is invalid...");
+        }
+
+        const product = await tx.product.findFirst({
+          where: { productId: findProduct.productId },
+        });
+        const currentDate = new Date();
+
+        const pointCampaign = await tx.campaign.findFirst({
+          where: {
+            campaignId: product?.campaignId || "",
+            inActive: false,
+            startDate: { lte: currentDate },
+            endDate: { gte: currentDate },
+          },
+        });
+
+        const loyaltyPoint = pointCampaign
+          ? pointCampaign.loyaltyPoint
+          : product?.basePoint;
+
+        const addPoint = await tx.loyaltyPoint.create({
+          data: {
+            userId,
+            loyaltyPoint,
+            createdBy,
+            log: {
+              create: {
+                userId,
+                loyaltyPoint: `+ ${String(loyaltyPoint)}`,
+                remark: "User add point product",
+                productId: findProduct.productId,
+                productCode: findProduct.productCode,
+                productName: findProduct.productName,
+                labelId: findProduct.labelId,
+                labelProducts: findProduct.labelCode,
+                scanDate: currentDate,
+                campaignId: pointCampaign?.campaignId || null,
+                createdBy,
+              },
+            },
+          },
+        });
+
+        await tx.logLoyalty.create({
+          data: { userId, labelProduct: label, status: 1 },
+        });
+
+        return { addPoint };
+      } else {
+        const findUser = await tx.logLoyalty.findFirst({
+          where: { userId },
+        });
+        if (!findUser) {
+          await tx.logLoyalty.create({
+            data: { userId, labelProduct: label, status: 2 },
+          });
+
+          throw new Error(
+            "Other users have already used the points in this product."
+          );
+        } else {
+          throw new Error("This product point was entered.");
+        }
+      }
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 /** END SECTION MOBILE */
 
 export {
@@ -3009,4 +3115,6 @@ export {
   addDetailBoothOwner,
   findUserBooth,
   addUserBooth,
+  deleteBooth,
+  addLoyaltyUser,
 };

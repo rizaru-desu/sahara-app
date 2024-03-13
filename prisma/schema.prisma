@@ -322,3 +322,18 @@ model runningNumber {
 
   @@index([id])
 }
+
+
+
+model logLoyalty {
+  id   String   @id @default(uuid()) @db.VarChar(255)
+  labelProduct String?  @db.VarChar(255)
+  userId     String?  @db.VarChar(255)
+  status     Int? 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  modifiedBy String?  @db.VarChar(255)
+  createdBy  String   @default("bySystem") @db.VarChar(255)
+
+  @@index([id])
+}

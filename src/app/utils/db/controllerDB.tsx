@@ -2575,7 +2575,7 @@ const dashboardMemberMob = async ({
           where: { userId },
         });
 
-        const listMember = await tx.booth.findFirst({
+        const listMember = await tx.booth.findMany({
           where: { boothOwnerId: dataOwner?.boothOwnerId },
         });
 

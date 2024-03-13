@@ -2575,19 +2575,17 @@ const dashboardMemberMob = async ({
           where: { userId },
         });
 
-        if (dataOwner) {
-          const listMember = await tx.booth.findFirst({
-            where: { boothOwnerId: dataOwner.boothOwnerId },
-          });
+        const listMember = await tx.booth.findFirst({
+          where: { boothOwnerId: dataOwner?.boothOwnerId },
+        });
 
-          return {
-            listMember,
-            pointLoyalty,
-            dataOwner,
-            historyPoint,
-            campaign,
-          };
-        }
+        return {
+          listMember,
+          pointLoyalty,
+          dataOwner,
+          historyPoint,
+          campaign,
+        };
       }
 
       return { pointLoyalty, historyPoint, campaign };

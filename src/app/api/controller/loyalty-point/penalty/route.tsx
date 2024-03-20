@@ -1,9 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { validateToken } from "@/app/utils/token/validate";
-import {
-  loyaltyPenaltyPoint,
-  loyaltySearch,
-} from "@/app/utils/db/controllerDB";
+import { loyaltyPenaltyPoint } from "@/app/utils/db/controllerDB";
 import _ from "lodash";
 import z from "zod";
 
@@ -60,7 +57,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (tokenValidated) {
-      const { result, resultLog } = await loyaltyPenaltyPoint({
+      const { penalty } = await loyaltyPenaltyPoint({
         pointId: resultValid.pointId,
         userId: resultValid.userId,
         point: resultValid.point,
@@ -71,7 +68,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          message: `The user ${result.userIdData?.fullname} received a penalty of ${resultLog.loyaltyPoint}.`,
+          message: `The user ${penalty.userIdData?.fullname} received a penalty of ${resultValid.loyaltyPoint}.`,
         },
         {
           status: 200,

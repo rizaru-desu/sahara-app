@@ -1790,25 +1790,34 @@ const loyaltyPenaltyPoint = async ({
   createdBy?: string;
 }) => {
   try {
-    const [resultLog, result] = await prisma.$transaction([
-      prisma.loyaltyPointLog.create({
-        data: { userId, pointId, loyaltyPoint, remark, createdBy },
-      }),
-      prisma.loyaltyPoint.update({
+    return prisma.$transaction(async (tx) => {
+      const findPointId = await tx.loyaltyPoint.findUnique({
         where: { pointId },
-        data: {
-          loyaltyPoint: point,
-          modifiedBy: createdBy,
-        },
-        include: {
-          userIdData: {
-            select: { fullname: true, email: true, phone: true },
-          },
-        },
-      }),
-    ]);
+      });
 
-    return { result, resultLog };
+      if (findPointId) {
+        let result = _.subtract(findPointId.loyaltyPoint, point);
+        const penalty = await tx.loyaltyPoint.update({
+          where: { pointId },
+          data: {
+            loyaltyPoint: _.max([result, 0]),
+            modifiedBy: createdBy,
+            log: {
+              create: { userId, loyaltyPoint, remark, createdBy },
+            },
+          },
+          include: {
+            userIdData: {
+              select: { fullname: true, email: true, phone: true },
+            },
+          },
+        });
+
+        return { penalty };
+      } else {
+        throw new Error("User point not found.");
+      }
+    });
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -2941,38 +2950,69 @@ const addLoyaltyUser = async ({
           },
         });
 
+        const existPoint = await tx.loyaltyPoint.findFirst({
+          where: { userId },
+        });
+
         const loyaltyPoint = pointCampaign
           ? pointCampaign.loyaltyPoint
           : product?.basePoint;
 
-        const addPoint = await tx.loyaltyPoint.create({
-          data: {
-            userId,
-            loyaltyPoint,
-            createdBy,
-            log: {
-              create: {
-                userId,
-                loyaltyPoint: `+ ${String(loyaltyPoint)}`,
-                remark: "User add point product",
-                productId: findProduct.productId,
-                productCode: findProduct.productCode,
-                productName: findProduct.productName,
-                labelId: findProduct.labelId,
-                labelProducts: findProduct.labelCode,
-                scanDate: currentDate,
-                campaignId: pointCampaign?.campaignId || null,
-                createdBy,
+        if (existPoint) {
+          await tx.loyaltyPoint.update({
+            where: { pointId: existPoint.pointId },
+            data: {
+              loyaltyPoint: _.add(
+                existPoint.loyaltyPoint,
+                Number(loyaltyPoint)
+              ),
+              log: {
+                create: {
+                  userId,
+                  loyaltyPoint: `+ ${String(loyaltyPoint)}`,
+                  remark: "User add point product",
+                  productId: findProduct.productId,
+                  productCode: findProduct.productCode,
+                  productName: findProduct.productName,
+                  labelId: findProduct.labelId,
+                  labelProducts: findProduct.labelCode,
+                  scanDate: currentDate,
+                  campaignId: pointCampaign?.campaignId || null,
+                  createdBy,
+                },
               },
             },
-          },
-        });
+          });
+        } else {
+          await tx.loyaltyPoint.create({
+            data: {
+              userId,
+              loyaltyPoint,
+              createdBy,
+              log: {
+                create: {
+                  userId,
+                  loyaltyPoint: `+ ${String(loyaltyPoint)}`,
+                  remark: "User add point product",
+                  productId: findProduct.productId,
+                  productCode: findProduct.productCode,
+                  productName: findProduct.productName,
+                  labelId: findProduct.labelId,
+                  labelProducts: findProduct.labelCode,
+                  scanDate: currentDate,
+                  campaignId: pointCampaign?.campaignId || null,
+                  createdBy,
+                },
+              },
+            },
+          });
+        }
 
         await tx.logLoyalty.create({
           data: { userId, labelProduct: label, status: 1 },
         });
 
-        return { addPoint };
+        return null;
       } else {
         const findUser = await tx.logLoyalty.findFirst({
           where: { userId },

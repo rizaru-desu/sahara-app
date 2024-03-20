@@ -67,7 +67,6 @@ export default function Home() {
         setLoading(false);
         setListPoint(topTenPoint);
         setListCampaign(activeCampaign);
-        console.log(topTenPoint);
         setDetailUsers(userDetail);
       }
     } catch (e: any) {

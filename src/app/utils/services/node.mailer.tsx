@@ -32,7 +32,6 @@ export default async function sendMailer({
 
     return info;
   } catch (error: any) {
-    console.log(error);
     throw new Error(error.message);
   }
 }

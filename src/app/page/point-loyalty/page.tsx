@@ -46,6 +46,16 @@ export default function Home() {
     loyaltyPoint: "",
     remark: "",
   });
+
+  const [rangeOpen, setRangeOpen] = React.useState<boolean>(false);
+  const [rangeDate, setRangeDate] = React.useState<any[]>([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+
   const [userCurrentPoint, setUserCurrentPoint] =
     React.useState<any>(undefined);
 
@@ -189,7 +199,7 @@ export default function Home() {
       const responseApi = await authService.addPenaltyLoyalty({
         pointId: userCurrentPoint.pointId,
         userId: userCurrentPoint.userId,
-        point: _.subtract(userCurrentPoint.loyaltyPoint, penaltyInput.point),
+        point: Number(penaltyInput.point),
         loyaltyPoint: `-${penaltyInput.point}`,
         remarks: penaltyInput.remark,
         createdBy: detailUsers.fullname,
@@ -252,11 +262,24 @@ export default function Home() {
 
         <Suspense fallback={<Loading />}>
           <div className="p-4 xl:ml-80 gap-12 min-h-screen">
-            <Search
-              onSearch={({ value }) => {
-                searchLoyalty({ value });
-              }}
-            />
+            <div className="flex flex-row gap-10 items-center justify-between">
+              <Search
+                onSearch={({ value }) => {
+                  searchLoyalty({ value });
+                }}
+              />
+
+              <button
+                type="button"
+                className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  setRangeOpen(true);
+                }}
+              >
+                Export log points by date range
+              </button>
+            </div>
 
             <div className="w-auto h-[700px]">
               <DataGrid
@@ -313,7 +336,7 @@ export default function Home() {
                     field: "fullname",
                     headerName: "Fullname",
                     minWidth: 250,
-                    align: "left",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
@@ -329,7 +352,7 @@ export default function Home() {
                     field: "phone",
                     headerName: "Phone",
                     minWidth: 250,
-                    align: "left",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
@@ -338,13 +361,14 @@ export default function Home() {
                     field: "loyaltyPoint",
                     headerName: "Loyalty Point",
                     minWidth: 250,
-                    align: "right",
+                    align: "center",
                     headerAlign: "center",
                     editable: false,
                   },
                   {
                     field: "createdBy",
                     headerName: "Created By",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -352,6 +376,7 @@ export default function Home() {
                   {
                     field: "createdAt",
                     headerName: "Created At",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -361,6 +386,7 @@ export default function Home() {
                   {
                     field: "modifiedBy",
                     headerName: "Modified By",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -368,6 +394,7 @@ export default function Home() {
                   {
                     field: "modifedAt",
                     headerName: "Modifed At",
+                    align: "center",
                     headerAlign: "center",
                     minWidth: 250,
                     editable: false,
@@ -456,6 +483,49 @@ export default function Home() {
                   className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:bg-red-300"
                 >
                   Submit Penalty
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog
+            open={rangeOpen}
+            onClose={() => {
+              setRangeOpen(false);
+            }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogContent className="bg-white w-full justify-center items-center gap-5 max-w-3xl mx-auto px-4 lg:px-6 py-8 shadow-md rounded-md flex flex-col">
+              <DateRange
+                editableDateInputs={false}
+                onChange={(item) => setRangeDate([item.selection])}
+                moveRangeOnFirstSelection={false}
+                ranges={rangeDate}
+                minDate={moment().subtract(90, "days").toDate()}
+              />
+
+              <div className="flex flex-row gap-5">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setRangeOpen(false);
+                    //searchStockRange();
+                  }}
+                  className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:bg-red-300"
+                >
+                  Download
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setRangeOpen(false);
+                  }}
+                  className="flex justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:bg-red-300"
+                >
+                  Cancel
                 </button>
               </div>
             </DialogContent>

@@ -61,8 +61,6 @@ export async function POST(request: NextRequest) {
     if (user) {
       if (!user?.inActive) {
         if (!_.isEmpty(isEqualRole)) {
-          console.log(resultValid.password, user?.password);
-
           const generateTokens = await generateToken({
             userId: user?.userId,
             userPassword: resultValid.password,

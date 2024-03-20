@@ -65,18 +65,6 @@ export async function POST(request: NextRequest) {
         },
       ];
 
-      console.log(
-        _.map(resultValid.data.productList, (product) => {
-          return {
-            shipQty: product.shipQty,
-            labelBox: product.labelBox,
-            labelBoxId: product.labelBoxId,
-            stockId: product.stockId,
-            createdBy: resultValid.createdBy,
-            statusProduct: product.status,
-          };
-        })
-      );
       const { createDR } = await newDeliveyOrderMob({
         noSurat: resultValid.data.noSurat,
         orderNo: String(resultValid.data.noOrder),

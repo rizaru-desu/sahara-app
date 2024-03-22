@@ -438,7 +438,9 @@ export default function Home() {
                       value={scanValue}
                       onSearch={({ value }) => {
                         setScanValue(value);
-                        scanProducts({ value });
+                        setTimeout(() => {
+                          scanProducts({ value });
+                        }, 3000);
                       }}
                     />
                   ) : (

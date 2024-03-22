@@ -9,7 +9,7 @@ const Schema = z
     alamatOwner: z.string(),
     instagram: z.string().optional(),
     facebook: z.string().optional(),
-    ecommerce: z.string().optional(),
+    eCommerce: z.string().optional(),
     berdiriSejak: z.string(),
     createdBy: z.string(),
   })
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         alamatOwner: resultValid.alamatOwner,
         facebook: resultValid.facebook || undefined,
         instagram: resultValid.instagram || undefined,
-        ecommerce: resultValid.ecommerce || undefined,
+        ecommerce: resultValid.eCommerce || undefined,
         berdiriSejak: resultValid.berdiriSejak,
         createdBy: resultValid.createdBy,
       });

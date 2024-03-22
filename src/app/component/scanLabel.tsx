@@ -32,9 +32,14 @@ function ScanLabel({ onSearch, value }: Props) {
         }}
         onChange={(e) => {
           const { value } = e.target;
-          setTimeout(() => {
+          if (_.size(value) >= 3) {
             onSearch({ value });
-          }, 3000);
+          } else {
+            toastMessage({
+              message: "Minimum of 3 letters",
+              type: "error",
+            });
+          }
         }}
       />
     </div>

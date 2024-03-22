@@ -8,6 +8,7 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  InputAdornment,
   Pagination,
   Switch,
   TextField,
@@ -25,6 +26,7 @@ import Search from "@/app/component/search";
 import moment from "moment";
 import * as XLSX from "xlsx";
 import ScanLabel from "@/app/component/scanLabel";
+import { FaSearch } from "react-icons/fa";
 
 export default function Home() {
   const router = useRouter();
@@ -434,15 +436,43 @@ export default function Home() {
                   </div>
 
                   {scanOpen ? (
-                    <ScanLabel
-                      value={scanValue}
-                      onSearch={({ value }) => {
-                        setScanValue(value);
-                        setTimeout(() => {
-                          scanProducts({ value });
-                        }, 3000);
-                      }}
-                    />
+                    <div className="flex items-center m-[2px] mb-3">
+                      <TextField
+                        name="value"
+                        id="value"
+                        label="Scan"
+                        type={"text"}
+                        size="small"
+                        InputLabelProps={{ shrink: true }}
+                        variant="outlined"
+                        value={scanValue}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <button className="text-black" type="submit">
+                                <FaSearch size={20} />
+                              </button>
+                            </InputAdornment>
+                          ),
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.keyCode === 13 || e.key === "Enter") {
+                            if (_.size(scanValue) >= 3) {
+                              scanProducts({ value: scanValue });
+                            } else {
+                              toastMessage({
+                                message: "Minimum of 3 letters",
+                                type: "error",
+                              });
+                            }
+                          }
+                        }}
+                        onChange={(e) => {
+                          const { value } = e.target;
+                          setScanValue(e.target.value);
+                        }}
+                      />
+                    </div>
                   ) : (
                     <Search
                       onSearch={({ value }) => {

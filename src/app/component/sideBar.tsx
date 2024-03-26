@@ -11,6 +11,7 @@ import {
   FaWarehouse,
   FaBoxOpen,
 } from "react-icons/fa";
+import { GiWantedReward } from "react-icons/gi";
 import { FaBoxesPacking } from "react-icons/fa6";
 import { RiMoneyEuroCircleFill } from "react-icons/ri";
 import { useRouter } from "next/navigation";
@@ -71,6 +72,16 @@ function SideBar({
         href: "/page/point-campaign",
         header: false,
         icon: <FaCog size={25} color={"#fff"} />,
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "548c0702-cc0e-11ee-8e87-38f9d362e2c9", //Admin Marketing
+        ],
+      },
+      {
+        title: "Package Redeem",
+        href: "/page/package-redeem",
+        header: false,
+        icon: <GiWantedReward size={25} color={"#fff"} />,
         roles: [
           "d4ead12a-564e-4f32-b5bb-84ccd253f904",
           "548c0702-cc0e-11ee-8e87-38f9d362e2c9", //Admin Marketing
@@ -144,6 +155,16 @@ function SideBar({
         roles: [
           "d4ead12a-564e-4f32-b5bb-84ccd253f904",
           "548c0702-cc0e-11ee-8e87-38f9d362e2c9", //Admin Marketing
+        ],
+      },
+      {
+        title: "Claim Redeem",
+        href: "/page/claim-redeem",
+        header: false,
+        icon: <FaCog size={25} color={"#fff"} />,
+        roles: [
+          "d4ead12a-564e-4f32-b5bb-84ccd253f904",
+          "e2848066-e8fb-11ee-b4f6-38f9d362e2c9", //Agent Redeem
         ],
       },
     ],

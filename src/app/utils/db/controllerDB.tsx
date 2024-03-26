@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import _ from "lodash";
 import moment from "moment";
+import { nanoid } from "nanoid";
 
 interface paginations {
   skip: number;
@@ -2391,6 +2392,434 @@ const orderDeliveryRecaive = async ({
 
 /** END SECTION DELIVERY ORDER */
 
+/** SECTION REEDEM PACKAGE */
+const addPackageReedem = async ({
+  packageName,
+  packageDesc,
+  point,
+  photo,
+  limit,
+  createdBy,
+}: {
+  packageName: string;
+  packageDesc: string;
+  point: number;
+  photo: any;
+  limit?: number;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const PackageRedem = await tx.packageReedem.create({
+        data: {
+          packageName,
+          packageDesc,
+          point,
+          photo,
+          limit,
+          createdBy,
+        },
+      });
+
+      return PackageRedem;
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const updatePackageReedem = async ({
+  packageId,
+  packageName,
+  packageDesc,
+  point,
+  photo,
+  limit,
+  createdBy,
+}: {
+  packageId: string;
+  packageName: string;
+  packageDesc: string;
+  point: number;
+  photo?: any;
+  limit?: number;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const PackageRedem = await tx.packageReedem.update({
+        where: { packageId },
+        data: {
+          packageName,
+          packageDesc,
+          point,
+          photo,
+          limit,
+          modifiedBy: createdBy,
+        },
+      });
+
+      return PackageRedem;
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const inActivePackageReedem = async ({
+  packageId,
+  value,
+  createdBy,
+}: {
+  packageId: string;
+  value: boolean;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const PackageRedem = await tx.packageReedem.update({
+        where: { packageId },
+        data: {
+          inActive: value,
+          modifiedBy: createdBy,
+        },
+      });
+
+      return PackageRedem;
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const claimPackageReedem = async ({
+  agentId,
+  reedemId,
+  createdBy,
+}: {
+  agentId: string;
+  reedemId: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const agent = await tx.agent.findUnique({ where: { agentId } });
+      const packageRedem = await tx.redeem.update({
+        where: { reedemId },
+        data: {
+          status: 2,
+          modifiedBy: createdBy,
+        },
+      });
+
+      return { packageRedem, agent };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const claimUserPackage = async ({
+  agentId,
+  userId,
+  packageId,
+  createdBy,
+}: {
+  agentId: string;
+  userId: string;
+  packageId: string;
+  createdBy: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findPoint = await tx.loyaltyPoint.findFirst({
+        where: { userId },
+      });
+
+      const findUser = await tx.user.findFirst({
+        where: { userId },
+      });
+
+      const findPackage = await tx.packageReedem.findUnique({
+        where: { packageId },
+      });
+
+      const findAgent = await tx.agent.findUnique({ where: { agentId } });
+
+      if (findPoint && findPackage) {
+        if (findPoint.loyaltyPoint >= findPackage.point) {
+          const findReedemUser = await tx.redeem.findMany({
+            where: {
+              userId,
+              packageId,
+            },
+          });
+
+          if (_.size(findReedemUser) === findPackage.limit) {
+            throw new Error("This package reedem is limit");
+          } else {
+            const createRedeem = await tx.redeem.create({
+              data: {
+                userId,
+                fullname: findUser?.fullname,
+                email: findUser?.email,
+                phone: findUser?.phone,
+                packageId,
+                packageName: findPackage.packageName,
+                redemCode: nanoid(8),
+                status: 1,
+                createdBy,
+                agentId: agentId,
+              },
+            });
+
+            const updatePoint = await tx.loyaltyPoint.update({
+              where: { pointId: findPoint.pointId },
+              data: {
+                loyaltyPoint: _.subtract(
+                  findPoint.loyaltyPoint,
+                  findPackage.point
+                ),
+                log: {
+                  create: {
+                    userId,
+                    loyaltyPoint: `- ${String(findPackage.point)}`,
+                    remark: `Reedem ${findPackage.packageName}`,
+                    modifiedBy: createdBy,
+                  },
+                },
+              },
+            });
+
+            return { createRedeem, updatePoint, findAgent };
+          }
+        }
+      }
+
+      return { findPoint, findPackage, findAgent };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const pageAllPackageRedeem = async ({ userId, skip, take }: pageAll) => {
+  try {
+    const [detail, allPackage, totalPackage] = await prisma.$transaction([
+      prisma.user.findUnique({
+        where: { userId },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
+      }),
+      prisma.packageReedem.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.packageReedem.count(),
+    ]);
+
+    return { detail, allPackage, totalPackage };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const packageRedeemPagination = async ({ skip, take }: paginations) => {
+  try {
+    const [result, count] = await prisma.$transaction([
+      prisma.packageReedem.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.packageReedem.count(),
+    ]);
+
+    return { result, count };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const redeemPagination = async ({
+  skip,
+  take,
+  userId,
+}: {
+  skip: number;
+  take: number;
+  userId: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const detail = await tx.user.findUnique({
+        where: { userId },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
+      });
+
+      const agentId = await tx.agent.findFirst({
+        where: { email: { contains: detail?.email } },
+      });
+
+      const result = await tx.redeem.findMany({
+        where: { agentId: agentId?.agentId },
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      });
+
+      const count = await tx.redeem.count({
+        where: { agentId: agentId && agentId.agentId },
+      });
+
+      const statusMap = await tx.stringMap.findMany({
+        where: { objectName: "Status Redeem" },
+        orderBy: { key: "asc" },
+      });
+
+      return { detail, result, count, statusMap };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const pageAllAgentRedeem = async ({ userId, skip, take }: pageAll) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const detail = await tx.user.findUnique({
+        where: { userId },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
+      });
+
+      const agentId = await tx.agent.findFirst({
+        where: { email: { contains: detail?.email } },
+      });
+
+      const allRedeem = await tx.redeem.findMany({
+        where: { agentId: agentId?.agentId },
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      });
+
+      const totalRedeem = await tx.redeem.count({
+        where: { agentId: agentId && agentId.agentId },
+      });
+
+      const statusMap = await tx.stringMap.findMany({
+        where: { objectName: "Status Redeem" },
+        orderBy: { key: "asc" },
+      });
+
+      return { detail, allRedeem, totalRedeem, statusMap };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const agentRedeemSearch = async ({
+  value,
+  userId,
+}: {
+  value: string;
+  userId: string;
+}) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const detail = await tx.user.findUnique({
+        where: { userId },
+        select: {
+          userId: true,
+          fullname: true,
+          inActive: true,
+          email: true,
+          leader: true,
+          roles: { select: { stringId: true } },
+        },
+      });
+
+      const agentId = await tx.agent.findFirst({
+        where: { email: { contains: detail?.email } },
+      });
+
+      const result = await tx.redeem.findMany({
+        where: { agentId: agentId?.agentId, redemCode: { contains: value } },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const statusMap = await tx.stringMap.findMany({
+        where: { objectName: "Status Redeem" },
+        orderBy: { key: "asc" },
+      });
+
+      return { detail, result, statusMap };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const packageRedeemSearch = async ({ value }: valueSearch) => {
+  try {
+    const [result, statusMap] = await prisma.$transaction([
+      prisma.packageReedem.findMany({
+        where: {
+          OR: [{ packageName: { contains: value } }],
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.stringMap.findMany({
+        where: { objectName: "Redeem Agent" },
+        orderBy: { key: "asc" },
+      }),
+    ]);
+
+    return { result, statusMap };
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const packageImage = async ({ packageId }: { packageId: string }) => {
+  try {
+    const [result] = await prisma.$transaction([
+      prisma.packageReedem.findUnique({
+        where: { packageId },
+        select: { photo: true },
+      }),
+    ]);
+
+    return result;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+/** END SECTION REEDEM PACKAGE */
+
 /** SECTION MOBILE */
 const forgotPasswordUser = async ({
   email,
@@ -3035,6 +3464,64 @@ const addLoyaltyUser = async ({
   }
 };
 
+const dashboardPackageRedeem = async ({ userId }: { userId: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const findPoint = await tx.loyaltyPoint.findFirst({ where: { userId } });
+      const getPackage = await tx.packageReedem.findMany({
+        where: {
+          inActive: false,
+        },
+      });
+      const getRedeem = await tx.redeem.findMany({
+        where: {
+          userId,
+        },
+      });
+
+      return { findPoint, getPackage, getRedeem };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const dashboardmyRedeem = async ({ userId }: { userId: string }) => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const getRedeem = await tx.redeem.findMany({
+        where: {
+          userId,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const statusMap = await tx.stringMap.findMany({
+        where: { objectName: "Status Redeem" },
+        orderBy: { key: "asc" },
+      });
+
+      const manyAgent = await tx.agent.findMany();
+
+      return { getRedeem, statusMap, manyAgent };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+const listAgentMobile = async () => {
+  try {
+    return prisma.$transaction(async (tx) => {
+      const getAgent = await tx.agent.findMany();
+
+      return { getAgent };
+    });
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
 /** END SECTION MOBILE */
 
 export {
@@ -3139,6 +3626,19 @@ export {
   orderDeliveryRecaive,
   orderDeliveryCancel,
 
+  /** Package Redem */
+  pageAllPackageRedeem,
+  packageRedeemSearch,
+  packageImage,
+  packageRedeemPagination,
+  inActivePackageReedem,
+  addPackageReedem,
+  updatePackageReedem,
+  agentRedeemSearch,
+  pageAllAgentRedeem,
+  redeemPagination,
+  claimPackageReedem,
+
   /** Mobile */
   detailUserMob,
   forgotPasswordUser,
@@ -3157,4 +3657,8 @@ export {
   addUserBooth,
   deleteBooth,
   addLoyaltyUser,
+  dashboardPackageRedeem,
+  dashboardmyRedeem,
+  claimUserPackage,
+  listAgentMobile,
 };

@@ -1029,6 +1029,126 @@ export class Services {
   };
 
   /** END SECTION DELIVERY ORDER*/
+
+  /** SECTION PACKAGE REDEM*/
+  addPackageRedeem = async ({ formData }: { formData: any }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/packageRedeem/add-package",
+      formData
+    );
+
+    return response;
+  };
+
+  editPackageRedeem = async ({ formData }: { formData: any }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/packageRedeem/edit-package",
+      formData
+    );
+
+    return response;
+  };
+
+  getPagePackageRedem = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/packageRedeem/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getPackageRedem = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/packageRedeem/all-package",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  searchPackage = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/packageRedeem/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  activePackage = async ({
+    packageId,
+    value,
+    createdBy,
+  }: {
+    packageId: string;
+    value: boolean;
+    createdBy: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/packageRedeem/update-active",
+      { packageId, value, createdBy }
+    );
+
+    return response;
+  };
+  /** END SECTION PACKAGE REDEM*/
+
+  getPageAgentRedeem = async ({
+    skip,
+    take,
+  }: {
+    skip: number;
+    take: number;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/agentRedeem/",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  getAgentRedeem = async ({ skip, take }: { skip: number; take: number }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/agentRedeem/all-redeem",
+      { skip, take }
+    );
+
+    return response;
+  };
+
+  searchAgentRedeem = async ({ value }: { value: string }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/agentRedeem/search",
+      { value }
+    );
+
+    return response;
+  };
+
+  claimRedeemAgent = async ({
+    redeemId,
+    agentId,
+    createdBy,
+  }: {
+    redeemId: string;
+    agentId: string;
+    createdBy: string;
+  }) => {
+    const response: AxiosResponse<any> = await this.instance.post(
+      "api/controller/agentRedeem/claim-redeem",
+      { redeemId, agentId, createdBy }
+    );
+
+    return response;
+  };
 }
 
 interface AgentInput {

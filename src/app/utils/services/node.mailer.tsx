@@ -16,19 +16,23 @@ const transporter = nodemailer.createTransport({
 export default async function sendMailer({
   send,
   subject,
+  cc,
   html,
 }: {
   send: string;
   subject: string;
+  cc?: string;
   html: any;
 }) {
   try {
     const info = await transporter.sendMail({
       from: '"no-reply" <no-reply@saharabogatama.co.id>',
+      cc: cc,
       to: send,
       subject: subject,
       html: html, // use the html parameter passed to the function
     });
+    console.log(info);
 
     return info;
   } catch (error: any) {
